@@ -10,7 +10,7 @@ Catalogue guidé de plugs et viewer Three.js photoréaliste avec matériaux mét
 `C:\Users\charl\Documents\CONFIGURATEUR DE BIJIOUX`
 
 ## Branche Git
-`master` ; commit local de publication `0fefb24`.
+`master`, suivi de `origin/master` sur https://github.com/rsbds-3d/configurateur ; dernier commit fonctionnel et documentaire vérifié `5158d83` avant clôture du journal.
 
 ## Version actuelle
 `v0.3-260902` (`VERSION` = `0.3`)
@@ -37,9 +37,12 @@ La version `v0.3-260902` possède un véritable lanceur Windows EXE avec serveur
 - Installateur Inno Setup v0.3 généré, puis application désinstallée/réinstallée et démarrée depuis `Program Files`.
 - Logo officiel ROSEBUDS maintenu dans le viewer 3D et en mode AR.
 - Commit local `0fefb24` préparé avec 278 fichiers publiables, sans fichier dépassant 100 Mo.
+- Dépôt public, site GitHub Pages et Release `v0.3-260902` publiés avec succès.
+- Site en ligne : https://rsbds-3d.github.io/configurateur/
+- Release Windows : https://github.com/rsbds-3d/configurateur/releases/tag/v0.3-260902
 
 ## Travail en cours
-Publication de l'installateur v0.3 dans les Releases GitHub. Le code et le site GitHub Pages sont déjà en ligne.
+Aucun travail bloquant en cours pour la version v0.3. Le site, le code source et l'installateur sont publiés.
 
 ## Décisions prises
 - Le lancer de rayons reste limité au maillage de la pierre via BVH.
@@ -84,13 +87,15 @@ Tests unitaires et de non-régression Node, plus vérification visuelle navigate
 - Suite complète de 21 tests réussie, aucun échec. L'EXE a été vérifié comme propriétaire du port 8080; la connexion web a été validée puis le catalogue chargé.
 - Installateur v0.3 et installation dans `C:\Program Files\Configurateur de Bijoux Rosebuds` vérifiés, avec raccourci ciblant directement l'EXE et réponse HTTP 200.
 - Installateur final : 22 186 804 octets, SHA-256 `4D466DA857035016B2E78C0D324A2B0FEF74D96DD9443F0425C45AB26CB7D787`.
+- Déploiement GitHub Pages final `33638429158` réussi sur le commit `5158d83`.
+- Release GitHub non brouillon et non préversion vérifiée, avec digest de l'installateur identique au fichier local.
 
 ## Tests restant à faire
 Validation visuelle du flux caméra AR sur un appareil réel après autorisation utilisateur, puis profilage mobile prolongé avec plusieurs modèles complexes affichés simultanément.
 
 ## Prochaines actions prioritaires
-1. Publier l'installateur v0.3 dans une Release GitHub.
-2. Tester l'authentification puis le viewer du site public depuis un second appareil.
+1. Tester l'authentification puis le viewer du site public depuis un second appareil.
+2. Profiler le temps de construction BVH sur les modèles les plus lourds.
 3. Mettre en place une authentification côté serveur si la confidentialité des modèles doit devenir une exigence forte.
 
 ## Interdictions / points de vigilance
