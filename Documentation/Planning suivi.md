@@ -21,7 +21,7 @@ Version : **v0.3-260902**
 | 2026-09-02 | Remplacement du lanceur BAT par un véritable EXE Windows avec serveur local intégré | Terminé et testé | Non mesurée |
 | 2026-09-02 | Séparation du paquet web autonome et de l'application de bureau | Terminé et testé | Non mesurée |
 | 2026-09-02 | Écran d'identification de la version en ligne avant chargement du catalogue | Terminé et testé | Non mesurée |
-| 2026-09-02 | Préparation du workflow de publication GitHub Pages | Terminé ; publication distante bloquée par l'indisponibilité de `github.com:443` | Non mesurée |
+| 2026-09-02 | Préparation et publication du dépôt public et du site GitHub Pages | Terminé et vérifié en HTTPS | Non mesurée |
 | 2026-09-02 | Compilation de l'EXE, génération de l'installateur v0.3, réinstallation et contrôle du serveur intégré | Terminé et testé | Non mesurée |
 | 2026-09-02 | Maintien du logo officiel ROSEBUDS dans le viewer 3D et en AR | Terminé et testé | Non mesurée |
 

@@ -70,6 +70,6 @@ Le viewer est un rendu temps réel WebGL. Il simule plusieurs phénomènes optiq
 
 ## Version en ligne
 
-La version publiée sur GitHub Pages est indépendante de l'installation Windows mais fournit le même catalogue, les mêmes modèles, matériaux, fonctions 3D et fonctions AR. Elle demande un identifiant et un mot de passe avant de charger l'application. L'autorisation est mémorisée uniquement pendant la session de l'onglet.
+La version publiée à l'adresse https://rsbds-3d.github.io/configurateur/ est indépendante de l'installation Windows mais fournit le même catalogue, les mêmes modèles, matériaux, fonctions 3D et fonctions AR. Elle demande un identifiant et un mot de passe avant de charger l'application. L'autorisation est mémorisée uniquement pendant la session de l'onglet.
 
 GitHub Pages étant statique, cette barrière protège l'accès normal à l'interface mais pas les fichiers contre une personne capable d'inspecter directement le dépôt ou les URL. Une authentification côté serveur reste nécessaire pour une confidentialité forte.

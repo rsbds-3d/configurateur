@@ -4,6 +4,9 @@ Version actuelle : **v0.3-260902**
 
 Configurateur de plugs Rosebuds avec catalogue guidé, import de modèles Rhino 3DM, matériaux métalliques PBR, pierres transparentes avec shader optique BVH et mode caméra AR.
 
+- Site en ligne : https://rsbds-3d.github.io/configurateur/
+- Code source : https://github.com/rsbds-3d/configurateur
+
 ## Application Windows
 
 L'application se lance avec le véritable exécutable :
@@ -32,7 +35,7 @@ Génération locale :
 ./online/build-online.ps1
 ```
 
-Le site généré se trouve dans `online/dist/`. Le workflow `.github/workflows/deploy-pages.yml` le publie sur GitHub Pages à chaque envoi sur la branche `master`.
+Le site généré se trouve dans `online/dist/`. Le workflow `.github/workflows/deploy-pages.yml` le publie sur GitHub Pages à chaque envoi sur la branche `master`, à l'adresse https://rsbds-3d.github.io/configurateur/.
 
 La barrière d'accès GitHub Pages est exécutée côté navigateur. Elle empêche l'accès normal à l'interface mais ne remplace pas une authentification serveur. Pour protéger également les fichiers et modèles contre un accès direct, le site devra être placé derrière Cloudflare Access ou un hébergement disposant d'une authentification côté serveur.
 

@@ -39,7 +39,7 @@ La version `v0.3-260902` possède un véritable lanceur Windows EXE avec serveur
 - Commit local `0fefb24` préparé avec 278 fichiers publiables, sans fichier dépassant 100 Mo.
 
 ## Travail en cours
-La publication GitHub distante reste à finaliser. Tout le livrable local est compilé, testé et réinstallé.
+Publication de l'installateur v0.3 dans les Releases GitHub. Le code et le site GitHub Pages sont déjà en ligne.
 
 ## Décisions prises
 - Le lancer de rayons reste limité au maillage de la pierre via BVH.
@@ -72,7 +72,7 @@ La publication GitHub distante reste à finaliser. Tout le livrable local est co
 ## Problèmes connus
 - Les premières constructions BVH de maillages complexes peuvent prendre du temps et restent synchrones ; une progression par étapes et en pourcentage rend désormais cette attente visible.
 - La fidélité d'une polysurface Rhino dépend du maillage de rendu embarqué dans le 3DM.
-- GitHub est actuellement injoignable depuis la machine sur `github.com:443`, dans GitHub CLI comme dans le navigateur intégré. Les jetons GitHub enregistrés sont en outre expirés ; une reconnexion sera nécessaire lorsque le réseau sera rétabli.
+- Le contrôle d'accès GitHub Pages est exécuté côté navigateur et ne protège pas les modèles contre une personne utilisant directement le dépôt public ou les URL des ressources.
 
 ## Tests réalisés
 Tests unitaires et de non-régression Node, plus vérification visuelle navigateur du catalogue et du viewer.
@@ -83,15 +83,15 @@ Tests unitaires et de non-régression Node, plus vérification visuelle navigate
 - Contrôle visuel du XXXL 100 confirmé : corps en aluminium rose, petite pierre verte rendue par le shader optique.
 - Suite complète de 21 tests réussie, aucun échec. L'EXE a été vérifié comme propriétaire du port 8080; la connexion web a été validée puis le catalogue chargé.
 - Installateur v0.3 et installation dans `C:\Program Files\Configurateur de Bijoux Rosebuds` vérifiés, avec raccourci ciblant directement l'EXE et réponse HTTP 200.
-- Installateur final : 22 187 286 octets, SHA-256 `9CD562D7C1160F721482996C385E6C3E8F3941C0346A66B0ACEFEF3EDBD897BA`.
+- Installateur final : 22 186 804 octets, SHA-256 `4D466DA857035016B2E78C0D324A2B0FEF74D96DD9443F0425C45AB26CB7D787`.
 
 ## Tests restant à faire
 Validation visuelle du flux caméra AR sur un appareil réel après autorisation utilisateur, puis profilage mobile prolongé avec plusieurs modèles complexes affichés simultanément.
 
 ## Prochaines actions prioritaires
-1. Rétablir l'accès HTTPS à `github.com`, puis reconnecter GitHub CLI.
-2. Vérifier les possibilités GitHub Pages privées de l'organisation `rsbds-3d` avant de créer le dépôt, afin de ne pas exposer les modèles propriétaires.
-3. Créer le dépôt distant, pousser `master`, activer Pages et publier l'installateur v0.3 comme livrable GitHub.
+1. Publier l'installateur v0.3 dans une Release GitHub.
+2. Tester l'authentification puis le viewer du site public depuis un second appareil.
+3. Mettre en place une authentification côté serveur si la confidentialité des modèles doit devenir une exigence forte.
 
 ## Interdictions / points de vigilance
 - Ne pas remplacer le shader BVH par un simple MeshPhysicalMaterial pour les pierres transparentes.
@@ -100,4 +100,4 @@ Validation visuelle du flux caméra AR sur un appareil réel après autorisation
 - Ne pas réintroduire un fond vidéo HTML sous un canvas transparent en AR : cela assombrit notamment les métaux noirs.
 
 ## Dernière demande utilisateur
-Continuer la mise à jour avec un véritable EXE, une version web indépendante mais fonctionnellement identique, protégée à l'entrée, puis publier l'application sur `https://github.com/rsbds-3d`.
+Fournir le lien du site en ligne après publication sur `https://github.com/rsbds-3d/configurateur`, et conserver le logo officiel ROSEBUDS dans le viewer 3D final.
