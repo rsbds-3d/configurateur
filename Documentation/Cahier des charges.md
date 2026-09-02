@@ -59,6 +59,7 @@ Modèles Classiques `Avec tête` validés : `LARGE 35`, `MEDIUM`, `SMALL 18`, `S
 - Interface responsive et panneau réduit par défaut.
 - Texte français correctement encodé en UTF-8.
 - Version visible dans l'interface.
+- Logo officiel ROSEBUDS visible sur l'accueil et dans le viewer 3D, avec contraste adapté au fond, y compris en AR.
 - Pas d'éléments non-plugs dans la bibliothèque produit.
 - Application Windows lancée par un véritable EXE autonome, sans appel à un BAT ni dépendance à Node.js.
 - Version web générée et publiée indépendamment de l'application Windows, avec parité fonctionnelle.

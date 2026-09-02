@@ -347,6 +347,17 @@ body.is-thumbnail-capture #jewel-canvas {
     0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
+.viewer-rosebuds-logo {
+  display: block;
+  width: min(190px, 42vw);
+  height: auto;
+  margin: 0 0 14px;
+  object-fit: contain;
+  object-position: left center;
+  filter: brightness(0) invert(1) drop-shadow(0 2px 10px rgba(0, 0, 0, 0.72));
+  mix-blend-mode: difference;
+}
+
 .eyebrow {
   margin: 0 0 8px;
   color: var(--gold);
@@ -1578,6 +1589,11 @@ canvas.is-decal-dragging {
     margin-bottom: 8px;
     font-size: clamp(0.64rem, 2.3vw, 0.82rem);
     line-height: 1.35;
+  }
+
+  .viewer-rosebuds-logo {
+    width: min(138px, 38vw);
+    margin-bottom: 8px;
   }
 
   h1 {

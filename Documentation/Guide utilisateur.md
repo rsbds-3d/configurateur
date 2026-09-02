@@ -44,6 +44,7 @@ Les noms de couleurs de cristal conservent leur appellation commerciale d'origin
 - Clic droit sur une pièce : matériaux compatibles.
 - Double-clic sur un objet : zoom sur la sélection.
 - Bouton en haut à droite : ouvrir ou réduire le panneau de réglages.
+- Le logo officiel ROSEBUDS reste visible dans l'en-tête du viewer 3D et adapte son contraste au fond de la scène.
 - `Voir en AR` : active la caméra et place le plug devant le flux vidéo. Le rendu métallique conserve les mêmes matériaux PBR, l'environnement et l'exposition que le viewer normal.
 - `Déplacer le logo` : permet de faire glisser la décalcomanie à la souris sur la tige. Sa position est mémorisée séparément pour chaque modèle dans le navigateur.
 
