@@ -1,0 +1,18 @@
+.tmp-*
+*.before-*
+*.log
+*.lnk
+online/dist/
+Configurateur de Bijoux Rosebuds.exe
+FICHIER D'INSTALLATION/*.exe
+FICHIER D'INSTALLATION/*.log
+FICHIER D'INSTALLATION/**/Anciens fichiers/
+/MODELES 3D/
+/MATERIAUX/
+/examples/
+/archibase.net.txt
+/.viewer-server.cjs
+/relancer-viewer.bat
+/Lancer Configurateur Bijoux.bat
+/Installer Configurateur Bijoux.bat
+/tester-interface.bat

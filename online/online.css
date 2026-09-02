@@ -1,0 +1,132 @@
+body.auth-locked {
+  overflow: hidden;
+}
+
+body.auth-locked > :not(.access-gate):not(script) {
+  visibility: hidden;
+}
+
+.access-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: 24px;
+  overflow-y: auto;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px) 0 0 / 120px 120px,
+    #080808;
+}
+
+.access-gate__panel {
+  width: min(460px, 100%);
+  display: grid;
+  gap: 24px;
+  padding: 36px;
+  border: 1px solid #3f382d;
+  border-radius: 8px;
+  background: #11100e;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
+}
+
+.access-gate__logo {
+  width: min(230px, 70vw);
+  height: auto;
+  filter: brightness(0) invert(1);
+}
+
+.access-gate__eyebrow,
+.access-gate__notice {
+  margin: 0;
+  color: #d9ad59;
+  font-size: 12px;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.access-gate h1 {
+  margin: 6px 0 10px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 38px;
+  font-weight: 400;
+  line-height: 1.05;
+  color: #fff4df;
+}
+
+.access-gate__intro,
+.access-gate__notice {
+  line-height: 1.55;
+}
+
+.access-gate__intro {
+  margin: 0;
+  color: #bdb5a8;
+}
+
+.access-gate__notice {
+  color: #81796d;
+  text-align: center;
+  text-transform: none;
+}
+
+.access-form {
+  display: grid;
+  gap: 16px;
+}
+
+.access-form label {
+  display: grid;
+  gap: 7px;
+  color: #d7cfc2;
+  font-size: 14px;
+}
+
+.access-form input {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid #4a4338;
+  border-radius: 6px;
+  outline: none;
+  background: #090909;
+  color: #fff4df;
+}
+
+.access-form input:focus {
+  border-color: #d9ad59;
+  box-shadow: 0 0 0 2px rgba(217, 173, 89, 0.18);
+}
+
+.access-form button {
+  min-height: 48px;
+  border: 1px solid #d9ad59;
+  border-radius: 6px;
+  background: #d9ad59;
+  color: #15110b;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.access-form button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.access-error {
+  min-height: 20px;
+  margin: -4px 0 0;
+  color: #ff8f84;
+  font-size: 13px;
+}
+
+@media (max-width: 520px) {
+  .access-gate__panel {
+    padding: 26px 20px;
+  }
+
+  .access-gate h1 {
+    font-size: 31px;
+  }
+}

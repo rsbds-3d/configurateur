@@ -1,0 +1,1975 @@
+{
+  "metal": [
+    {
+      "label": "Acier bruni"
+    },
+    {
+      "label": "Acier inoxydable bruni"
+    },
+    {
+      "label": "Aluminium anodisé bruni aigue clair"
+    },
+    {
+      "label": "Aluminium anodisé bruni bleu"
+    },
+    {
+      "label": "Aluminium anodisé bruni fuchsia"
+    },
+    {
+      "label": "Aluminium anodisé bruni olive"
+    },
+    {
+      "label": "Aluminium anodisé bruni orange"
+    },
+    {
+      "label": "Aluminium anodisé bruni orchidée"
+    },
+    {
+      "label": "Aluminium anodisé bruni rose"
+    },
+    {
+      "label": "Aluminium anodisé bruni vert clair"
+    },
+    {
+      "label": "Aluminium anodisé bruni vert foncé"
+    },
+    {
+      "label": "Aluminium anodisé bruni violet"
+    },
+    {
+      "label": "Aluminium bruni"
+    },
+    {
+      "label": "Argent bruni"
+    },
+    {
+      "label": "Bronze bruni"
+    },
+    {
+      "label": "Chrome bruni"
+    },
+    {
+      "label": "Cuivre bruni"
+    },
+    {
+      "label": "Laiton bruni"
+    },
+    {
+      "label": "Or bruni"
+    },
+    {
+      "label": "Or jaune bruni"
+    },
+    {
+      "label": "Platine bruni"
+    },
+    {
+      "label": "Titane bruni"
+    },
+    {
+      "label": "Corten clair"
+    },
+    {
+      "label": "Corten plus foncé"
+    },
+    {
+      "label": "Corten rouillé"
+    },
+    {
+      "label": "Grille métallique étendue"
+    },
+    {
+      "label": "Grilles d'aération métalliques 2"
+    },
+    {
+      "label": "Grilles d'aération métalliques 3"
+    },
+    {
+      "label": "Grilles d'aération métalliques"
+    },
+    {
+      "label": "Acier inoxydable mat"
+    },
+    {
+      "label": "Acier mat"
+    },
+    {
+      "label": "Aluminium anodisé mat aigue-marine"
+    },
+    {
+      "label": "Aluminium anodisé mat bleu"
+    },
+    {
+      "label": "Aluminium anodisé mat fuchsia"
+    },
+    {
+      "label": "Aluminium anodisé mat olive"
+    },
+    {
+      "label": "Aluminium anodisé mat orange"
+    },
+    {
+      "label": "Aluminium anodisé mat orchidée"
+    },
+    {
+      "label": "Aluminium anodisé mat rose"
+    },
+    {
+      "label": "Aluminium anodisé mat vert clair"
+    },
+    {
+      "label": "Aluminium anodisé mat vert foncé"
+    },
+    {
+      "label": "Aluminium anodisé mat violet"
+    },
+    {
+      "label": "Aluminium mat"
+    },
+    {
+      "label": "Argent mat"
+    },
+    {
+      "label": "Bronze mat"
+    },
+    {
+      "label": "Chrome mat"
+    },
+    {
+      "label": "Cuivre mat"
+    },
+    {
+      "label": "Laiton mat"
+    },
+    {
+      "label": "Or jaune mat"
+    },
+    {
+      "label": "Or mat"
+    },
+    {
+      "label": "Platine mat"
+    },
+    {
+      "label": "Titane mat"
+    },
+    {
+      "label": "Acier inoxydable poli"
+    },
+    {
+      "label": "Acier poli"
+    },
+    {
+      "label": "Aluminium anodisé poli aigue-marine"
+    },
+    {
+      "label": "Aluminium anodisé poli bleu"
+    },
+    {
+      "label": "Aluminium anodisé poli fuchsia"
+    },
+    {
+      "label": "Aluminium anodisé poli olive"
+    },
+    {
+      "label": "Aluminium anodisé poli orange"
+    },
+    {
+      "label": "Aluminium anodisé poli orchidée"
+    },
+    {
+      "label": "Aluminium anodisé poli rose"
+    },
+    {
+      "label": "Aluminium anodisé poli vert clair"
+    },
+    {
+      "label": "Aluminium anodisé poli vert foncé"
+    },
+    {
+      "label": "Aluminium anodisé poli violet"
+    },
+    {
+      "label": "Aluminium poli"
+    },
+    {
+      "label": "Argent poli"
+    },
+    {
+      "label": "Bronze poli"
+    },
+    {
+      "label": "Chrome poli"
+    },
+    {
+      "label": "Cuivre poli"
+    },
+    {
+      "label": "Laiton poli"
+    },
+    {
+      "label": "Or jaune poli"
+    },
+    {
+      "label": "Or poli"
+    },
+    {
+      "label": "Platine poli"
+    },
+    {
+      "label": "Titane poli"
+    },
+    {
+      "label": "Acier inoxydable satiné"
+    },
+    {
+      "label": "Acier satiné"
+    },
+    {
+      "label": "Aluminium anodisé satiné aigue-marine"
+    },
+    {
+      "label": "Aluminium anodisé satiné bleu"
+    },
+    {
+      "label": "Aluminium anodisé satiné fuchsia"
+    },
+    {
+      "label": "Aluminium anodisé satiné olive"
+    },
+    {
+      "label": "Aluminium anodisé satiné orange"
+    },
+    {
+      "label": "Aluminium anodisé satiné orchidée"
+    },
+    {
+      "label": "Aluminium anodisé satiné rose"
+    },
+    {
+      "label": "Aluminium anodisé satiné vert clair"
+    },
+    {
+      "label": "Aluminium anodisé satiné vert foncé"
+    },
+    {
+      "label": "Aluminium anodisé satiné violet"
+    },
+    {
+      "label": "Aluminium satiné"
+    },
+    {
+      "label": "Argent satiné"
+    },
+    {
+      "label": "Bronze satiné"
+    },
+    {
+      "label": "Chrome satiné"
+    },
+    {
+      "label": "Cuivre satiné"
+    },
+    {
+      "label": "Laiton satiné"
+    },
+    {
+      "label": "Or jaune satiné"
+    },
+    {
+      "label": "Or satiné"
+    },
+    {
+      "label": "Platine satiné"
+    },
+    {
+      "label": "Titane satiné"
+    },
+    {
+      "label": "Acier galvanisé"
+    },
+    {
+      "label": "Cuivre martelé réfléchissant"
+    },
+    {
+      "label": "Cuivre martelé"
+    },
+    {
+      "label": "Cuivre patiné"
+    },
+    {
+      "label": "Fonte réfléchissante"
+    },
+    {
+      "label": "Fonte"
+    },
+    {
+      "label": "Grille métallique"
+    },
+    {
+      "label": "Martelé réfléchissant"
+    },
+    {
+      "label": "Martelé"
+    },
+    {
+      "label": "Tôle en losanges 1"
+    },
+    {
+      "label": "Tôle en losanges 2 réfléchissante"
+    },
+    {
+      "label": "Tôle en losanges 2"
+    },
+    {
+      "label": "Tôle en losanges 3 réfléchissante"
+    },
+    {
+      "label": "Tôle en losanges 3"
+    },
+    {
+      "label": "Metal - Flat - White"
+    },
+    {
+      "label": "Metal - Flat - Yellow"
+    },
+    {
+      "label": "Metal - Polished - White"
+    },
+    {
+      "label": "Metal - Polished - Yellow"
+    }
+  ],
+  "gem": [
+    {
+      "label": "Verre dépoli bleu clair",
+      "kind": "crystal"
+    },
+    {
+      "label": "Verre dépoli bleu foncé",
+      "kind": "crystal"
+    },
+    {
+      "label": "Verre dépoli clair",
+      "kind": "crystal"
+    },
+    {
+      "label": "Verre dépoli gris",
+      "kind": "crystal"
+    },
+    {
+      "label": "Verre dépoli turquoise",
+      "kind": "crystal"
+    },
+    {
+      "label": "Verre dépoli vert clair",
+      "kind": "crystal"
+    },
+    {
+      "label": "Verre dépoli vert moyen",
+      "kind": "crystal"
+    },
+    {
+      "label": "Plexiglass",
+      "kind": "crystal"
+    },
+    {
+      "label": "Verre bleu clair",
+      "kind": "crystal"
+    },
+    {
+      "label": "Verre bleu foncé",
+      "kind": "crystal"
+    },
+    {
+      "label": "Verre gris",
+      "kind": "crystal"
+    },
+    {
+      "label": "Verre limpide",
+      "kind": "crystal"
+    },
+    {
+      "label": "Verre turquoise",
+      "kind": "crystal"
+    },
+    {
+      "label": "Verre vert clair",
+      "kind": "crystal"
+    },
+    {
+      "label": "Verre vert moyen",
+      "kind": "crystal"
+    },
+    {
+      "label": "Émail - Black",
+      "kind": "cabochon"
+    },
+    {
+      "label": "Émail - Red",
+      "kind": "cabochon"
+    },
+    {
+      "label": "Émail - White",
+      "kind": "cabochon"
+    },
+    {
+      "label": "Opaque - Onyx",
+      "kind": "cabochon"
+    },
+    {
+      "label": "Opaque - Tigers Eye",
+      "kind": "cabochon"
+    },
+    {
+      "label": "Opaque - Turquoise",
+      "kind": "cabochon"
+    },
+    {
+      "label": "Realistic - Diamond",
+      "kind": "gem"
+    },
+    {
+      "label": "Realistic - Emerald",
+      "kind": "gem"
+    },
+    {
+      "label": "Realistic - Ruby",
+      "kind": "gem"
+    },
+    {
+      "label": "Realistic - Sapphire",
+      "kind": "gem"
+    },
+    {
+      "label": "Stylized - Diamond",
+      "kind": "gem"
+    },
+    {
+      "label": "Stylized - Emerald",
+      "kind": "gem"
+    },
+    {
+      "label": "Stylized - Ruby",
+      "kind": "gem"
+    },
+    {
+      "label": "Stylized - Sapphire",
+      "kind": "gem"
+    },
+    {
+      "label": "Perle - Dark Gray",
+      "kind": "cabochon"
+    },
+    {
+      "label": "Perle - White",
+      "kind": "cabochon"
+    }
+  ],
+  "support": [
+    {
+      "label": "Acajou poli",
+      "family": "wood"
+    },
+    {
+      "label": "Acajou à grandes feuilles poli",
+      "family": "wood"
+    },
+    {
+      "label": "Acajou à grandes feuilles",
+      "family": "wood"
+    },
+    {
+      "label": "Acajou",
+      "family": "wood"
+    },
+    {
+      "label": "Aggloméré poli",
+      "family": "wood"
+    },
+    {
+      "label": "Aggloméré",
+      "family": "wood"
+    },
+    {
+      "label": "Aniégré poli",
+      "family": "wood"
+    },
+    {
+      "label": "Aniégré",
+      "family": "wood"
+    },
+    {
+      "label": "Antiaris poli",
+      "family": "wood"
+    },
+    {
+      "label": "Antiaris",
+      "family": "wood"
+    },
+    {
+      "label": "Buches fendues",
+      "family": "wood"
+    },
+    {
+      "label": "Buches",
+      "family": "wood"
+    },
+    {
+      "label": "Avodiré poli",
+      "family": "wood"
+    },
+    {
+      "label": "Avodiré",
+      "family": "wood"
+    },
+    {
+      "label": "Ayous poli",
+      "family": "wood"
+    },
+    {
+      "label": "Ayous",
+      "family": "wood"
+    },
+    {
+      "label": "Bambou poli",
+      "family": "wood"
+    },
+    {
+      "label": "Bambou",
+      "family": "wood"
+    },
+    {
+      "label": "Bossé poli",
+      "family": "wood"
+    },
+    {
+      "label": "Bossé",
+      "family": "wood"
+    },
+    {
+      "label": "Bouleau poli",
+      "family": "wood"
+    },
+    {
+      "label": "Bouleau",
+      "family": "wood"
+    },
+    {
+      "label": "Broussin 1 poli",
+      "family": "wood"
+    },
+    {
+      "label": "Broussin 1",
+      "family": "wood"
+    },
+    {
+      "label": "Broussin 2 poli",
+      "family": "wood"
+    },
+    {
+      "label": "Broussin 2",
+      "family": "wood"
+    },
+    {
+      "label": "Broussin 3 poli",
+      "family": "wood"
+    },
+    {
+      "label": "Broussin 3",
+      "family": "wood"
+    },
+    {
+      "label": "Broussin de chêne poli",
+      "family": "wood"
+    },
+    {
+      "label": "Broussin de chêne",
+      "family": "wood"
+    },
+    {
+      "label": "Broussin de platane poli",
+      "family": "wood"
+    },
+    {
+      "label": "Broussin de platane",
+      "family": "wood"
+    },
+    {
+      "label": "Bubinga poli",
+      "family": "wood"
+    },
+    {
+      "label": "Bubinga",
+      "family": "wood"
+    },
+    {
+      "label": "Cerisier foncé poli",
+      "family": "wood"
+    },
+    {
+      "label": "Cerisier foncé",
+      "family": "wood"
+    },
+    {
+      "label": "Cerisier poli",
+      "family": "wood"
+    },
+    {
+      "label": "Cerisier",
+      "family": "wood"
+    },
+    {
+      "label": "Châtaigner poli",
+      "family": "wood"
+    },
+    {
+      "label": "Châtaigner",
+      "family": "wood"
+    },
+    {
+      "label": "Chêne brésilien poli",
+      "family": "wood"
+    },
+    {
+      "label": "Chêne brésilien",
+      "family": "wood"
+    },
+    {
+      "label": "Chêne clair poli",
+      "family": "wood"
+    },
+    {
+      "label": "Chêne clair",
+      "family": "wood"
+    },
+    {
+      "label": "Chêne foncé poli",
+      "family": "wood"
+    },
+    {
+      "label": "Chêne foncé",
+      "family": "wood"
+    },
+    {
+      "label": "Chêne poli",
+      "family": "wood"
+    },
+    {
+      "label": "Chêne rouge poli",
+      "family": "wood"
+    },
+    {
+      "label": "Chêne rouge",
+      "family": "wood"
+    },
+    {
+      "label": "Chêne",
+      "family": "wood"
+    },
+    {
+      "label": "Ciguë poli",
+      "family": "wood"
+    },
+    {
+      "label": "Ciguë",
+      "family": "wood"
+    },
+    {
+      "label": "Contreplaqué poli",
+      "family": "wood"
+    },
+    {
+      "label": "Contreplaqué",
+      "family": "wood"
+    },
+    {
+      "label": "Cèdre rouge poli",
+      "family": "wood"
+    },
+    {
+      "label": "Cèdre rouge",
+      "family": "wood"
+    },
+    {
+      "label": "Douglas poli",
+      "family": "wood"
+    },
+    {
+      "label": "Douglas",
+      "family": "wood"
+    },
+    {
+      "label": "Douka poli",
+      "family": "wood"
+    },
+    {
+      "label": "Douka",
+      "family": "wood"
+    },
+    {
+      "label": "Eyong jaune poli",
+      "family": "wood"
+    },
+    {
+      "label": "Eyong jaune",
+      "family": "wood"
+    },
+    {
+      "label": "Eyong poli",
+      "family": "wood"
+    },
+    {
+      "label": "Eyong",
+      "family": "wood"
+    },
+    {
+      "label": "Framiré poli",
+      "family": "wood"
+    },
+    {
+      "label": "Framiré",
+      "family": "wood"
+    },
+    {
+      "label": "Frêne poli",
+      "family": "wood"
+    },
+    {
+      "label": "Frêne",
+      "family": "wood"
+    },
+    {
+      "label": "Fuma poli",
+      "family": "wood"
+    },
+    {
+      "label": "Fuma",
+      "family": "wood"
+    },
+    {
+      "label": "Hêtre clair poli",
+      "family": "wood"
+    },
+    {
+      "label": "Hêtre clair",
+      "family": "wood"
+    },
+    {
+      "label": "Hêtre poli",
+      "family": "wood"
+    },
+    {
+      "label": "Hêtre rouge poli",
+      "family": "wood"
+    },
+    {
+      "label": "Hêtre rouge",
+      "family": "wood"
+    },
+    {
+      "label": "Hêtre",
+      "family": "wood"
+    },
+    {
+      "label": "Igaganga poli",
+      "family": "wood"
+    },
+    {
+      "label": "Igaganga",
+      "family": "wood"
+    },
+    {
+      "label": "Iroko poli",
+      "family": "wood"
+    },
+    {
+      "label": "Iroko",
+      "family": "wood"
+    },
+    {
+      "label": "Ivindo poli",
+      "family": "wood"
+    },
+    {
+      "label": "Ivindo",
+      "family": "wood"
+    },
+    {
+      "label": "Kosipo poli",
+      "family": "wood"
+    },
+    {
+      "label": "Kosipo",
+      "family": "wood"
+    },
+    {
+      "label": "Kotibé poli",
+      "family": "wood"
+    },
+    {
+      "label": "Kotibé",
+      "family": "wood"
+    },
+    {
+      "label": "Koto poli",
+      "family": "wood"
+    },
+    {
+      "label": "Koto",
+      "family": "wood"
+    },
+    {
+      "label": "Lauan poli",
+      "family": "wood"
+    },
+    {
+      "label": "Lauan",
+      "family": "wood"
+    },
+    {
+      "label": "Limba poli",
+      "family": "wood"
+    },
+    {
+      "label": "Limba",
+      "family": "wood"
+    },
+    {
+      "label": "Liège clair poli",
+      "family": "wood"
+    },
+    {
+      "label": "Liège clair",
+      "family": "wood"
+    },
+    {
+      "label": "Liège foncé poli",
+      "family": "wood"
+    },
+    {
+      "label": "Liège foncé",
+      "family": "wood"
+    },
+    {
+      "label": "Liège poli",
+      "family": "wood"
+    },
+    {
+      "label": "Liège",
+      "family": "wood"
+    },
+    {
+      "label": "Louro faia poli",
+      "family": "wood"
+    },
+    {
+      "label": "Louro faia rouge poli",
+      "family": "wood"
+    },
+    {
+      "label": "Louro faia rouge",
+      "family": "wood"
+    },
+    {
+      "label": "Louro faia",
+      "family": "wood"
+    },
+    {
+      "label": "Makoré poli",
+      "family": "wood"
+    },
+    {
+      "label": "Makoré",
+      "family": "wood"
+    },
+    {
+      "label": "Moabi poli",
+      "family": "wood"
+    },
+    {
+      "label": "Moabi",
+      "family": "wood"
+    },
+    {
+      "label": "Movingui poli",
+      "family": "wood"
+    },
+    {
+      "label": "Movingui",
+      "family": "wood"
+    },
+    {
+      "label": "Mélèze poli",
+      "family": "wood"
+    },
+    {
+      "label": "Mélèze",
+      "family": "wood"
+    },
+    {
+      "label": "Niangon poli",
+      "family": "wood"
+    },
+    {
+      "label": "Niangon",
+      "family": "wood"
+    },
+    {
+      "label": "Niové poli",
+      "family": "wood"
+    },
+    {
+      "label": "Niové",
+      "family": "wood"
+    },
+    {
+      "label": "Noyer foncé poli",
+      "family": "wood"
+    },
+    {
+      "label": "Noyer foncé",
+      "family": "wood"
+    },
+    {
+      "label": "Noyer marron poli",
+      "family": "wood"
+    },
+    {
+      "label": "Noyer marron",
+      "family": "wood"
+    },
+    {
+      "label": "Noyer moins de lignes poli",
+      "family": "wood"
+    },
+    {
+      "label": "Noyer moins de lignes",
+      "family": "wood"
+    },
+    {
+      "label": "Noyer poli",
+      "family": "wood"
+    },
+    {
+      "label": "Noyer",
+      "family": "wood"
+    },
+    {
+      "label": "Olivier poli",
+      "family": "wood"
+    },
+    {
+      "label": "OlivierOlive",
+      "family": "wood"
+    },
+    {
+      "label": "Orme japonais poli",
+      "family": "wood"
+    },
+    {
+      "label": "Orme japonais",
+      "family": "wood"
+    },
+    {
+      "label": "Orme poli",
+      "family": "wood"
+    },
+    {
+      "label": "Orme rouge poli",
+      "family": "wood"
+    },
+    {
+      "label": "Orme rouge",
+      "family": "wood"
+    },
+    {
+      "label": "Orme",
+      "family": "wood"
+    },
+    {
+      "label": "Ozigo poli",
+      "family": "wood"
+    },
+    {
+      "label": "Ozigo",
+      "family": "wood"
+    },
+    {
+      "label": "Palissandre poli",
+      "family": "wood"
+    },
+    {
+      "label": "Palissandre",
+      "family": "wood"
+    },
+    {
+      "label": "Paldao poli",
+      "family": "wood"
+    },
+    {
+      "label": "Paldao",
+      "family": "wood"
+    },
+    {
+      "label": "Palmier brésilien poli",
+      "family": "wood"
+    },
+    {
+      "label": "Palmier brésilien",
+      "family": "wood"
+    },
+    {
+      "label": "Palmier de Rio poli",
+      "family": "wood"
+    },
+    {
+      "label": "Palmier de Rio",
+      "family": "wood"
+    },
+    {
+      "label": "Palmier indien poli",
+      "family": "wood"
+    },
+    {
+      "label": "Palmier indien",
+      "family": "wood"
+    },
+    {
+      "label": "Particules poli",
+      "family": "wood"
+    },
+    {
+      "label": "Particules",
+      "family": "wood"
+    },
+    {
+      "label": "Peuplier poli",
+      "family": "wood"
+    },
+    {
+      "label": "Peuplier",
+      "family": "wood"
+    },
+    {
+      "label": "Pin argenté poli",
+      "family": "wood"
+    },
+    {
+      "label": "Pin argenté",
+      "family": "wood"
+    },
+    {
+      "label": "Pin de l'Oregon foncé poli",
+      "family": "wood"
+    },
+    {
+      "label": "Pin de l'Oregon foncé",
+      "family": "wood"
+    },
+    {
+      "label": "Pin de l'Oregon poli",
+      "family": "wood"
+    },
+    {
+      "label": "Pin de l'Oregon",
+      "family": "wood"
+    },
+    {
+      "label": "Pin maritime poli",
+      "family": "wood"
+    },
+    {
+      "label": "Pin maritime",
+      "family": "wood"
+    },
+    {
+      "label": "Pin rose poli",
+      "family": "wood"
+    },
+    {
+      "label": "Pin rose",
+      "family": "wood"
+    },
+    {
+      "label": "Pin sylvestre poli",
+      "family": "wood"
+    },
+    {
+      "label": "PinSylvestre",
+      "family": "wood"
+    },
+    {
+      "label": "Platane poli",
+      "family": "wood"
+    },
+    {
+      "label": "Platane",
+      "family": "wood"
+    },
+    {
+      "label": "Poirier poli",
+      "family": "wood"
+    },
+    {
+      "label": "Poirier",
+      "family": "wood"
+    },
+    {
+      "label": "Ramin poli",
+      "family": "wood"
+    },
+    {
+      "label": "Ramin",
+      "family": "wood"
+    },
+    {
+      "label": "Sapelli brun poli",
+      "family": "wood"
+    },
+    {
+      "label": "Sapelli brun",
+      "family": "wood"
+    },
+    {
+      "label": "Sapelli poli",
+      "family": "wood"
+    },
+    {
+      "label": "Sapelli",
+      "family": "wood"
+    },
+    {
+      "label": "Sorbier alisier poli",
+      "family": "wood"
+    },
+    {
+      "label": "Sorbier alisier",
+      "family": "wood"
+    },
+    {
+      "label": "Tan poli",
+      "family": "wood"
+    },
+    {
+      "label": "Tan",
+      "family": "wood"
+    },
+    {
+      "label": "Tatajuba poli",
+      "family": "wood"
+    },
+    {
+      "label": "Tatajuba",
+      "family": "wood"
+    },
+    {
+      "label": "Teck africain poli",
+      "family": "wood"
+    },
+    {
+      "label": "Teck africain",
+      "family": "wood"
+    },
+    {
+      "label": "Teck poli",
+      "family": "wood"
+    },
+    {
+      "label": "Teck",
+      "family": "wood"
+    },
+    {
+      "label": "Wengé poli",
+      "family": "wood"
+    },
+    {
+      "label": "Wengé",
+      "family": "wood"
+    },
+    {
+      "label": "Zebrano poli",
+      "family": "wood"
+    },
+    {
+      "label": "Zebrano",
+      "family": "wood"
+    },
+    {
+      "label": "Ébène poli",
+      "family": "wood"
+    },
+    {
+      "label": "Ébène",
+      "family": "wood"
+    },
+    {
+      "label": "Érable clair poli",
+      "family": "wood"
+    },
+    {
+      "label": "Érable clair",
+      "family": "wood"
+    },
+    {
+      "label": "Érable foncé poli",
+      "family": "wood"
+    },
+    {
+      "label": "Érable foncé",
+      "family": "wood"
+    },
+    {
+      "label": "Érable moyen",
+      "family": "wood"
+    },
+    {
+      "label": "Érable moyen poli",
+      "family": "wood"
+    },
+    {
+      "label": "Érable poli",
+      "family": "wood"
+    },
+    {
+      "label": "Érable",
+      "family": "wood"
+    },
+    {
+      "label": "Bleu imprimé fleuri",
+      "family": "velvet"
+    },
+    {
+      "label": "Capitons",
+      "family": "velvet"
+    },
+    {
+      "label": "Couverture verte et bleue",
+      "family": "velvet"
+    },
+    {
+      "label": "Couverture verte",
+      "family": "velvet"
+    },
+    {
+      "label": "Feutre bleu",
+      "family": "velvet"
+    },
+    {
+      "label": "Gros canevas marron",
+      "family": "velvet"
+    },
+    {
+      "label": "Imprimé floral rouge",
+      "family": "velvet"
+    },
+    {
+      "label": "Jeans bleu clair",
+      "family": "velvet"
+    },
+    {
+      "label": "Jeans bleu délavé",
+      "family": "velvet"
+    },
+    {
+      "label": "Jeans bleu foncé",
+      "family": "velvet"
+    },
+    {
+      "label": "Jeans bleu vert",
+      "family": "velvet"
+    },
+    {
+      "label": "Jeans violet bleu foncé",
+      "family": "velvet"
+    },
+    {
+      "label": "Moquette rouge bleue",
+      "family": "velvet"
+    },
+    {
+      "label": "Motif fleuri cyan",
+      "family": "velvet"
+    },
+    {
+      "label": "Motif texture japonaise",
+      "family": "velvet"
+    },
+    {
+      "label": "Paillasson extérieur",
+      "family": "velvet"
+    },
+    {
+      "label": "Paillasson marron bosselé",
+      "family": "velvet"
+    },
+    {
+      "label": "Paillasson marron foncé",
+      "family": "velvet"
+    },
+    {
+      "label": "Paillasson noir et blanc",
+      "family": "velvet"
+    },
+    {
+      "label": "Rugueux coloré",
+      "family": "velvet"
+    },
+    {
+      "label": "Rugueux tons de marrons",
+      "family": "velvet"
+    },
+    {
+      "label": "Tapis de bain vert",
+      "family": "velvet"
+    },
+    {
+      "label": "Tissu beige",
+      "family": "velvet"
+    },
+    {
+      "label": "Tissu blanc",
+      "family": "velvet"
+    },
+    {
+      "label": "Tissu bleu gris",
+      "family": "velvet"
+    },
+    {
+      "label": "Tissu bleu noir",
+      "family": "velvet"
+    },
+    {
+      "label": "Tissu carreaux rose et marron",
+      "family": "velvet"
+    },
+    {
+      "label": "Tissu carreaux verts",
+      "family": "velvet"
+    },
+    {
+      "label": "Tissu gris rayé",
+      "family": "velvet"
+    },
+    {
+      "label": "Tissu gris",
+      "family": "velvet"
+    },
+    {
+      "label": "Tissu jaune avec volutes",
+      "family": "velvet"
+    },
+    {
+      "label": "Tissu marron",
+      "family": "velvet"
+    },
+    {
+      "label": "Tissu noir et bleu",
+      "family": "velvet"
+    },
+    {
+      "label": "Tissu rouge bleu",
+      "family": "velvet"
+    },
+    {
+      "label": "Tissu rouge vert",
+      "family": "velvet"
+    },
+    {
+      "label": "Tissu texture japonaise",
+      "family": "velvet"
+    },
+    {
+      "label": "Tissu violet",
+      "family": "velvet"
+    },
+    {
+      "label": "Voile jaune-vert",
+      "family": "velvet"
+    },
+    {
+      "label": "Écossais vert",
+      "family": "velvet"
+    },
+    {
+      "label": "Bleu vernis",
+      "family": "stone"
+    },
+    {
+      "label": "Craquelé",
+      "family": "stone"
+    },
+    {
+      "label": "Grès céramique",
+      "family": "stone"
+    },
+    {
+      "label": "Porcelaine",
+      "family": "stone"
+    },
+    {
+      "label": "Terracotta",
+      "family": "stone"
+    },
+    {
+      "label": "Plâtre avocat",
+      "family": "stone"
+    },
+    {
+      "label": "Plâtre beige",
+      "family": "stone"
+    },
+    {
+      "label": "Plâtre blanc ancien",
+      "family": "stone"
+    },
+    {
+      "label": "Plâtre blanc sale",
+      "family": "stone"
+    },
+    {
+      "label": "Plâtre blanc",
+      "family": "stone"
+    },
+    {
+      "label": "Plâtre bleu clair",
+      "family": "stone"
+    },
+    {
+      "label": "Plâtre bleu gris",
+      "family": "stone"
+    },
+    {
+      "label": "Plâtre bleu vert",
+      "family": "stone"
+    },
+    {
+      "label": "Plâtre brume",
+      "family": "stone"
+    },
+    {
+      "label": "Plâtre chocolat",
+      "family": "stone"
+    },
+    {
+      "label": "Plâtre eau",
+      "family": "stone"
+    },
+    {
+      "label": "Plâtre gris clair",
+      "family": "stone"
+    },
+    {
+      "label": "Plâtre gris classique",
+      "family": "stone"
+    },
+    {
+      "label": "Plâtre gris",
+      "family": "stone"
+    },
+    {
+      "label": "Plâtre lavande",
+      "family": "stone"
+    },
+    {
+      "label": "Plâtre marine",
+      "family": "stone"
+    },
+    {
+      "label": "Plâtre marron",
+      "family": "stone"
+    },
+    {
+      "label": "Plâtre noir",
+      "family": "stone"
+    },
+    {
+      "label": "Plâtre ocre",
+      "family": "stone"
+    },
+    {
+      "label": "Plâtre pêche",
+      "family": "stone"
+    },
+    {
+      "label": "Plâtre rose",
+      "family": "stone"
+    },
+    {
+      "label": "Plâtre sable",
+      "family": "stone"
+    },
+    {
+      "label": "Plâtre saumon",
+      "family": "stone"
+    },
+    {
+      "label": "Plâtre sel marin",
+      "family": "stone"
+    },
+    {
+      "label": "Plâtre vert pâle",
+      "family": "stone"
+    },
+    {
+      "label": "Cuir gris",
+      "family": "leather"
+    },
+    {
+      "label": "Cuir marron clair",
+      "family": "leather"
+    },
+    {
+      "label": "Cuir marron foncé",
+      "family": "leather"
+    },
+    {
+      "label": "Cuir rouge gris",
+      "family": "leather"
+    },
+    {
+      "label": "Cuir rouge",
+      "family": "leather"
+    },
+    {
+      "label": "Agneau",
+      "family": "velvet"
+    },
+    {
+      "label": "Fausse fourrure",
+      "family": "velvet"
+    },
+    {
+      "label": "Écorce grise",
+      "family": "wood"
+    },
+    {
+      "label": "Écorce marron",
+      "family": "wood"
+    },
+    {
+      "label": "Écorce verte",
+      "family": "wood"
+    },
+    {
+      "label": "Gravier gris petites pierres",
+      "family": "stone"
+    },
+    {
+      "label": "Motifs de pavés en pierre",
+      "family": "stone"
+    },
+    {
+      "label": "Pavés courts et longs",
+      "family": "stone"
+    },
+    {
+      "label": "Pavés pierre carrés gris",
+      "family": "stone"
+    },
+    {
+      "label": "Pavés pierre carrés",
+      "family": "stone"
+    },
+    {
+      "label": "Pavés rectangulaires avec herbe",
+      "family": "stone"
+    },
+    {
+      "label": "Pavés rectangulaires gris quinconce",
+      "family": "stone"
+    },
+    {
+      "label": "Pavés",
+      "family": "stone"
+    },
+    {
+      "label": "Pierres avec herbe",
+      "family": "stone"
+    },
+    {
+      "label": "Pierres incrustées",
+      "family": "stone"
+    },
+    {
+      "label": "Texture maçonnerie grès coloré grossier y5159",
+      "family": "stone"
+    },
+    {
+      "label": "Texture maçonnerie grès coloré grossier y5168",
+      "family": "stone"
+    },
+    {
+      "label": "Texture maçonnerie grès coloré y5330",
+      "family": "stone"
+    },
+    {
+      "label": "Texture maçonnerie grès coloré y5331",
+      "family": "stone"
+    },
+    {
+      "label": "Texture maçonnerie grès coloré y5332",
+      "family": "stone"
+    },
+    {
+      "label": "Texture maçonnerie grès motif coloré y5440",
+      "family": "stone"
+    },
+    {
+      "label": "Bandes de pierres 01",
+      "family": "stone"
+    },
+    {
+      "label": "Bandes de pierres 02",
+      "family": "stone"
+    },
+    {
+      "label": "Bandes de pierres",
+      "family": "stone"
+    },
+    {
+      "label": "Blocs de pierres taillées",
+      "family": "stone"
+    },
+    {
+      "label": "Blocs en pierre taillée différentes tailles gris clair",
+      "family": "stone"
+    },
+    {
+      "label": "Blocs en pierre taillée différentes tailles grises",
+      "family": "stone"
+    },
+    {
+      "label": "Galets enfouis ovales",
+      "family": "stone"
+    },
+    {
+      "label": "Galets enfouis",
+      "family": "stone"
+    },
+    {
+      "label": "Granit clair",
+      "family": "stone"
+    },
+    {
+      "label": "Granit gris foncé",
+      "family": "stone"
+    },
+    {
+      "label": "Granit noir poli",
+      "family": "stone"
+    },
+    {
+      "label": "Granit noir",
+      "family": "stone"
+    },
+    {
+      "label": "Granit rose",
+      "family": "stone"
+    },
+    {
+      "label": "Granit rouge poli",
+      "family": "stone"
+    },
+    {
+      "label": "Granit rouge",
+      "family": "stone"
+    },
+    {
+      "label": "Granit à points noir",
+      "family": "stone"
+    },
+    {
+      "label": "Graviers",
+      "family": "stone"
+    },
+    {
+      "label": "Grès clair",
+      "family": "stone"
+    },
+    {
+      "label": "Grès gris clair",
+      "family": "stone"
+    },
+    {
+      "label": "Grès marron clair",
+      "family": "stone"
+    },
+    {
+      "label": "Grès marron rouge",
+      "family": "stone"
+    },
+    {
+      "label": "Grès",
+      "family": "stone"
+    },
+    {
+      "label": "Joint blanc petites pierres",
+      "family": "stone"
+    },
+    {
+      "label": "Marbre bleu poli",
+      "family": "marble"
+    },
+    {
+      "label": "Marbre bleu",
+      "family": "marble"
+    },
+    {
+      "label": "Marbre brun poli",
+      "family": "marble"
+    },
+    {
+      "label": "Marbre brun",
+      "family": "marble"
+    },
+    {
+      "label": "Marbre clair poli",
+      "family": "marble"
+    },
+    {
+      "label": "Marbre clair",
+      "family": "marble"
+    },
+    {
+      "label": "Marbre gris brun poli",
+      "family": "marble"
+    },
+    {
+      "label": "Marbre gris brun",
+      "family": "marble"
+    },
+    {
+      "label": "Marbre gris poli",
+      "family": "marble"
+    },
+    {
+      "label": "Marbre gris",
+      "family": "marble"
+    },
+    {
+      "label": "Marbre marron poli",
+      "family": "marble"
+    },
+    {
+      "label": "Marbre marron",
+      "family": "marble"
+    },
+    {
+      "label": "Marbre noir poli",
+      "family": "marble"
+    },
+    {
+      "label": "Marbre noir",
+      "family": "marble"
+    },
+    {
+      "label": "Marbre rose poli",
+      "family": "marble"
+    },
+    {
+      "label": "Marbre rose",
+      "family": "marble"
+    },
+    {
+      "label": "Marbre émeulé",
+      "family": "marble"
+    },
+    {
+      "label": "Motif béton",
+      "family": "stone"
+    },
+    {
+      "label": "Mur granit rose",
+      "family": "stone"
+    },
+    {
+      "label": "Mur pierres avec joint",
+      "family": "stone"
+    },
+    {
+      "label": "Mur pierres nature",
+      "family": "stone"
+    },
+    {
+      "label": "Mur rustique",
+      "family": "stone"
+    },
+    {
+      "label": "Pavé foncé",
+      "family": "stone"
+    },
+    {
+      "label": "Pavé marron foncé",
+      "family": "stone"
+    },
+    {
+      "label": "Petites pierres",
+      "family": "stone"
+    },
+    {
+      "label": "Pierre d'ornement",
+      "family": "stone"
+    },
+    {
+      "label": "Pierre grise",
+      "family": "stone"
+    },
+    {
+      "label": "Pierres avec joint blanc différentes tailles et couleurs",
+      "family": "stone"
+    },
+    {
+      "label": "Pierres avec joint différentes formes",
+      "family": "stone"
+    },
+    {
+      "label": "Pierres avec joint différentes tailles et couleurs",
+      "family": "stone"
+    },
+    {
+      "label": "Pierres avec joint différentes tailles gris uni",
+      "family": "stone"
+    },
+    {
+      "label": "Pierres différentes tailles et couleurs avec joint gris",
+      "family": "stone"
+    },
+    {
+      "label": "Pierres empilées",
+      "family": "stone"
+    },
+    {
+      "label": "Pierres grands formats sans joint différentes tailles et couleurs",
+      "family": "stone"
+    },
+    {
+      "label": "Pierres grises avec joint gris différentes tailles",
+      "family": "stone"
+    },
+    {
+      "label": "Pierres grises avec joint sable différentes tailles",
+      "family": "stone"
+    },
+    {
+      "label": "Pierres jaunes avec joint",
+      "family": "stone"
+    },
+    {
+      "label": "Pierres plates sans joint claires",
+      "family": "stone"
+    },
+    {
+      "label": "Pierres plates sans joint foncées",
+      "family": "stone"
+    },
+    {
+      "label": "Pierres sans joint différentes tailles et couleurs",
+      "family": "stone"
+    },
+    {
+      "label": "Pierres sans joint différentes tailles rectangulaires gris",
+      "family": "stone"
+    },
+    {
+      "label": "Pierres sans joint jaunes et grises",
+      "family": "stone"
+    },
+    {
+      "label": "Pierres sans joint ombrées jaunes et grises",
+      "family": "stone"
+    },
+    {
+      "label": "Pierres sans joint taillées différentes couleurs",
+      "family": "stone"
+    },
+    {
+      "label": "Pierres taillées avec joint différentes tailles et couleurs",
+      "family": "stone"
+    },
+    {
+      "label": "Pierres taillées vieux château",
+      "family": "stone"
+    },
+    {
+      "label": "Roche",
+      "family": "stone"
+    },
+    {
+      "label": "Vieilles pierres aléatoires",
+      "family": "stone"
+    },
+    {
+      "label": "Vieilles pierres avec joint blanc",
+      "family": "stone"
+    },
+    {
+      "label": "Vieilles pierres avec joint gris et marron",
+      "family": "stone"
+    },
+    {
+      "label": "Granito gris clair poli",
+      "family": "stone"
+    },
+    {
+      "label": "Granito gris clair",
+      "family": "stone"
+    },
+    {
+      "label": "Granito gris poli",
+      "family": "stone"
+    },
+    {
+      "label": "Granito gris",
+      "family": "stone"
+    },
+    {
+      "label": "Granito poli",
+      "family": "stone"
+    },
+    {
+      "label": "Granito rouge vert poli",
+      "family": "stone"
+    },
+    {
+      "label": "Granito rouge vert",
+      "family": "stone"
+    },
+    {
+      "label": "Granito",
+      "family": "stone"
+    },
+    {
+      "label": "Ardoise bleue et marron",
+      "family": "stone"
+    },
+    {
+      "label": "Ardoise bleue marron",
+      "family": "stone"
+    },
+    {
+      "label": "Ardoise bleue",
+      "family": "stone"
+    },
+    {
+      "label": "Ardoise foncée",
+      "family": "stone"
+    },
+    {
+      "label": "Ardoise grise",
+      "family": "stone"
+    },
+    {
+      "label": "Ardoise multicolore",
+      "family": "stone"
+    },
+    {
+      "label": "Bleu multicolore",
+      "family": "stone"
+    },
+    {
+      "label": "Multicolore - ardoise",
+      "family": "stone"
+    }
+  ]
+}

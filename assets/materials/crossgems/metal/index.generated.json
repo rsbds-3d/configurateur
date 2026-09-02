@@ -1,0 +1,380 @@
+{
+  "cg-aluminum-aquamarine": {
+    "label": "CrossGems - Aluminum Aquamarine",
+    "color": "#a3c0c5",
+    "roughness": 0.16,
+    "clearcoatRoughness": 0.09,
+    "env": 1.12,
+    "preview": "./assets/materials/crossgems/metal/all/aluminum-aquamarine.png",
+    "group": "CrossGems"
+  },
+  "cg-aluminum-berry": {
+    "label": "CrossGems - Aluminum Berry",
+    "color": "#8f116d",
+    "roughness": 0.16,
+    "clearcoatRoughness": 0.09,
+    "env": 1.12,
+    "preview": "./assets/materials/crossgems/metal/all/aluminum-berry.png",
+    "group": "CrossGems"
+  },
+  "cg-aluminum-blue": {
+    "label": "CrossGems - Aluminum Blue",
+    "color": "#1b60c7",
+    "roughness": 0.16,
+    "clearcoatRoughness": 0.09,
+    "env": 1.12,
+    "preview": "./assets/materials/crossgems/metal/all/aluminum-blue.png",
+    "group": "CrossGems"
+  },
+  "cg-aluminum-forest": {
+    "label": "CrossGems - Aluminum Forest",
+    "color": "#6f9c78",
+    "roughness": 0.16,
+    "clearcoatRoughness": 0.09,
+    "env": 1.12,
+    "preview": "./assets/materials/crossgems/metal/all/aluminum-forest.png",
+    "group": "CrossGems"
+  },
+  "cg-aluminum-fuchsia": {
+    "label": "CrossGems - Aluminum Fuchsia",
+    "color": "#b239c5",
+    "roughness": 0.16,
+    "clearcoatRoughness": 0.09,
+    "env": 1.12,
+    "preview": "./assets/materials/crossgems/metal/all/aluminum-fuchsia.png",
+    "group": "CrossGems"
+  },
+  "cg-aluminum-lime": {
+    "label": "CrossGems - Aluminum Lime",
+    "color": "#6aaf4d",
+    "roughness": 0.16,
+    "clearcoatRoughness": 0.09,
+    "env": 1.12,
+    "preview": "./assets/materials/crossgems/metal/all/aluminum-lime.png",
+    "group": "CrossGems"
+  },
+  "cg-aluminum-olive": {
+    "label": "CrossGems - Aluminum Olive",
+    "color": "#8f8d6f",
+    "roughness": 0.16,
+    "clearcoatRoughness": 0.09,
+    "env": 1.12,
+    "preview": "./assets/materials/crossgems/metal/all/aluminum-olive.png",
+    "group": "CrossGems"
+  },
+  "cg-aluminum-orange": {
+    "label": "CrossGems - Aluminum Orange",
+    "color": "#c69f15",
+    "roughness": 0.16,
+    "clearcoatRoughness": 0.09,
+    "env": 1.12,
+    "preview": "./assets/materials/crossgems/metal/all/aluminum-orange.png",
+    "group": "CrossGems"
+  },
+  "cg-aluminum-orchid": {
+    "label": "CrossGems - Aluminum Orchid",
+    "color": "#9b94b7",
+    "roughness": 0.16,
+    "clearcoatRoughness": 0.09,
+    "env": 1.12,
+    "preview": "./assets/materials/crossgems/metal/all/aluminum-orchid.png",
+    "group": "CrossGems"
+  },
+  "cg-aluminum-purple": {
+    "label": "CrossGems - Aluminum Purple",
+    "color": "#764fb4",
+    "roughness": 0.16,
+    "clearcoatRoughness": 0.09,
+    "env": 1.12,
+    "preview": "./assets/materials/crossgems/metal/all/aluminum-purple.png",
+    "group": "CrossGems"
+  },
+  "cg-aluminum": {
+    "label": "CrossGems - Aluminum",
+    "color": "#bfbebe",
+    "roughness": 0.16,
+    "clearcoatRoughness": 0.09,
+    "env": 1.12,
+    "preview": "./assets/materials/crossgems/metal/all/aluminum.png",
+    "group": "CrossGems"
+  },
+  "cg-brass": {
+    "label": "CrossGems - Brass",
+    "color": "#cac89f",
+    "roughness": 0.11,
+    "clearcoatRoughness": 0.07,
+    "env": 1.18,
+    "preview": "./assets/materials/crossgems/metal/all/brass.png",
+    "group": "CrossGems"
+  },
+  "cg-bronze": {
+    "label": "CrossGems - Bronze",
+    "color": "#75564c",
+    "roughness": 0.11,
+    "clearcoatRoughness": 0.07,
+    "env": 1.18,
+    "preview": "./assets/materials/crossgems/metal/all/bronze.png",
+    "group": "CrossGems"
+  },
+  "cg-copper": {
+    "label": "CrossGems - Copper",
+    "color": "#c58248",
+    "roughness": 0.11,
+    "clearcoatRoughness": 0.07,
+    "env": 1.18,
+    "preview": "./assets/materials/crossgems/metal/all/copper.png",
+    "group": "CrossGems"
+  },
+  "cg-green-gold-10k": {
+    "label": "CrossGems - Green Gold 10K",
+    "color": "#b9c78b",
+    "roughness": 0.075,
+    "clearcoatRoughness": 0.04,
+    "env": 1.32,
+    "preview": "./assets/materials/crossgems/metal/all/green-gold-10k.png",
+    "group": "CrossGems"
+  },
+  "cg-green-gold-14k": {
+    "label": "CrossGems - Green Gold 14K",
+    "color": "#b9c78b",
+    "roughness": 0.075,
+    "clearcoatRoughness": 0.04,
+    "env": 1.32,
+    "preview": "./assets/materials/crossgems/metal/all/green-gold-14k.png",
+    "group": "CrossGems"
+  },
+  "cg-green-gold-18k-sand-blast": {
+    "label": "CrossGems - Green Gold 18K Sand Blast",
+    "color": "#becf8b",
+    "roughness": 0.22,
+    "clearcoatRoughness": 0.16,
+    "env": 1.05,
+    "preview": "./assets/materials/crossgems/metal/all/green-gold-18k-sand-blast.png",
+    "group": "CrossGems"
+  },
+  "cg-green-gold-18k": {
+    "label": "CrossGems - Green Gold 18K",
+    "color": "#b9c78b",
+    "roughness": 0.075,
+    "clearcoatRoughness": 0.04,
+    "env": 1.32,
+    "preview": "./assets/materials/crossgems/metal/all/green-gold-18k.png",
+    "group": "CrossGems"
+  },
+  "cg-palladium-18k": {
+    "label": "CrossGems - Palladium 18K",
+    "color": "#b2b2b1",
+    "roughness": 0.075,
+    "clearcoatRoughness": 0.04,
+    "env": 1.32,
+    "preview": "./assets/materials/crossgems/metal/all/palladium-18k.png",
+    "group": "CrossGems"
+  },
+  "cg-platinum-950-sand-blast": {
+    "label": "CrossGems - Platinum 950 Sand Blast",
+    "color": "#b7b7b7",
+    "roughness": 0.22,
+    "clearcoatRoughness": 0.16,
+    "env": 1.05,
+    "preview": "./assets/materials/crossgems/metal/all/platinum-950-sand-blast.png",
+    "group": "CrossGems"
+  },
+  "cg-platinum-950": {
+    "label": "CrossGems - Platinum 950",
+    "color": "#b2b2b1",
+    "roughness": 0.075,
+    "clearcoatRoughness": 0.04,
+    "env": 1.32,
+    "preview": "./assets/materials/crossgems/metal/all/platinum-950.png",
+    "group": "CrossGems"
+  },
+  "cg-rhodium": {
+    "label": "CrossGems - Rhodium",
+    "color": "#b2b2b1",
+    "roughness": 0.075,
+    "clearcoatRoughness": 0.04,
+    "env": 1.32,
+    "preview": "./assets/materials/crossgems/metal/all/rhodium.png",
+    "group": "CrossGems"
+  },
+  "cg-rose-gold-10k": {
+    "label": "CrossGems - Rose Gold 10K",
+    "color": "#d0a983",
+    "roughness": 0.075,
+    "clearcoatRoughness": 0.04,
+    "env": 1.32,
+    "preview": "./assets/materials/crossgems/metal/all/rose-gold-10k.png",
+    "group": "CrossGems"
+  },
+  "cg-rose-gold-14k": {
+    "label": "CrossGems - Rose Gold 14K",
+    "color": "#d0a983",
+    "roughness": 0.075,
+    "clearcoatRoughness": 0.04,
+    "env": 1.32,
+    "preview": "./assets/materials/crossgems/metal/all/rose-gold-14k.png",
+    "group": "CrossGems"
+  },
+  "cg-rose-gold-18k-sand-blast": {
+    "label": "CrossGems - Rose Gold 18K Sand Blast",
+    "color": "#e7be92",
+    "roughness": 0.22,
+    "clearcoatRoughness": 0.16,
+    "env": 1.05,
+    "preview": "./assets/materials/crossgems/metal/all/rose-gold-18k-sand-blast.png",
+    "group": "CrossGems"
+  },
+  "cg-rose-gold-18k": {
+    "label": "CrossGems - Rose Gold 18K",
+    "color": "#d0a983",
+    "roughness": 0.075,
+    "clearcoatRoughness": 0.04,
+    "env": 1.32,
+    "preview": "./assets/materials/crossgems/metal/all/rose-gold-18k.png",
+    "group": "CrossGems"
+  },
+  "cg-silver-925-sand-blast": {
+    "label": "CrossGems - Silver 925 Sand Blast",
+    "color": "#b7b7b7",
+    "roughness": 0.22,
+    "clearcoatRoughness": 0.16,
+    "env": 1.05,
+    "preview": "./assets/materials/crossgems/metal/all/silver-925-sand-blast.png",
+    "group": "CrossGems"
+  },
+  "cg-silver-925": {
+    "label": "CrossGems - Silver 925",
+    "color": "#b2b2b1",
+    "roughness": 0.075,
+    "clearcoatRoughness": 0.04,
+    "env": 1.32,
+    "preview": "./assets/materials/crossgems/metal/all/silver-925.png",
+    "group": "CrossGems"
+  },
+  "cg-steel": {
+    "label": "CrossGems - Steel",
+    "color": "#aeafb1",
+    "roughness": 0.16,
+    "clearcoatRoughness": 0.09,
+    "env": 1.12,
+    "preview": "./assets/materials/crossgems/metal/all/steel.png",
+    "group": "CrossGems"
+  },
+  "cg-titanium": {
+    "label": "CrossGems - Titanium",
+    "color": "#8b8b8a",
+    "roughness": 0.16,
+    "clearcoatRoughness": 0.09,
+    "env": 1.12,
+    "preview": "./assets/materials/crossgems/metal/all/titanium.png",
+    "group": "CrossGems"
+  },
+  "cg-tungsten": {
+    "label": "CrossGems - Tungsten",
+    "color": "#868c8a",
+    "roughness": 0.16,
+    "clearcoatRoughness": 0.09,
+    "env": 1.12,
+    "preview": "./assets/materials/crossgems/metal/all/tungsten.png",
+    "group": "CrossGems"
+  },
+  "cg-white-gold-10k": {
+    "label": "CrossGems - White Gold 10K",
+    "color": "#b2b2b1",
+    "roughness": 0.075,
+    "clearcoatRoughness": 0.04,
+    "env": 1.32,
+    "preview": "./assets/materials/crossgems/metal/all/white-gold-10k.png",
+    "group": "CrossGems"
+  },
+  "cg-white-gold-14k": {
+    "label": "CrossGems - White Gold 14K",
+    "color": "#b2b2b1",
+    "roughness": 0.075,
+    "clearcoatRoughness": 0.04,
+    "env": 1.32,
+    "preview": "./assets/materials/crossgems/metal/all/white-gold-14k.png",
+    "group": "CrossGems"
+  },
+  "cg-white-gold-18k-sand-blast": {
+    "label": "CrossGems - White Gold 18K Sand Blast",
+    "color": "#b7b7b7",
+    "roughness": 0.22,
+    "clearcoatRoughness": 0.16,
+    "env": 1.05,
+    "preview": "./assets/materials/crossgems/metal/all/white-gold-18k-sand-blast.png",
+    "group": "CrossGems"
+  },
+  "cg-white-gold-18k": {
+    "label": "CrossGems - White Gold 18K",
+    "color": "#b2b2b1",
+    "roughness": 0.075,
+    "clearcoatRoughness": 0.04,
+    "env": 1.32,
+    "preview": "./assets/materials/crossgems/metal/all/white-gold-18k.png",
+    "group": "CrossGems"
+  },
+  "cg-yellow-gold-10k": {
+    "label": "CrossGems - Yellow Gold 10K",
+    "color": "#d0bb83",
+    "roughness": 0.075,
+    "clearcoatRoughness": 0.04,
+    "env": 1.32,
+    "preview": "./assets/materials/crossgems/metal/all/yellow-gold-10k.png",
+    "group": "CrossGems"
+  },
+  "cg-yellow-gold-14k": {
+    "label": "CrossGems - Yellow Gold 14K",
+    "color": "#d0bb83",
+    "roughness": 0.075,
+    "clearcoatRoughness": 0.04,
+    "env": 1.32,
+    "preview": "./assets/materials/crossgems/metal/all/yellow-gold-14k.png",
+    "group": "CrossGems"
+  },
+  "cg-yellow-gold-18k-sand-blast": {
+    "label": "CrossGems - Yellow Gold 18K Sand Blast",
+    "color": "#e7d392",
+    "roughness": 0.22,
+    "clearcoatRoughness": 0.16,
+    "env": 1.05,
+    "preview": "./assets/materials/crossgems/metal/all/yellow-gold-18k-sand-blast.png",
+    "group": "CrossGems"
+  },
+  "cg-yellow-gold-18k": {
+    "label": "CrossGems - Yellow Gold 18K",
+    "color": "#d0bb83",
+    "roughness": 0.075,
+    "clearcoatRoughness": 0.04,
+    "env": 1.32,
+    "preview": "./assets/materials/crossgems/metal/all/yellow-gold-18k.png",
+    "group": "CrossGems"
+  },
+  "cg-yellow-gold-19-25k": {
+    "label": "CrossGems - Yellow Gold 19.25K",
+    "color": "#d0bb83",
+    "roughness": 0.075,
+    "clearcoatRoughness": 0.04,
+    "env": 1.32,
+    "preview": "./assets/materials/crossgems/metal/all/yellow-gold-19-25k.png",
+    "group": "CrossGems"
+  },
+  "cg-yellow-gold-22k": {
+    "label": "CrossGems - Yellow Gold 22K",
+    "color": "#d0bb83",
+    "roughness": 0.075,
+    "clearcoatRoughness": 0.04,
+    "env": 1.32,
+    "preview": "./assets/materials/crossgems/metal/all/yellow-gold-22k.png",
+    "group": "CrossGems"
+  },
+  "cg-yellow-gold-24k": {
+    "label": "CrossGems - Yellow Gold 24K",
+    "color": "#d0bb83",
+    "roughness": 0.075,
+    "clearcoatRoughness": 0.04,
+    "env": 1.32,
+    "preview": "./assets/materials/crossgems/metal/all/yellow-gold-24k.png",
+    "group": "CrossGems"
+  }
+}

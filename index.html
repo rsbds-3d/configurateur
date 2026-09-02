@@ -1,0 +1,933 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Viewer 3D joaillerie luxe pour bague en or, gemme padparadscha et pavage diamant."
+    />
+    <title>Configurateur de bijoux Rosebuds</title>
+    <link rel="stylesheet" href="./welcome.css?v=20260902-release-v03" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.164.1/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.164.1/examples/jsm/",
+          "meshoptimizer": "https://unpkg.com/meshoptimizer@0.20.0/meshopt_decoder.module.js",
+          "lil-gui": "https://unpkg.com/lil-gui@0.19.2/dist/lil-gui.esm.js",
+          "three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@0.7.6/build/index.module.js"
+        }
+      }
+    </script>
+  </head>
+  <body class="is-welcome">
+    <section id="welcome-screen" class="welcome-screen" aria-labelledby="welcome-title">
+      <header class="welcome-header">
+        <div class="welcome-brand">
+          <img class="welcome-rosebuds-logo" src="./assets/brand/rosebuds-logo.png?v=20260902-release-v03" alt="ROSEBUDS" width="284" height="117" />
+          <div class="welcome-brand-copy">
+            <p class="welcome-signature">CHARLES THIERRY DE VILLE D'AVRAY</p>
+            <h1 id="welcome-title">Configurateur de bijoux</h1>
+          </div>
+        </div>
+        <div class="welcome-header-meta">
+          <p class="welcome-intro">Composez votre plug Rosebuds étape par étape. Les choix proposés restent compatibles avec les modèles disponibles.</p>
+          <span class="app-version" aria-label="Version de l'application">v0.3-260902</span>
+        </div>
+      </header>
+
+      <main class="welcome-main">
+        <div class="welcome-progress" aria-label="Progression de la configuration">
+          <span id="welcome-progress-value">Étape 1 sur 6</span>
+          <div class="welcome-progress-track" aria-hidden="true"><i id="welcome-progress-bar"></i></div>
+        </div>
+        <div id="welcome-steps" class="welcome-steps" aria-live="polite"></div>
+        <section id="welcome-results" class="welcome-results" hidden aria-labelledby="welcome-results-title">
+          <div class="welcome-results-heading">
+            <div>
+              <p class="welcome-kicker">Sélection compatible</p>
+              <h2 id="welcome-results-title">Choisissez le modèle à ouvrir</h2>
+            </div>
+            <p id="welcome-results-count" class="welcome-results-count"></p>
+          </div>
+          <div id="welcome-gallery" class="welcome-gallery"></div>
+        </section>
+      </main>
+    </section>
+
+    <main id="app" hidden>
+      <a class="viewer-back" href="./" aria-label="Revenir au catalogue">Catalogue</a>
+      <video id="ar-camera-feed" class="ar-camera-feed" autoplay muted playsinline hidden aria-label="Image filmée par la caméra"></video>
+      <canvas id="jewel-canvas" aria-label="Viewer 3D interactif de bijou"></canvas>
+      <button id="toggle-ar" class="ar-toggle" type="button" aria-pressed="false">Voir en AR</button>
+      <p id="ar-status" class="ar-status" role="status" hidden></p>
+
+      <section id="catalog-filter-bar" class="catalog-bar" aria-label="Sélecteur de modèles Rosebuds" hidden>
+        <div class="catalog-bar__header">
+          <span>Catalogue Rosebuds</span>
+          <strong>Filtrer les plugs disponibles</strong>
+        </div>
+        <div class="catalog-bar__filters">
+          <label>
+            <span>Taille</span>
+            <select id="catalog-filter-size">
+              <option value="">Toutes les tailles</option>
+            </select>
+          </label>
+          <label>
+            <span>Métal</span>
+            <select id="catalog-filter-metal">
+              <option value="">Alu ou inox</option>
+              <option value="alu">Alu</option>
+              <option value="inox">Inox</option>
+            </select>
+          </label>
+          <label>
+            <span>Finition métal</span>
+            <select id="catalog-filter-metal-finish">
+              <option value="">Toutes les finitions</option>
+            </select>
+          </label>
+          <label>
+            <span>Ornement</span>
+            <select id="catalog-filter-ornament">
+              <option value="">Tous les ornements</option>
+            </select>
+          </label>
+          <label>
+            <span>Finition ornement</span>
+            <select id="catalog-filter-ornament-finish">
+              <option value="">Toutes les finitions</option>
+            </select>
+          </label>
+        </div>
+        <div id="catalog-filter-gallery" class="catalog-bar__gallery" aria-live="polite"></div>
+      </section>
+
+      <section class="brand-panel" aria-label="Informations produit">
+        <p class="creator-name">CHARLES THIERRY DE VILLE D'AVRAY</p>
+        <h1>Configurateur de bijoux</h1>
+        <p>Or jaune poli, gemme rose-orange et pavage lumineux.</p>
+      </section>
+
+      <aside class="controls is-collapsed" aria-label="Réglages du viewer 3D">
+        <div class="controls__header">
+          <div>
+            <p class="eyebrow">Studio WebGL</p>
+            <h2>Direction artistique</h2>
+            <p class="viewer-version">v0.3-260902</p>
+          </div>
+          <button id="toggle-panel" class="icon-button" type="button" aria-label="Ouvrir le panneau" aria-expanded="false">
+            <span></span>
+          </button>
+        </div>
+
+        <div class="control-grid">
+          <label id="single-model-control" class="control-wide">
+            <span>Pièce de la bibliothèque</span>
+            <select id="jewel-model">
+              <option value="plug-decalcomanie">Plug avec décalcomanie</option>
+              <option value="plug-classique-55-sans-tete">Plug classique 55 sans tête</option>
+              <option value="plug-classique-67-sans-tete">Plug classique 67 sans tête</option>
+              <option value="plug-classique-large-35-sans-tete">Plug LARGE 35 sans tête</option>
+              <option value="plug-classique-large-35">Plug LARGE 35 avec pierre</option>
+              <option value="plug-classique-medium-30-sans-tete">Plug MEDIUM 30 sans tête</option>
+              <option value="plug-classique-medium">Plug MEDIUM avec pierre</option>
+              <option value="plug-classique-small-18">Plug SMALL 18 avec pierre</option>
+              <option value="plug-classique-small">Plug SMALL avec pierre</option>
+              <option value="plug-new-small-cabochon-lisse">Plug NEW SMALL cabochon lisse</option>
+              <option value="plug-new-small-cristal">Plug NEW SMALL cristal</option>
+              <option value="plug-new-medium-30-sans-tete-cabochon-lisse">Plug NEW MEDIUM 30 cabochon lisse</option>
+              <option value="plug-new-medium-30-sans-tete-cristal">Plug NEW MEDIUM 30 cristal</option>
+              <option value="plug-new-medium-35-sans-tete-cabochon-lisse">Plug NEW MEDIUM 35 cabochon lisse</option>
+              <option value="plug-new-medium-35-sans-tete-cristal">Plug NEW MEDIUM 35 cristal</option>
+              <option value="plug-new-medium-55-sans-tete-cabochon-lisse">Plug NEW MEDIUM 55 cabochon lisse</option>
+              <option value="plug-new-medium-55-sans-tete-cristal">Plug NEW MEDIUM 55 cristal</option>
+              <option value="plug-new-medium-67-sans-tete-cabochon-lisse">Plug NEW MEDIUM 67 cabochon lisse</option>
+              <option value="plug-new-medium-67-sans-tete-cristal">Plug NEW MEDIUM 67 cristal</option>
+              <option value="plug-new-medium-xl-45-sans-tete-cabochon-lisse">Plug NEW MEDIUM XL 45 cabochon lisse</option>
+              <option value="plug-new-medium-xl-45-sans-tete-cristal">Plug NEW MEDIUM XL 45 cristal</option>
+              <option value="plug-new-medium-xxl-50-sans-tete-cabochon-lisse">Plug NEW MEDIUM XXL 50 cabochon lisse</option>
+              <option value="plug-new-medium-xxl-50-sans-tete-cristal">Plug NEW MEDIUM XXL 50 cristal</option>
+              <option value="plug-new-medium-xxxl-60-sans-tete-cabochon-lisse">Plug NEW MEDIUM XXXL 60 cabochon lisse</option>
+              <option value="plug-new-medium-xxxl-60-sans-tete-cristal">Plug NEW MEDIUM XXXL 60 cristal</option>
+              <option value="plug-classique-xl-35">Plug XL 35 avec pierre</option>
+              <option value="plug-classique-xl-45-avec-assiette">Plug XL 45 avec assiette</option>
+              <option value="plug-classique-xl-45-sans-tete">Plug XL 45 sans tête</option>
+              <option value="plug-classique-xl">Plug XL avec pierre</option>
+              <option value="plug-classique-xxl-35">Plug XXL 35 avec pierre</option>
+              <option value="plug-classique-xxl-50-sans-tete">Plug XXL 50 sans tête</option>
+              <option value="plug-classique-xxl">Plug XXL avec pierre</option>
+              <option value="plug-classique-xxxl-60-sans-tete">Plug XXXL 60 sans tête</option>
+              <option value="plug-classique-xxxl-60" selected>Plug XXXL 60 avec pierre</option>
+              <option value="plug-classique-xxxl-70">Plug XXXL 70 avec pierre</option>
+              <option value="plug-classique-xxxl-80">Plug XXXL 80 avec pierre</option>
+              <option value="plug-classique-xxxl-90">Plug XXXL 90 avec pierre</option>
+              <option value="plug-classique-xxxl-100">Plug XXXL 100 avec pierre</option>
+            </select>
+          </label>
+          <div id="model-compare-control" class="model-compare control-wide">
+            <label class="rhino-check model-compare__toggle">
+              <input id="compare-models-enabled" type="checkbox" />
+              <span>Afficher plusieurs plugs côte à côte</span>
+            </label>
+            <label id="compare-model-spacing-control" class="control-wide" hidden>
+              <span>Jeu entre les plugs <b id="compare-model-spacing-value">100</b> mm</span>
+              <input id="compare-model-spacing" type="range" min="0" max="300" value="100" step="any" />
+            </label>
+            <div id="compare-model-list" class="model-compare__list" hidden aria-label="Choix multiple de plugs"></div>
+          </div>
+          <label class="control-wide">
+            <span>Largeur panneau menu <b id="menu-panel-width-value">430</b> px</span>
+            <input id="menu-panel-width" type="range" min="320" max="720" value="430" step="any" />
+          </label>
+          <div class="library-actions control-wide">
+            <button id="library-add" type="button">Ajouter un modèle</button>
+            <button id="library-remove" type="button">Enlever la sélection</button>
+            <button id="repair-import" type="button">Réparer import</button>
+            <button id="open-log" type="button">Journal de débogage</button>
+          </div>
+          <div class="decal-position-control control-wide">
+            <label class="rhino-check">
+              <input id="decal-edit-mode" type="checkbox" />
+              <span>Déplacer le logo à la souris</span>
+            </label>
+            <button id="decal-reset-position" type="button">Recentrer sur la tige</button>
+          </div>
+          <div id="material-visibility-library" class="material-visibility control-wide" aria-label="Bibliothèque de visibilité des matériaux">
+            <div class="material-visibility__header">
+              <div>
+                <span>Bibliothèque de matériaux</span>
+                <strong>Choisir les listes où chaque matériau apparaît</strong>
+              </div>
+              <button id="material-visibility-reset" type="button">Tout afficher</button>
+            </div>
+            <div id="material-visibility-table" class="material-visibility__table"></div>
+          </div>
+          <div class="material-editor control-wide" aria-label="Édition matériau de l'objet sélectionné">
+            <label>
+              <span>Objet à éditer</span>
+              <select id="object-select">
+                <option value="">Aucun objet</option>
+              </select>
+            </label>
+            <div>
+              <span>Objet sélectionné</span>
+              <strong id="selected-object-name">Aucun objet</strong>
+            </div>
+            <label>
+              <span>Appliquer un métal</span>
+              <select id="object-metal-material">
+                <option value="">Choisir un métal...</option>
+                <option value="yellow-gold">Or jaune 18k</option>
+                <option value="white-gold">Or blanc</option>
+                <option value="rose-gold">Or rose</option>
+                <option value="platinum">Platine</option>
+                <option value="silver" selected>Argent poli</option>
+                <option value="black-rhodium">Rhodium noir</option>
+                <option value="aluminum-gray">Aluminium poli gris</option>
+                <option value="aluminum-black">Aluminium anodisé noir</option>
+                <option value="aluminum-red">Aluminium anodisé rouge</option>
+                <option value="aluminum-violet">Aluminium anodisé violet</option>
+                <option value="aluminum-pink">Aluminium anodisé rose</option>
+                <option value="aluminum-green">Aluminium anodisé vert</option>
+                <option value="aluminum-blue">Aluminium anodisé bleu</option>
+                <option value="aluminum-gold">Aluminium anodisé or</option>
+                <option value="aluminum-orange">Aluminium anodisé orange</option>
+                <option value="titanium-polished">Titane poli</option>
+                <option value="stainless-mirror-silver">Inox poli miroir argent</option>
+                <option value="stainless-mirror-gold">Inox poli miroir or</option>
+                <option value="stainless-flash-gold-1-micron">Inox flash or 1 micron</option>
+              </select>
+            </label>
+            <label>
+              <span>Appliquer une pierre</span>
+              <select id="object-gem-material">
+                <option value="">Choisir une pierre...</option>
+              </select>
+            </label>
+            <label>
+              <span>Bibliothèque matériaux</span>
+              <select id="saved-materials">
+                <option value="">Aucun matériau sauvegardé</option>
+              </select>
+            </label>
+            <div class="library-actions">
+              <button id="apply-saved-material" type="button">Appliquer sauvegarde</button>
+              <button id="save-project-material" type="button">Sauver projet</button>
+              <button id="save-general-material" type="button">Sauver général</button>
+              <button id="delete-saved-material" type="button">Supprimer</button>
+            </div>
+          </div>
+          <label class="control-wide">
+            <span>Méthode reflets internes</span>
+            <select id="effect-method">
+              <option value="spectral" selected>Dispersion RGB facettée</option>
+              <option value="physical">PBR transmission pure</option>
+              <option value="chromatic">Cubemap chromatique</option>
+              <option value="caustic">Caustiques + scintillement</option>
+            </select>
+          </label>
+          <div class="effect-status control-wide" aria-label="Effets actifs du projet">
+            <div class="effect-status__header">
+              <span>Effets du projet courant</span>
+              <strong id="active-effects-count">0 actif</strong>
+            </div>
+            <label><input id="fx-dispersion" type="checkbox" /> Dispersion / coques RGB</label>
+            <label><input id="fx-parametric" type="checkbox" /> Feux spectraux paramétriques</label>
+            <label><input id="fx-custom-reflections" type="checkbox" /> Reflets internes personnalisés</label>
+            <label><input id="fx-caustics" type="checkbox" /> Caustiques au sol</label>
+            <label><input id="fx-bicolor" type="checkbox" /> Bicolore pierre</label>
+            <label><input id="fx-bloom" type="checkbox" /> Bloom cinéma</label>
+            <label><input id="fx-dof-toggle" type="checkbox" /> Profondeur de champ</label>
+            <label><input id="fx-auto-rotate" type="checkbox" /> Auto-rotation</label>
+          </div>
+          <label>
+            <span>Pierre centrale</span>
+            <input id="gem-color" type="color" value="#ff7d62" />
+          </label>
+          <label>
+            <span>Bicolore pierre</span>
+            <select id="gem-bicolor-mode">
+              <option value="off" selected>Désactivé</option>
+              <option value="hard">Limite franche</option>
+              <option value="soft">Limite progressive</option>
+            </select>
+          </label>
+          <label data-bicolor-control>
+            <span>Couleur zone A</span>
+            <input id="gem-zone-a" type="color" value="#b9154c" />
+          </label>
+          <label data-bicolor-control>
+            <span>Couleur zone B</span>
+            <input id="gem-zone-b" type="color" value="#28a56f" />
+          </label>
+          <label data-bicolor-control>
+            <span>Forme de limite</span>
+            <select id="gem-boundary-shape">
+              <option value="linear" selected>Rectiligne</option>
+              <option value="curved">Courbe organique</option>
+            </select>
+          </label>
+          <label data-bicolor-control>
+            <span>Progressivité limite</span>
+            <input id="gem-boundary-softness" type="range" min="0.01" max="0.55" value="0.18" step="any" />
+          </label>
+          <label data-bicolor-control>
+            <span>Rotation limite</span>
+            <input id="gem-boundary-angle" type="range" min="-180" max="180" value="-18" step="any" />
+          </label>
+          <label data-bicolor-control>
+            <span>Amplitude courbe</span>
+            <input id="gem-boundary-amplitude" type="range" min="0" max="0.65" value="0.22" step="any" />
+          </label>
+          <label data-bicolor-control>
+            <span>Période courbe</span>
+            <input id="gem-boundary-period" type="range" min="0.5" max="6" value="2.2" step="any" />
+          </label>
+          <label>
+            <span>Pierre précieuse</span>
+            <select id="gem-preset"></select>
+          </label>
+          <label>
+            <span>Type matériau pierre</span>
+            <select id="gem-material-model">
+              <option value="natural" selected>Naturel facetté</option>
+              <option value="high-fire">Spectral haute dispersion</option>
+              <option value="opal">Opale irisée</option>
+              <option value="included">Pierre avec inclusions</option>
+              <option value="smoky">Fumé / profondeur sombre</option>
+              <option value="milky-cabochon">Cabochon laiteux</option>
+            </select>
+          </label>
+          <label>
+            <span>Forme de pierre</span>
+            <select id="gem-shape">
+              <option value="round">Rond / Brillant</option>
+              <option value="princess">Princesse</option>
+              <option value="cushion">Coussin</option>
+              <option value="rectangle">Rectangle</option>
+              <option value="octagon">Octogonale</option>
+              <option value="oval" selected>Ovale</option>
+              <option value="triangle">Triangle</option>
+              <option value="marquise">Marquise</option>
+              <option value="lozenge">Losange</option>
+              <option value="heart">Coeur</option>
+              <option value="pear">Poire</option>
+              <option value="baguette">Baguette</option>
+            </select>
+          </label>
+          <div class="stone-showcase-controls control-wide" aria-label="Pierre t&eacute;moin issue du tableau Rhino">
+            <div class="stone-showcase-controls__header">
+              <span>Pierre t&eacute;moin</span>
+              <strong>Formes et mat&eacute;riaux du tableau</strong>
+            </div>
+            <label class="control-wide rhino-check">
+              <input id="stone-showcase-visible" type="checkbox" />
+              <span>Afficher la pierre témoin séparée</span>
+            </label>
+            <label>
+              <span>Type de pierre / g&eacute;om&eacute;trie</span>
+              <select id="stone-showcase-geometry"></select>
+            </label>
+            <label>
+              <span>Mat&eacute;riau de pierre</span>
+              <select id="stone-showcase-material"></select>
+            </label>
+            <label>
+              <span>Dimension <b id="stone-showcase-scale-value">1.00x</b></span>
+              <input id="stone-showcase-scale" type="range" min="0.35" max="4.5" value="1" step="any" />
+            </label>
+            <label class="control-wide rhino-check">
+              <input id="stone-showcase-pedestal" type="checkbox" />
+              <span>Pierre visible sur un socle</span>
+            </label>
+          </div>
+          <label>
+            <span>Teinte des feux</span>
+            <input id="reflection-color" type="color" value="#ffd1f0" />
+          </label>
+          <label>
+            <span>Intensité feux</span>
+            <input id="reflection-intensity" type="range" min="0" max="6" value="2.7" step="any" />
+          </label>
+          <label data-effect-control="physical spectral chromatic">
+            <span>IOR gemme</span>
+            <input id="gem-ior" type="range" min="1.45" max="2.45" value="1.78" step="any" />
+          </label>
+          <label data-effect-control="physical spectral chromatic caustic">
+            <span>Moteur diamant</span>
+            <select id="diamond-shader-mode">
+              <option value="mesh-bvh">three-mesh-bvh Diamond Shader</option>
+              <option value="studio-bvh">BVH studio joaillerie</option>
+              <option value="path-tracing">THREE.js PathTracing Renderer</option>
+            </select>
+          </label>
+          <label data-effect-control="physical spectral chromatic caustic">
+            <span>Rebonds internes <b id="diamond-bounces-value">8</b></span>
+            <input id="diamond-bounces" type="range" min="8" max="16" value="8" step="1" />
+          </label>
+          <label data-effect-control="physical spectral chromatic caustic">
+            <span>Absorption Beer-Lambert <b id="diamond-beer-absorption-value">0.006</b></span>
+            <input id="diamond-beer-absorption" type="range" min="0" max="0.05" value="0.006" step="any" />
+          </label>
+          <label data-effect-control="physical spectral chromatic caustic">
+            <span>Micro-rugosité polissage <b id="diamond-micro-roughness-value">0.000</b></span>
+            <input id="diamond-micro-roughness" type="range" min="0" max="0.08" value="0" step="any" />
+          </label>
+          <label data-effect-control="physical spectral chromatic caustic">
+            <span>Réflexions HDRI <b id="diamond-hdri-reflection-value">1.00</b></span>
+            <input id="diamond-hdri-reflection" type="range" min="0" max="2.5" value="1" step="any" />
+          </label>
+          <label data-effect-control="physical spectral chromatic caustic">
+            <span>Échantillons path tracing <b id="diamond-path-samples-value">4</b></span>
+            <input id="diamond-path-samples" type="range" min="1" max="8" value="4" step="1" />
+          </label>
+          <label data-effect-control="spectral chromatic">
+            <span>Séparation RGB</span>
+            <input id="dispersion" type="range" min="0" max="1" value="0.42" step="any" />
+          </label>
+          <label data-effect-control="spectral">
+            <span>Feux arc-en-ciel</span>
+            <input id="fire-balance" type="range" min="0" max="1" value="0.58" step="any" />
+          </label>
+          <label>
+            <span>Absorption interne</span>
+            <input id="gem-absorption" type="range" min="0.2" max="5" value="1.8" step="any" />
+          </label>
+          <label>
+            <span>Voile / inclusions</span>
+            <input id="gem-cloudiness" type="range" min="0" max="1" value="0.08" step="any" />
+          </label>
+          <label>
+            <span>Contraste facettes</span>
+            <input id="facet-contrast" type="range" min="0" max="1" value="0.38" step="any" />
+          </label>
+          <label>
+            <span>Spectre multicolore</span>
+            <input id="spectral-richness" type="range" min="0" max="1" value="0.48" step="any" />
+          </label>
+          <label data-effect-control="chromatic">
+            <span>Aberration optique</span>
+            <input id="chromatic-shift" type="range" min="0" max="1.2" value="0.48" step="any" />
+          </label>
+          <label data-effect-control="caustic">
+            <span>Densité scintillement</span>
+            <input id="sparkle-density" type="range" min="0" max="1" value="0.62" step="any" />
+          </label>
+          <label data-effect-control="caustic">
+            <span>Étalement caustiques</span>
+            <input id="caustic-spread" type="range" min="0.45" max="1.8" value="1" step="any" />
+          </label>
+          <div class="reflection-editor control-wide" aria-label="Reflets lumineux internes personnalisés">
+            <div class="reflection-editor__top">
+              <label>
+                <span>Reflet à modifier</span>
+                <select id="reflection-select"></select>
+              </label>
+              <div class="reflection-editor__actions">
+                <button id="add-reflection" type="button">Ajouter</button>
+                <button id="remove-reflection" type="button">Enlever</button>
+              </div>
+            </div>
+            <label>
+              <span>Couleur du reflet</span>
+              <input id="custom-reflection-color" type="color" value="#ff3355" />
+            </label>
+            <label>
+              <span>Forme lumineuse</span>
+              <select id="reflection-shape">
+                <option value="point">Point sans tache</option>
+                <option value="soft" selected>Tache douce</option>
+                <option value="oval">Ovale diffus</option>
+                <option value="facet">Trait de facette</option>
+                <option value="bar">Barre lumineuse</option>
+                <option value="cross">Éclat croisé</option>
+              </select>
+            </label>
+            <div class="reflection-pad">
+              <button type="button" data-reflect-move="z:-1" aria-label="Avancer le reflet">↑</button>
+              <button type="button" data-reflect-move="x:-1" aria-label="Déplacer le reflet à gauche">←</button>
+              <button type="button" data-reflect-move="x:1" aria-label="Déplacer le reflet à droite">→</button>
+              <button type="button" data-reflect-move="z:1" aria-label="Reculer le reflet">↓</button>
+            </div>
+            <div class="step-controls">
+              <button type="button" data-reflect-move="y:1">Monter</button>
+              <button type="button" data-reflect-move="y:-1">Descendre</button>
+              <button type="button" data-reflect-size="-1">Rayon -</button>
+              <button type="button" data-reflect-size="1">Rayon +</button>
+            </div>
+            <label>
+              <span>Profondeur verticale</span>
+              <input id="reflection-depth" type="range" min="-0.26" max="0.24" value="0" step="any" />
+            </label>
+            <label>
+              <span>Rayon de la tache</span>
+              <input id="reflection-radius" type="range" min="0.01" max="0.75" value="0.07" step="any" />
+            </label>
+          </div>
+          <label>
+            <span>HDRI studio</span>
+            <input id="env-intensity" type="range" min="0" max="4" value="1.65" step="any" />
+          </label>
+          <label>
+            <span>Intensité métal</span>
+            <input id="metal-intensity" type="range" min="0.35" max="2.5" value="1.38" step="any" />
+          </label>
+          <label>
+            <span>Métal précieux</span>
+            <select id="metal-preset">
+              <option value="yellow-gold">Or jaune 18k</option>
+              <option value="white-gold">Or blanc</option>
+              <option value="rose-gold">Or rose</option>
+              <option value="platinum">Platine</option>
+              <option value="silver" selected>Argent poli</option>
+              <option value="black-rhodium">Rhodium noir</option>
+                <option value="aluminum-gray">Aluminium poli gris</option>
+                <option value="aluminum-black">Aluminium anodisé noir</option>
+                <option value="aluminum-red">Aluminium anodisé rouge</option>
+                <option value="aluminum-violet">Aluminium anodisé violet</option>
+                <option value="aluminum-pink">Aluminium anodisé rose</option>
+                <option value="aluminum-green">Aluminium anodisé vert</option>
+                <option value="aluminum-blue">Aluminium anodisé bleu</option>
+                <option value="aluminum-gold">Aluminium anodisé or</option>
+                <option value="aluminum-orange">Aluminium anodisé orange</option>
+                <option value="titanium-polished">Titane poli</option>
+                <option value="stainless-mirror-silver">Inox poli miroir argent</option>
+                <option value="stainless-mirror-gold">Inox poli miroir or</option>
+                <option value="stainless-flash-gold-1-micron">Inox flash or 1 micron</option>
+            </select>
+          </label>
+          <label>
+            <span>Rugosité métal</span>
+            <input id="metal-roughness" type="range" min="0.005" max="0.38" value="0.06" step="any" />
+          </label>
+          <div class="facet-texture control-wide" aria-label="Texture liee aux facettes">
+            <div class="facet-texture__header">
+              <span>Texture suit facettes</span>
+              <label class="rhino-check"><input id="facet-texture-enabled" type="checkbox" checked /> <span>Actif</span></label>
+            </div>
+            <label class="control-wide">
+              <span>Preset facettisation réaliste</span>
+              <select id="facet-realism-preset">
+                <option value="polished-gold" selected>Or poli anti-facettes - meilleur défaut</option>
+                <option value="mirror-chrome">Chrome joaillerie miroir</option>
+                <option value="soft-cast">Fonte précieuse adoucie</option>
+                <option value="readable-facets">Facettes lisibles contrôle qualité</option>
+              </select>
+            </label>
+            <label>
+              <span>Mode</span>
+              <select id="facet-texture-mode">
+                <option value="subtle">Subtil</option>
+                <option value="jewelry" selected>Joaillerie luxe</option>
+                <option value="technical">Technique lisible</option>
+              </select>
+            </label>
+            <label>
+              <span>Intensité facettes <b id="facet-texture-intensity-value">0.18</b></span>
+              <input id="facet-texture-intensity" type="range" min="0" max="1" value="0.18" step="any" />
+            </label>
+            <label>
+              <span>Variation roughness <b id="facet-texture-roughness-value">0.14</b></span>
+              <input id="facet-texture-roughness" type="range" min="0" max="0.6" value="0.14" step="any" />
+            </label>
+            <label>
+              <span>Variation teinte metal <b id="facet-texture-tint-value">0.055</b></span>
+              <input id="facet-texture-tint" type="range" min="0" max="0.35" value="0.055" step="any" />
+            </label>
+            <label>
+              <span>Variation reflets <b id="facet-texture-reflectance-value">0.16</b></span>
+              <input id="facet-texture-reflectance" type="range" min="0" max="0.6" value="0.16" step="any" />
+            </label>
+            <label>
+              <span>Échelle facettes <b id="facet-texture-scale-value">1.60</b></span>
+              <input id="facet-texture-scale" type="range" min="0.2" max="8" value="1.6" step="any" />
+            </label>
+            <label>
+              <span>Graine motif <b id="facet-texture-seed-value">0.37</b></span>
+              <input id="facet-texture-seed" type="range" min="0" max="1" value="0.37" step="any" />
+            </label>
+            <label class="control-wide rhino-check">
+              <input id="optical-polish-enabled" type="checkbox" />
+              <span>Polissage optique anti-facettes</span>
+            </label>
+            <label>
+              <span>Force polissage <b id="optical-polish-strength-value">0.68</b></span>
+              <input id="optical-polish-strength" type="range" min="0" max="0.95" value="0.68" step="any" />
+            </label>
+            <label>
+              <span>Conserver arêtes <b id="optical-polish-edge-value">0.58</b></span>
+              <input id="optical-polish-edge" type="range" min="0.08" max="1" value="0.58" step="any" />
+            </label>
+            <label class="control-wide">
+              <span>Configurations sauvegardées</span>
+              <select id="facet-config-library">
+                <option value="">Aucune configuration</option>
+              </select>
+            </label>
+            <div class="library-actions control-wide">
+              <button id="facet-config-apply" type="button">Appliquer</button>
+              <button id="facet-config-save" type="button">Sauvegarder</button>
+              <button id="facet-config-delete" type="button">Supprimer</button>
+              <button id="facet-config-default" type="button">Meilleur défaut</button>
+            </div>
+          </div>
+          <label class="control-wide">
+            <span>Ambiance éclairage</span>
+            <select id="lighting-preset">
+              <option value="current" selected>Actuel - studio sombre luxe</option>
+              <option value="dashboard-chrome">Tableau de bord chrome & bois</option>
+              <option value="diamond-macro">Macro diamant contrastée</option>
+              <option value="soft-marble">Softbox marbre clair</option>
+              <option value="velvet-evening">Velours noir soirée</option>
+            </select>
+          </label>
+          <label>
+            <span>Key light</span>
+            <input id="key-light" type="range" min="0" max="12" value="5.2" step="any" />
+          </label>
+          <label>
+            <span>Rim light</span>
+            <input id="rim-light" type="range" min="0" max="12" value="4.4" step="any" />
+          </label>
+          <label>
+            <span>Fill light</span>
+            <input id="fill-light" type="range" min="0" max="8" value="1.7" step="any" />
+          </label>
+          <label>
+            <span>Support noble</span>
+            <select id="support-material">
+              <option value="hidden">Masquer le sol</option>
+              <option value="velvet-black" selected>Velours noir</option>
+              <option value="velvet-burgundy">Velours bordeaux</option>
+              <option value="velvet-emerald">Velours vert émeraude</option>
+              <option value="velvet-sapphire">Velours bleu nuit</option>
+              <option value="velvet-ivory">Velours ivoire</option>
+              <option value="walnut">Bois noyer satiné</option>
+              <option value="ebony">Bois ébène</option>
+              <option value="mahogany">Bois acajou poli</option>
+              <option value="oak-smoked">Bois chêne fumé</option>
+              <option value="rosewood">Bois palissandre</option>
+              <option value="marble-white">Marbre blanc veiné</option>
+              <option value="marble-black">Marbre noir</option>
+              <option value="marble-green">Marbre vert Alpi</option>
+              <option value="marble-rose">Marbre rose portugais</option>
+              <option value="marble-champagne">Marbre champagne</option>
+              <option value="travertine">Pierre travertin</option>
+              <option value="slate">Ardoise sombre</option>
+              <option value="limestone">Pierre calcaire claire</option>
+              <option value="basalt">Basalte adouci</option>
+              <option value="onyx-honey">Onyx miel translucide</option>
+              <option value="ivory">Ivoire mat</option>
+              <option value="leather">Cuir brun grainé</option>
+              <option value="champagne-satin">Satin champagne</option>
+              <option value="pbr-walnut-relief">PBR noyer rainur&eacute;</option>
+              <option value="pbr-ebony-ribbed">PBR &eacute;b&egrave;ne rainur&eacute;</option>
+              <option value="pbr-marble-calacatta">PBR marbre Calacatta</option>
+              <option value="pbr-marble-nero-gold">PBR marbre Nero or</option>
+              <option value="pbr-travertine-filled">PBR travertin rempli</option>
+              <option value="pbr-limestone-brushed">PBR calcaire bross&eacute;</option>
+              <option value="pbr-velvet-ribbed-black">PBR velours noir c&ocirc;tel&eacute;</option>
+              <option value="pbr-leather-full-grain">PBR cuir pleine fleur</option>
+              <option value="pbr-onyx-honey-polished">PBR onyx miel poli</option>
+              <option value="chrome-mirror">Chrome miroir</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="segmented segmented--wrap" role="group" aria-label="Fond">
+          <button class="is-active" type="button" data-bg="black">Noir</button>
+          <button type="button" data-bg="white">Blanc</button>
+          <button type="button" data-bg="champagne">Champagne</button>
+          <button type="button" data-bg="graphite">Graphite</button>
+          <button type="button" data-bg="warm-ivory">Ivoire</button>
+          <button type="button" data-bg="bronze-night">Bronze</button>
+          <button type="button" data-bg="blue-black">Bleu noir</button>
+          <button type="button" data-bg="emerald-dark">Émeraude</button>
+        </div>
+
+        <div class="toggles">
+          <label><input id="auto-rotate" type="checkbox" /> Auto-rotation</label>
+          <label><input id="caustics" type="checkbox" /> Caustiques fake</label>
+          <label><input id="dof" type="checkbox" /> Profondeur de champ</label>
+        </div>
+
+        <label class="file-loader">
+          <span>Importer OBJ/FBX/PLY/3DS/GLB/3DM</span>
+          <input id="model-file" type="file" accept=".glb,.gltf,.obj,.fbx,.ply,.3ds,.3dm,.step,.stp,.stl" />
+        </label>
+        <div class="rhino-remesh control-wide" aria-label="Remaillage Rhino a posteriori">
+          <div class="rhino-remesh__header">
+            <div>
+              <span>Maillage Rhino</span>
+              <strong id="rhino-remesh-state">Source 3DM disponible</strong>
+            </div>
+            <label class="rhino-check"><input id="rhino-remesh-live" type="checkbox" checked /> <span>Temps reel</span></label>
+          </div>
+          <label>
+            <span>Finesse cible</span>
+            <select id="rhino-remesh-quality">
+              <option value="draft">Rapide - aperçu brut</option>
+              <option value="balanced">Équilibré - joaillerie web</option>
+              <option value="luxury">Luxe HD - plug lisse réaliste</option>
+              <option value="silky-metal">Métal soyeux - arêtes conservées</option>
+              <option value="macro-polish" selected>Macro poli - NURBS affiné par défaut</option>
+              <option value="custom">Personnalisé</option>
+            </select>
+          </label>
+          <label>
+            <span>Tolérance corde <b id="rhino-remesh-chord-value">0.015</b></span>
+            <input id="rhino-remesh-chord" type="range" min="0.001" max="0.18" value="0.015" step="any" />
+          </label>
+          <label>
+            <span>Angle facettes <b id="rhino-remesh-angle-value">5</b> deg</span>
+            <input id="rhino-remesh-angle" type="range" min="1" max="30" value="5" step="any" />
+          </label>
+          <label>
+            <span>Arête max <b id="rhino-remesh-max-edge-value">0.12</b></span>
+            <input id="rhino-remesh-max-edge" type="range" min="0.0001" max="0.8" value="0.12" step="any" />
+          </label>
+          <label>
+            <span>Subdivision visuelle <b id="rhino-remesh-subdivision-value">0</b></span>
+            <input id="rhino-remesh-subdivision" type="range" min="0" max="3" value="0" step="1" />
+          </label>
+          <label>
+            <span>Relaxation surface <b id="rhino-remesh-relaxation-value">0</b></span>
+            <input id="rhino-remesh-relaxation" type="range" min="0" max="8" value="0" step="1" />
+          </label>
+          <label>
+            <span>Force relaxation <b id="rhino-remesh-relaxation-strength-value">0.00</b></span>
+            <input id="rhino-remesh-relaxation-strength" type="range" min="0" max="0.85" value="0" step="any" />
+          </label>
+          <label>
+            <span>Seuil arêtes préservées <b id="rhino-remesh-preserve-angle-value">42</b> deg</span>
+            <input id="rhino-remesh-preserve-angle" type="range" min="8" max="85" value="42" step="any" />
+          </label>
+          <label>
+            <span>Lissage arêtes <b id="rhino-remesh-smooth-value">68</b> deg</span>
+            <input id="rhino-remesh-smooth-angle" type="range" min="1" max="89" value="68" step="any" />
+          </label>
+          <label>
+            <span>Mode aperçu</span>
+            <select id="rhino-preview-mode">
+              <option value="wire-overlay" selected>Filaire sur matière</option>
+              <option value="surface-overlay">Surface transparente + filaire</option>
+              <option value="wire-only">Filaire seul</option>
+            </select>
+          </label>
+          <label>
+            <span>Opacite filaire <b id="rhino-preview-opacity-value">0.42</b></span>
+            <input id="rhino-preview-opacity" type="range" min="0.08" max="1" value="0.42" step="any" />
+          </label>
+          <label class="rhino-check"><input id="rhino-remesh-recompute-normals" type="checkbox" checked /> <span>Lissage anti-facettes</span></label>
+          <label class="rhino-check"><input id="rhino-remesh-weighted-normals" type="checkbox" /> <span>Normales pondérées</span></label>
+          <label class="rhino-check"><input id="rhino-preserve-frame" type="checkbox" checked /> <span>Conserver le repère Rhino</span></label>
+          <label class="rhino-check"><input id="rhino-z-up" type="checkbox" checked /> <span>Z Rhino vertical</span></label>
+          <label class="rhino-check"><input id="rhino-preview-enabled" type="checkbox" /> <span>Aperçu instantané du maillage</span></label>
+          <p id="rhino-preview-stats" class="rhino-preview-stats">Aperçu : désactivé</p>
+          <button id="rhino-remesh-apply" type="button">Recalculer depuis le 3DM</button>
+        </div>
+      </aside>
+
+      <dialog id="mesh-preview-dialog" class="mesh-dialog" aria-label="Prévisualisation du maillage 3DM">
+        <form method="dialog" class="mesh-dialog__panel">
+          <div class="mesh-dialog__header">
+            <div>
+              <p class="eyebrow">Import Rhino 3DM</p>
+              <h2>Prévisualisation du maillage</h2>
+            </div>
+            <button id="mesh-import-cancel" class="icon-button" type="button" aria-label="Annuler l'import">
+              <span></span>
+            </button>
+          </div>
+          <p id="mesh-import-summary" class="mesh-dialog__summary"></p>
+          <div class="mesh-stats" aria-label="Statistiques du fichier">
+            <span><strong id="mesh-stat-meshes">0</strong> mesh(s)</span>
+            <span><strong id="mesh-stat-lines">0</strong> ligne(s) / cotation(s)</span>
+            <span><strong id="mesh-stat-vertices">0</strong> sommets</span>
+            <span><strong id="mesh-stat-triangles">0</strong> triangles</span>
+          </div>
+          <p class="mesh-dialog__note">
+            Rhino stocke la polysurface NURBS, mais WebGL affiche une tessellation triangulée. Ces réglages affinent
+            la tessellation utilisée par le viewer quand elle est disponible et appliquent un post-traitement sans changer les matériaux PBR.
+          </p>
+          <div class="mesh-dialog__grid">
+            <label class="control-wide">
+              <span>Qualité cible</span>
+              <select id="mesh-quality">
+                <option value="draft">Rapide - aperçu brut</option>
+                <option value="balanced">Équilibré - joaillerie web</option>
+                <option value="luxury">Luxe HD - plug lisse réaliste</option>
+                <option value="silky-metal">Métal soyeux - arêtes conservées</option>
+                <option value="macro-polish" selected>Macro poli - NURBS affiné par défaut</option>
+                <option value="custom">Personnalisé</option>
+              </select>
+            </label>
+            <label>
+              <span>Tolérance corde <b id="mesh-chord-value">0.05</b></span>
+              <input id="mesh-chord" type="range" min="0.005" max="0.25" value="0.05" step="any" />
+            </label>
+            <label>
+              <span>Angle max facettes <b id="mesh-angle-value">12</b>°</span>
+              <input id="mesh-angle" type="range" min="3" max="35" value="12" step="any" />
+            </label>
+            <label>
+              <span>Longueur arête max <b id="mesh-max-edge-value">0.35</b></span>
+              <input id="mesh-max-edge" type="range" min="0.0001" max="1.2" value="0.35" step="any" />
+            </label>
+            <label>
+              <span>Soudure sommets <b id="mesh-weld-value">0.001</b></span>
+              <input id="mesh-weld" type="range" min="0" max="0.02" value="0.001" step="any" />
+            </label>
+            <label>
+              <span>Lissage normales <b id="mesh-smooth-angle-value">0</b>°</span>
+              <input id="mesh-smooth-angle" type="range" min="0" max="89" value="0" step="any" />
+            </label>
+            <label>
+              <span>Subdivision visuelle <b id="mesh-subdivision-value">0</b></span>
+              <input id="mesh-subdivision" type="range" min="0" max="3" value="0" step="1" />
+            </label>
+            <label>
+              <span>Relaxation surface <b id="mesh-relaxation-value">0</b></span>
+              <input id="mesh-relaxation" type="range" min="0" max="8" value="0" step="1" />
+            </label>
+            <label>
+              <span>Force relaxation <b id="mesh-relaxation-strength-value">0.00</b></span>
+              <input id="mesh-relaxation-strength" type="range" min="0" max="0.85" value="0" step="any" />
+            </label>
+            <label>
+              <span>Seuil arêtes préservées <b id="mesh-preserve-angle-value">42</b> deg</span>
+              <input id="mesh-preserve-angle" type="range" min="8" max="85" value="42" step="any" />
+            </label>
+            <label><input id="mesh-recompute-normals" type="checkbox" /> Recalculer les normales</label>
+            <label><input id="mesh-weighted-normals" type="checkbox" /> Normales pondérées</label>
+            <label><input id="mesh-double-sided" type="checkbox" checked /> Double face visible</label>
+            <label><input id="mesh-ignore-annotations" type="checkbox" checked /> Ignorer cotations / courbes</label>
+            <label><input id="mesh-preserve-materials" type="checkbox" checked /> Préserver indices matériaux Rhino</label>
+            <label><input id="mesh-preserve-frame" type="checkbox" checked /> Conserver le repère Rhino</label>
+            <label><input id="mesh-rhino-z-up" type="checkbox" checked /> Z Rhino vertical</label>
+            <label><input id="mesh-soft-shadow" type="checkbox" checked /> Ombre studio douce</label>
+            <label><input id="mesh-geometric-shadow" type="checkbox" /> Ombre géométrique du mesh</label>
+          </div>
+          <div class="mesh-dialog__actions">
+            <button id="mesh-import-apply" type="button">Importer avec ces réglages</button>
+          </div>
+        </form>
+      </dialog>
+
+      <div id="loader" class="loader is-hidden" role="status" aria-live="polite" aria-atomic="true">
+        <div class="loader__meta">
+          <span id="loader-stage">Préparation du studio joaillerie</span>
+          <strong id="loader-percent">0 %</strong>
+        </div>
+        <div class="loader__bar" role="progressbar" aria-label="Progression du chargement" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <span id="loader-progress"></span>
+        </div>
+      </div>
+
+      <div id="notice" class="notice" hidden></div>
+
+      <section id="material-context-menu" class="material-context-menu" hidden aria-label="Matériaux de l’objet sélectionné">
+        <div class="material-context-menu__header">
+          <div>
+            <span id="material-context-kind">Matériau détecté</span>
+            <strong id="material-context-object">Objet</strong>
+          </div>
+          <button id="material-context-close" type="button" aria-label="Fermer le menu">×</button>
+        </div>
+        <div id="material-context-options" class="material-context-menu__options"></div>
+        <button id="material-context-switch" class="material-context-menu__switch" type="button"></button>
+      </section>
+
+      <section id="debug-log-panel" class="debug-log" hidden aria-label="Journal de débogage">
+        <div class="debug-log__header">
+          <h2>Journal de débogage</h2>
+          <div>
+            <button id="copy-log" type="button">Copier</button>
+            <button id="clear-log" type="button">Vider</button>
+            <button id="close-log" type="button">Fermer</button>
+          </div>
+        </div>
+        <textarea id="debug-log-output" readonly spellcheck="false"></textarea>
+      </section>
+    </main>
+
+    <script src="./welcome.js?v=20260902-release-v03" defer></script>
+  </body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
