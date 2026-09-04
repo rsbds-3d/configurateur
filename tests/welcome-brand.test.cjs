@@ -19,6 +19,7 @@ assert(fs.statSync(logo).size > 1000, "Le fichier du logo ROSEBUDS ne doit pas �
 assert(html.includes('class="welcome-rosebuds-logo"'), "Le logo ROSEBUDS doit apparaître dans l'en-tête.");
 assert(html.includes('alt="ROSEBUDS"'), "Le logo doit avoir un nom accessible.");
 assert(html.includes('class="viewer-rosebuds-logo"'), "Le logo ROSEBUDS doit rester visible dans le viewer 3D.");
+assert(!/CHARLES THIERRY DE VILLE D'AVRAY/i.test(html), "Le nom personnel ne doit plus apparaître dans l'accueil ni dans le viewer.");
 assert(viewerCss.includes(".viewer-rosebuds-logo"), "Le viewer doit définir une présentation dédiée au logo ROSEBUDS.");
 assert(css.includes("filter: brightness(0) invert(1)"), "Le logo doit être blanc sur le fond sombre.");
 assert(css.includes("mix-blend-mode: difference"), "Le logo doit conserver un contraste noir ou blanc selon le fond.");
