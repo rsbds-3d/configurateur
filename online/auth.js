@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const APP_SCRIPT = "./welcome.js?v=20260902-release-v03";
+  const APP_SCRIPT = "./welcome.js?v=20260911-nonblocking-tools-v04";
   const SESSION_KEY = "rosebuds-online-access-v03";
   const CREDENTIAL_SALT = "rosebuds-configurator-v1";
   const CREDENTIAL_HASH = "773378c2ea078c94a654dac3bc5aba02721f3e4cc682f7160cce46c653873e9c";

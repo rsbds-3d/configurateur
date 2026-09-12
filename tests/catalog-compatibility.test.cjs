@@ -47,7 +47,7 @@ assert(app.includes('modelFamily === "Classique" && ["XXL", "XXXL"].includes(met
 assert(welcome.includes('model.family === "NEW SMALL" && metalFamily === "alu" && ornament === "gem"'), "La gemme doit etre bloquee sur NEW SMALL aluminium.");
 assert(welcome.includes('["gem", "pressed-glass"].includes(ornament)'), "Gem et verre presse doivent partager une restriction de famille explicite.");
 assert(welcome.includes('model.metalSizeClass === "SMALL"') && welcome.includes('model.family === "NEW MEDIUM"'), "Gem et verre presse doivent etre reserves a SMALL, NEW SMALL et NEW MEDIUM.");
-assert(welcome.includes('if (getMetalSizeClass(label) === "SMALL") ornaments.push("gem", "pressed-glass")'), "Gem et verre presse doivent etre limites aux geometries SMALL compatibles.");
+assert(welcome.includes('if (getMetalSizeClass(label, option.value) === "SMALL") ornaments.push("gem", "pressed-glass")'), "Gem et verre presse doivent etre limites aux geometries SMALL compatibles.");
 assert(welcome.includes('ornaments.push("crystal")'), "Le cristal doit rester disponible pour tous les modeles avec ornement.");
 assert(welcome.includes('["Clear", "Clear"') && welcome.includes('["Aurore Boreale", "Aurore Boreale"'), "Les cristaux doivent afficher leurs noms catalogue d'origine.");
 assert(!welcome.includes('"Cristal clair"') && !welcome.includes('"Aurore boréale"'), "Les traductions françaises des noms de cristaux ne doivent plus être affichées.");

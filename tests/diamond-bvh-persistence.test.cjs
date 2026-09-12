@@ -29,10 +29,10 @@ assert.match(
   /if \(!replaceMaterialOnMesh\(mesh, sourceMaterial, nextMaterial\)\)/,
   "L'installation du shader doit vérifier que la substitution du matériau a réussi.",
 );
-assert.match(
+assert.doesNotMatch(
   source,
-  /fallbackOptical\.isCabochon \|\| fallbackOptical\.ior < 1\.72/,
-  "Le fallback CPU coûteux doit rester désactivé pour les cristaux ordinaires et les cabochons.",
+  /function bakeDiamondInternalRayTracing|function traceDiamondChannel|new diamondBVHModule\.MeshBVH\(/,
+  "Aucun calcul BVH ni bake CPU bloquant ne doit subsister sur le fil de l'interface.",
 );
 
 console.log("diamond-bvh-persistence.test.cjs: OK");

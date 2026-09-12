@@ -37,7 +37,7 @@ for (const relativePath of textFiles) {
 
 const index = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const expectedLabels = [
-  "Choisir les listes o\u00f9 chaque mat\u00e9riau appara\u00eet",
+  "G\u00e9rer les listes",
   "Biblioth\u00e8que",
   "Pi\u00e8ce de la biblioth\u00e8que",
   "Journal de d\u00e9bogage"

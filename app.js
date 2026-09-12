@@ -15,6 +15,10 @@ import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
 import { MeshoptDecoder } from "meshoptimizer";
+import { buildBVHInWorker, compileBeforeSwap, abortError } from "./assets/js/diamond/background-bvh.js";
+import { attachDecalGesture } from "./assets/js/decal-gesture.js";
+import { pointInPlacementFrame, placementInWorld } from "./assets/js/decal-placement.js";
+import { buildViewerProductSummary, resolveRosebudsProductLink } from "./assets/js/rosebuds-product-link.js";
 
 const canvas = document.querySelector("#jewel-canvas");
 const loaderEl = document.querySelector("#loader");
@@ -31,8 +35,28 @@ let loadingHideTimer = 0;
 let diamondCalculationProgressActive = false;
 let diamondCalculationProgressTotal = 0;
 let diamondCalculationProgressCompleted = 0;
+let diamondWorkStarted = false;
+let viewerInteractionActive = false;
+let lastViewerInteractionAt = performance.now();
 
-function setLoadingProgress(percent, stage) {
+function noteViewerInteraction(active = viewerInteractionActive) {
+  viewerInteractionActive = active;
+  lastViewerInteractionAt = performance.now();
+}
+
+async function waitForViewerIdle(signal, isCurrent, onWait, idleMs = 850) {
+  while (!signal?.aborted && isCurrent()) {
+    const idleFor = performance.now() - lastViewerInteractionAt;
+    const inputPending = navigator.scheduling?.isInputPending?.({ includeContinuous: true }) === true;
+    if (!viewerInteractionActive && !inputPending && idleFor >= idleMs) return;
+    onWait?.();
+    await new Promise((resolve) => window.setTimeout(resolve, 80));
+  }
+  throw abortError();
+}
+
+function setLoadingProgress(percent, stage, optical = false) {
+  if (diamondWorkStarted && !optical) return;
   const next = THREE.MathUtils.clamp(Number(percent) || 0, 0, 100);
   loadingProgress = Math.max(loadingProgress, next);
   const rounded = Math.round(loadingProgress);
@@ -51,7 +75,6 @@ function startLoading(stage = "Préparation du modèle 3D", percent = 3) {
 
 function finishLoading(stage = "Modèle prêt") {
   if (diamondCalculationProgressActive) {
-    setLoadingProgress(Math.max(94, loadingProgress), "Préparation du lancer de rayons");
     return;
   }
   setLoadingProgress(100, stage);
@@ -65,15 +88,17 @@ function showDiamondCalculationProgress(stage, percent = 94) {
     diamondCalculationProgressActive = true;
     diamondCalculationProgressTotal = 0;
     diamondCalculationProgressCompleted = 0;
+    diamondCalculationHadFailure = false;
     if (loadingProgress >= 100 || loaderEl?.classList.contains("is-hidden")) loadingProgress = 0;
   }
-  setLoadingProgress(percent, stage);
+  setLoadingProgress(percent, stage, true);
   loaderEl?.classList.remove("is-hidden");
 }
 
 function finishDiamondCalculationProgress(stage = "Rendu à lancer de rayons prêt") {
-  setLoadingProgress(100, stage);
+  setLoadingProgress(100, stage, true);
   diamondCalculationProgressActive = false;
+  diamondWorkStarted = false;
   window.clearTimeout(loadingHideTimer);
   loadingHideTimer = window.setTimeout(() => loaderEl?.classList.add("is-hidden"), 650);
 }
@@ -391,6 +416,9 @@ const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 let canvasPointerStart = null;
 let stemDecalDragState = null;
+let stemDecalGesture = null;
+let selectedStemDecal = null;
+let stemDecalSelectionHelper = null;
 let arCameraStream = null;
 let arSceneState = null;
 let arVideoTexture = null;
@@ -420,6 +448,14 @@ composer.addPass(bokehPass);
 const root = new THREE.Group();
 root.name = "Luxury ring root";
 scene.add(root);
+
+const scaleReferenceGroup = new THREE.Group();
+scaleReferenceGroup.name = "Objets de comparaison à l’échelle";
+scaleReferenceGroup.visible = false;
+scene.add(scaleReferenceGroup);
+let optimizedRenderWorker = null;
+let optimizedRenderJobId = 0;
+let optimizedRenderBlob = null;
 
 let centerGemMesh = null;
 const uploadedModels = new Map();
@@ -3365,6 +3401,20 @@ function buildMaterialVisibilityLibrary() {
       table.appendChild(row);
     });
   });
+  table.dataset.built = "true";
+}
+
+function toggleMaterialVisibilityLibrary() {
+  const table = document.querySelector("#material-visibility-table");
+  const toggle = document.querySelector("#material-visibility-toggle");
+  const reset = document.querySelector("#material-visibility-reset");
+  if (!table || !toggle) return;
+  const opening = table.hidden;
+  if (opening && table.dataset.built !== "true") buildMaterialVisibilityLibrary();
+  table.hidden = !opening;
+  toggle.setAttribute("aria-expanded", String(opening));
+  toggle.textContent = opening ? "Masquer les listes" : "Gérer les listes";
+  if (reset) reset.hidden = !opening;
 }
 
 function applyMaterialVisibilityChange(input) {
@@ -3391,7 +3441,11 @@ function applyMaterialVisibilityChange(input) {
 function resetMaterialVisibilityLibrary() {
   localStorage.removeItem(MATERIAL_VISIBILITY_KEY);
   populateMaterialSelectOptions();
-  buildMaterialVisibilityLibrary();
+  const table = document.querySelector("#material-visibility-table");
+  if (table) {
+    table.dataset.built = "false";
+    if (!table.hidden) buildMaterialVisibilityLibrary();
+  }
   showNotice("Tous les mat\u00e9riaux sont de nouveau visibles dans leurs listes.");
 }
 
@@ -3881,7 +3935,8 @@ function loadJewelryExample(id, options = {}) {
 }
 
 function updateProductCopy(defaults) {
-  document.querySelector(".brand-panel p:last-child").textContent = defaults.copy;
+  const description = document.querySelector("#viewer-product-description");
+  if (description) description.textContent = String(defaults.copy || "").replace(/\bclassique\b/gi, "de la gamme Originale");
 }
 
 function loadWithTimeout(promise, timeoutMs, label) {
@@ -4480,6 +4535,17 @@ function handleCatalogGalleryClick(event) {
     } else if (settings.activeCatalogGemPreset) {
       applyCatalogGemPreset("gem", settings.activeCatalogGemPreset, { reason: "restauration finition pierre catalogue" });
     }
+    if (scaleReferenceGroup.visible) refreshScaleReference();
+    const meta = getCatalogModelMeta(id, modelDefaults[id]?.title || id);
+    const params = new URLSearchParams(window.location.search);
+    params.set("catalogModel", id);
+    params.set("modelFamily", meta.modelFamily || "");
+    params.set("plugSize", meta.size || "");
+    if (state.metal) params.set("metalFamily", state.metal);
+    if (state.metalFinish) params.set("metalFinish", state.metalFinish);
+    if (state.ornament) params.set("ornament", state.ornament);
+    if (state.ornamentFinish) params.set("ornamentFinish", state.ornamentFinish);
+    void updateViewerProductInformation(params, meta);
     renderCatalogGallery();
     showNotice("Modèle chargé depuis le catalogue filtré.");
   });
@@ -5263,6 +5329,8 @@ function updateRhinoMeshPreview() {
 }
 
 function resetJewelryRoot() {
+  stemDecalGesture?.cancel();
+  clearStemDecalSelection();
   clearRhinoMeshPreview();
   detachManipulator();
   closeMaterialContextMenu();
@@ -6913,7 +6981,7 @@ function setupControlsAccordion() {
   const getBlock = (selector) => {
     const el = document.querySelector(selector);
     if (!el) return null;
-    const grouped = el.closest(".material-editor, .material-visibility, .effect-status, .reflection-editor, .facet-texture, .rhino-remesh, .library-actions, .segmented, .toggles, .file-loader");
+    const grouped = el.closest(".material-editor, .material-visibility, .effect-status, .reflection-editor, .facet-texture, .rhino-remesh, .library-actions, .decal-position-control, .segmented, .toggles, .file-loader");
     if (grouped) return grouped;
     return el.closest(".material-editor, .material-visibility, .effect-status, .reflection-editor, .facet-texture, .rhino-remesh, .stone-showcase-controls, .library-actions, .segmented, .toggles, .file-loader, label");
   };
@@ -6939,7 +7007,7 @@ function setupControlsAccordion() {
     return panel;
   };
 
-  addSection("Bibliothèque", "Pièces, stockage local, listes", ["#jewel-model", "#model-compare-control", "#menu-panel-width", "#library-add", "#material-visibility-library"], true);
+  addSection("Bibliothèque", "Pièces, stockage local, listes", ["#jewel-model", "#model-compare-control", "#menu-panel-width", "#library-add", "#decal-edit-mode", "#material-visibility-library"], true);
   addSection("Objet & mat\u00e9riaux", "Sélection, métaux, facettes", ["#object-select", "#metal-intensity", "#metal-preset", "#metal-roughness", "#facet-texture-enabled"], true);
   addSection("Pierre & reflets", "Gemmes, feux, effets", [
     "#effect-method",
@@ -7129,6 +7197,305 @@ function toggleCameraAR() {
   else startCameraAR();
 }
 
+function showAuxiliaryProgress(percent, stage) {
+  window.clearTimeout(loadingHideTimer);
+  if (percent <= 5 || loaderEl?.classList.contains("is-hidden")) loadingProgress = 0;
+  setLoadingProgress(percent, stage, true);
+  loaderEl?.classList.remove("is-hidden");
+}
+
+function finishAuxiliaryProgress(stage) {
+  setLoadingProgress(100, stage, true);
+  window.clearTimeout(loadingHideTimer);
+  loadingHideTimer = window.setTimeout(() => loaderEl?.classList.add("is-hidden"), 900);
+}
+
+function getSceneUnitsPerMillimeter() {
+  let scale = null;
+  root.traverse((child) => {
+    if (scale == null && Number.isFinite(child.userData?.sceneUnitsPerMillimeter)) scale = child.userData.sceneUnitsPerMillimeter;
+  });
+  if (scale != null) return scale;
+  const box = getVisibleMeshBox(root);
+  const diameter = getCatalogModelMeta(settings.modelId, modelDefaults[settings.modelId]?.title || "").diameterMm || 50;
+  return isBoxEmpty(box) ? 0.03 : Math.max(box.getSize(new THREE.Vector3()).length() / Math.max(diameter * 2.4, 1), 0.002);
+}
+
+function clearScaleReference() {
+  scaleReferenceGroup.traverse((child) => {
+    child.geometry?.dispose?.();
+    if (Array.isArray(child.material)) child.material.forEach((material) => material?.dispose?.());
+    else child.material?.dispose?.();
+  });
+  scaleReferenceGroup.clear();
+}
+
+function makeScaleReferenceMaterial(options = {}) {
+  return new THREE.MeshPhysicalMaterial({
+    color: options.color || "#b8bdc2",
+    metalness: options.metalness ?? 0.05,
+    roughness: options.roughness ?? 0.32,
+    transmission: options.transmission ?? 0,
+    thickness: options.thickness ?? 0,
+    transparent: (options.transmission || 0) > 0,
+    opacity: options.opacity ?? 1,
+    envMapIntensity: 1.2,
+  });
+}
+
+function makeCoinReference(unit) {
+  const group = new THREE.Group();
+  const coin = new THREE.Mesh(new THREE.CylinderGeometry(11.625 * unit, 11.625 * unit, 2.33 * unit, 96), makeScaleReferenceMaterial({ color: "#d7b45a", metalness: 0.92, roughness: 0.22 }));
+  coin.rotation.x = Math.PI / 2;
+  coin.position.y = floor.position.y + 11.625 * unit;
+  group.add(coin);
+  return group;
+}
+
+function makeBottleReference(unit, large = false) {
+  const height = (large ? 320 : 180) * unit;
+  const radius = (large ? 45 : 30) * unit;
+  const group = new THREE.Group();
+  const plastic = makeScaleReferenceMaterial({ color: "#d8f2f5", roughness: 0.18, transmission: 0.72, thickness: 1.2, opacity: 0.72 });
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.88, radius, height * 0.78, 64, 3), plastic);
+  body.position.y = floor.position.y + height * 0.39;
+  const shoulder = new THREE.Mesh(new THREE.SphereGeometry(radius * 0.9, 64, 32, 0, Math.PI * 2, 0, Math.PI * 0.5), plastic.clone());
+  shoulder.scale.y = 0.52;
+  shoulder.position.y = floor.position.y + height * 0.78;
+  const neck = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.28, radius * 0.38, height * 0.14, 48), plastic.clone());
+  neck.position.y = floor.position.y + height * 0.9;
+  const cap = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.3, radius * 0.3, height * 0.06, 48), makeScaleReferenceMaterial({ color: "#ed2b86", metalness: 0, roughness: 0.48 }));
+  cap.position.y = floor.position.y + height * 0.99;
+  group.add(body, shoulder, neck, cap);
+  return group;
+}
+
+function makeRulerTexture() {
+  const surface = document.createElement("canvas");
+  surface.width = 1600;
+  surface.height = 220;
+  const context = surface.getContext("2d");
+  context.fillStyle = "#f7e7a9";
+  context.fillRect(0, 0, surface.width, surface.height);
+  context.fillStyle = "#171717";
+  context.font = "42px Arial";
+  context.textAlign = "center";
+  for (let millimeter = 0; millimeter <= 200; millimeter += 1) {
+    const x = 18 + (surface.width - 36) * (millimeter / 200);
+    const length = millimeter % 10 === 0 ? 86 : millimeter % 5 === 0 ? 58 : 34;
+    context.fillRect(x, 0, 2, length);
+    if (millimeter % 10 === 0 && millimeter < 200) context.fillText(String(millimeter / 10), x + 12, 145);
+  }
+  const texture = new THREE.CanvasTexture(surface);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  return texture;
+}
+
+function makeRulerReference(unit) {
+  const group = new THREE.Group();
+  const ruler = new THREE.Mesh(
+    new THREE.BoxGeometry(200 * unit, 2.4 * unit, 28 * unit),
+    makeScaleReferenceMaterial({ color: "#fff2ba", roughness: 0.5 }),
+  );
+  ruler.position.y = floor.position.y + 1.2 * unit;
+  const markings = new THREE.Mesh(
+    new THREE.PlaneGeometry(200 * unit, 28 * unit),
+    new THREE.MeshBasicMaterial({ map: makeRulerTexture(), toneMapped: false, side: THREE.DoubleSide }),
+  );
+  markings.rotation.x = -Math.PI / 2;
+  markings.position.y = floor.position.y + 2.43 * unit;
+  group.add(ruler, markings);
+  return group;
+}
+
+function frameModelAndScaleReference() {
+  const box = getVisibleMeshBox(root);
+  if (scaleReferenceGroup.visible) box.union(new THREE.Box3().setFromObject(scaleReferenceGroup));
+  if (isBoxEmpty(box)) return;
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+  const radius = Math.max(size.x, size.y, size.z, 0.8);
+  controls.target.copy(center);
+  camera.position.set(center.x + radius * 1.5, center.y + radius * 0.75, center.z + radius * 1.85);
+  camera.near = Math.max(0.001, radius / 2400);
+  camera.far = Math.max(1000, radius * 12);
+  camera.updateProjectionMatrix();
+  controls.update();
+}
+
+function refreshScaleReference() {
+  clearScaleReference();
+  const enabled = document.querySelector("#scale-reference-enabled")?.checked === true;
+  const select = document.querySelector("#scale-reference-type");
+  scaleReferenceGroup.visible = enabled;
+  if (select) select.disabled = !enabled;
+  if (!enabled) {
+    frameImportedModel(root);
+    return;
+  }
+  const unit = getSceneUnitsPerMillimeter();
+  const type = select?.value || "coin";
+  const object = type === "coin" ? makeCoinReference(unit)
+    : type === "bottle-small" ? makeBottleReference(unit, false)
+      : type === "bottle-large" ? makeBottleReference(unit, true)
+        : makeRulerReference(unit);
+  const modelBox = getVisibleMeshBox(root);
+  const objectBox = new THREE.Box3().setFromObject(object);
+  const margin = Math.max(unit * 12, 0.08);
+  object.position.x += modelBox.max.x - objectBox.min.x + margin;
+  scaleReferenceGroup.add(object);
+  scaleReferenceGroup.updateWorldMatrix(true, true);
+  frameModelAndScaleReference();
+}
+
+function renderCanvasToPngBlob() {
+  composer.render();
+  return new Promise((resolve, reject) => {
+    renderer.domElement.toBlob((blob) => blob ? resolve(blob) : reject(new Error("Capture PNG vide")), "image/png", 1);
+  });
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.click();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+async function downloadCurrentView() {
+  try {
+    showAuxiliaryProgress(12, "Capture de la vue 3D");
+    const blob = await renderCanvasToPngBlob();
+    downloadBlob(blob, `rosebuds-${settings.modelId || "plug"}.png`);
+    finishAuxiliaryProgress("Image PNG téléchargée");
+  } catch (error) {
+    finishAuxiliaryProgress("Capture impossible");
+    showNotice("Impossible de capturer la vue 3D dans ce navigateur.");
+  }
+}
+
+async function shareCurrentView() {
+  try {
+    showAuxiliaryProgress(12, "Préparation de l’image à partager");
+    const blob = await renderCanvasToPngBlob();
+    const file = new File([blob], `rosebuds-${settings.modelId || "plug"}.png`, { type: "image/png" });
+    if (navigator.canShare?.({ files: [file] })) {
+      await navigator.share({ title: "Mon plug Rosebuds", text: document.querySelector("#viewer-product-summary")?.textContent || "Configuration Rosebuds", files: [file] });
+    } else if (navigator.share) {
+      await navigator.share({ title: "Mon plug Rosebuds", text: document.querySelector("#viewer-product-summary")?.textContent || "Configuration Rosebuds", url: window.location.href });
+    } else {
+      downloadBlob(blob, file.name);
+      showNotice("Le partage natif n’est pas disponible : l’image PNG a été téléchargée.");
+    }
+    finishAuxiliaryProgress("Image prête à être partagée");
+  } catch (error) {
+    if (error?.name !== "AbortError") showNotice("Le partage de l’image n’a pas pu être lancé.");
+    finishAuxiliaryProgress(error?.name === "AbortError" ? "Partage annulé" : "Partage indisponible");
+  }
+}
+
+function smoothMetalMeshesForOptimizedRender() {
+  root.traverse((child) => {
+    if (!child.isMesh || child.userData?.classicPlugRole === "gem") return;
+    const materials = Array.isArray(child.material) ? child.material : [child.material];
+    const isMetal = child.userData?.classicPlugRole === "metal"
+      || materials.some((material) => material?.userData?.jewelryMaterial?.type === "metal" || material?.metalness > 0.65);
+    if (!isMetal) return;
+    child.geometry?.computeVertexNormals?.();
+    materials.filter(Boolean).forEach((material) => {
+      material.flatShading = false;
+      material.needsUpdate = true;
+    });
+  });
+}
+
+function optimizedPixelsToBlob(message) {
+  const surface = document.createElement("canvas");
+  surface.width = message.width;
+  surface.height = message.height;
+  const context = surface.getContext("2d");
+  context.putImageData(new ImageData(message.pixels, message.width, message.height), 0, 0);
+  return new Promise((resolve, reject) => surface.toBlob((blob) => blob ? resolve(blob) : reject(new Error("Conversion PNG impossible")), "image/png", 1));
+}
+
+function showOptimizedRender(blob, caption) {
+  optimizedRenderBlob = blob;
+  const image = document.querySelector("#optimized-render-image");
+  const dialog = document.querySelector("#optimized-render-dialog");
+  const captionEl = document.querySelector("#optimized-render-caption");
+  if (image) {
+    if (image.dataset.objectUrl) URL.revokeObjectURL(image.dataset.objectUrl);
+    image.dataset.objectUrl = URL.createObjectURL(blob);
+    image.src = image.dataset.objectUrl;
+  }
+  if (captionEl) captionEl.textContent = caption;
+  if (dialog?.showModal && !dialog.open) dialog.showModal();
+}
+
+async function createOptimizedRender() {
+  const button = document.querySelector("#optimized-render");
+  if (button) button.disabled = true;
+  try {
+    showAuxiliaryProgress(4, "Lissage adaptatif des surfaces métalliques");
+    smoothMetalMeshesForOptimizedRender();
+    await waitForProgressPaint();
+    const currentPixelRatio = renderer.getPixelRatio();
+    const capturePixelRatio = Math.min(Math.max(currentPixelRatio, window.devicePixelRatio * 1.25), 2.5);
+    renderer.setPixelRatio(capturePixelRatio);
+    composer.setPixelRatio(capturePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight, false);
+    composer.setSize(window.innerWidth, window.innerHeight);
+    showAuxiliaryProgress(18, "Calcul de l’éclairage PBR haute définition");
+    await waitForProgressPaint();
+    const sourceBlob = await renderCanvasToPngBlob();
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    composer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight, false);
+    composer.setSize(window.innerWidth, window.innerHeight);
+    showAuxiliaryProgress(28, "Préparation de la super-résolution IA locale");
+
+    const id = ++optimizedRenderJobId;
+    optimizedRenderWorker ||= new Worker(new URL("./assets/js/render-enhance-worker.js", import.meta.url), { type: "module" });
+    const enhanced = await new Promise((resolve, reject) => {
+      const onMessage = async (event) => {
+        const message = event.data || {};
+        if (message.id !== id) return;
+        if (message.type === "progress") {
+          showAuxiliaryProgress(Math.max(28, message.progress || 0), message.label || "Optimisation IA locale");
+          return;
+        }
+        optimizedRenderWorker.removeEventListener("message", onMessage);
+        optimizedRenderWorker.removeEventListener("error", onError);
+        if (message.type === "error") reject(new Error(message.message));
+        else resolve(await optimizedPixelsToBlob(message));
+      };
+      const onError = (event) => {
+        optimizedRenderWorker.removeEventListener("message", onMessage);
+        optimizedRenderWorker.removeEventListener("error", onError);
+        reject(event.error || new Error(event.message || "IA d’image interrompue"));
+      };
+      optimizedRenderWorker.addEventListener("message", onMessage);
+      optimizedRenderWorker.addEventListener("error", onError);
+      optimizedRenderWorker.postMessage({ type: "enhance", id, blob: sourceBlob });
+    }).catch((error) => {
+      logDebug("optimized-render", "Super-résolution indisponible, rendu WebGL haute définition conservé.", { message: error?.message || String(error) });
+      return sourceBlob;
+    });
+    const aiApplied = enhanced !== sourceBlob;
+    showOptimizedRender(enhanced, aiApplied ? "Lissage PBR et super-résolution Swin2SR locale" : "Rendu PBR haute définition (repli sans IA)");
+    finishAuxiliaryProgress(aiApplied ? "Rendu optimisé par IA prêt" : "Rendu haute définition prêt");
+  } catch (error) {
+    logDebug("optimized-render", "Création du rendu optimisé impossible.", { message: error?.message || String(error) });
+    finishAuxiliaryProgress("Rendu optimisé indisponible");
+    showNotice("Le rendu optimisé n’a pas pu être créé.");
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
 function wireInterface() {
   logDebug("info", "Application initialis?e", {
     userAgent: navigator.userAgent,
@@ -7138,7 +7505,6 @@ function wireInterface() {
   populateGemPresets();
   populateStoneShowcaseControls();
   ensureMaterialSelectSwatches();
-  buildMaterialVisibilityLibrary();
   restoreMenuPanelWidth();
   setupControlsAccordion();
   applyDefaultControlsPanelState();
@@ -7149,18 +7515,57 @@ function wireInterface() {
     }
   });
   document.querySelector("#material-visibility-reset")?.addEventListener("click", resetMaterialVisibilityLibrary);
+  document.querySelector("#material-visibility-toggle")?.addEventListener("click", toggleMaterialVisibilityLibrary);
+  renderer.domElement.addEventListener("pointerdown", () => noteViewerInteraction(true), { capture: true });
+  renderer.domElement.addEventListener("pointermove", (event) => {
+    if (event.buttons) noteViewerInteraction(true);
+  }, { capture: true });
+  renderer.domElement.addEventListener("pointerup", () => noteViewerInteraction(false), { capture: true });
+  renderer.domElement.addEventListener("pointercancel", () => noteViewerInteraction(false), { capture: true });
+  renderer.domElement.addEventListener("wheel", () => noteViewerInteraction(false), { capture: true, passive: true });
   renderer.domElement.addEventListener("pointerdown", handleCanvasPointerDown);
-  renderer.domElement.addEventListener("pointermove", handleStemDecalPointerMove);
   renderer.domElement.addEventListener("pointerup", handleCanvasPointerUp);
   renderer.domElement.addEventListener("contextmenu", handleCanvasContextMenu);
   renderer.domElement.addEventListener("dblclick", handleCanvasDoubleClick);
   renderer.domElement.addEventListener("pointercancel", () => {
     canvasPointerStart = null;
-    finishStemDecalDrag(false);
+    stemDecalGesture?.cancel();
   });
+  stemDecalGesture = attachDecalGesture(renderer.domElement, {
+    hitTest: getStemDecalAtPointer,
+    select: selectStemDecal,
+    begin: startStemDecalDrag,
+    move: handleStemDecalPointerMove,
+    finish: finishStemDecalDrag,
+    immediate: () => document.querySelector("#decal-edit-mode")?.checked === true,
+    lock: () => {
+      canvasPointerStart = null;
+      const saved = { enabled: controls.enabled, autoRotate: controls.autoRotate };
+      controls.enabled = false;
+      controls.autoRotate = false;
+      return saved;
+    },
+    unlock: (saved) => {
+      controls.enabled = saved.enabled;
+      controls.autoRotate = saved.autoRotate;
+      canvasPointerStart = null;
+    },
+  });
+  window.addEventListener("blur", () => stemDecalGesture.cancel());
+  window.addEventListener("pagehide", () => stemDecalGesture.cancel());
+  window.addEventListener("keydown", (event) => { if (event.key === "Escape") stemDecalGesture.cancel(); });
   document.querySelector("#decal-edit-mode")?.addEventListener("change", syncStemDecalEditMode);
   document.querySelector("#decal-reset-position")?.addEventListener("click", resetCurrentStemDecalPosition);
   document.querySelector("#toggle-ar")?.addEventListener("click", toggleCameraAR);
+  document.querySelector("#scale-reference-enabled")?.addEventListener("change", refreshScaleReference);
+  document.querySelector("#scale-reference-type")?.addEventListener("change", refreshScaleReference);
+  document.querySelector("#download-view-png")?.addEventListener("click", downloadCurrentView);
+  document.querySelector("#share-view")?.addEventListener("click", shareCurrentView);
+  document.querySelector("#optimized-render")?.addEventListener("click", createOptimizedRender);
+  document.querySelector("#optimized-render-close")?.addEventListener("click", () => document.querySelector("#optimized-render-dialog")?.close());
+  document.querySelector("#optimized-render-download")?.addEventListener("click", () => {
+    if (optimizedRenderBlob) downloadBlob(optimizedRenderBlob, `rosebuds-${settings.modelId || "plug"}-optimise.png`);
+  });
   document.querySelector("#material-context-close")?.addEventListener("click", closeMaterialContextMenu);
   document.querySelector("#material-context-switch")?.addEventListener("click", () => {
     if (contextMaterialType === "support" || contextMaterialType === "environment") return;
@@ -7214,6 +7619,7 @@ function wireInterface() {
       if (settings.activeCatalogGemPreset) {
         applyCatalogGemPreset("gem", settings.activeCatalogGemPreset, { reason: "changement piece bibliotheque" });
       }
+      if (scaleReferenceGroup.visible) refreshScaleReference();
       showNotice("Pièce de la bibliothèque chargée.");
     });
   });
@@ -7909,6 +8315,7 @@ function detachDiamondRuntimeFromMaterial(material) {
   if (material?.userData) {
     delete material.userData.diamondBvhUniform;
     delete material.userData.diamondBvhGeometryUuid;
+    delete material.userData.diamondBvhGeometrySignature;
     delete material.userData.diamondBvhSourceMesh;
     delete material.userData.diamondGpuBvhEnabled;
   }
@@ -8878,10 +9285,6 @@ function handleCanvasDoubleClick(event) {
 }
 function handleCanvasPointerDown(event) {
   if (event.button !== 0) return;
-  if (startStemDecalDrag(event)) {
-    canvasPointerStart = null;
-    return;
-  }
   canvasPointerStart = {
     x: event.clientX,
     y: event.clientY,
@@ -8890,11 +9293,6 @@ function handleCanvasPointerDown(event) {
 }
 
 function handleCanvasPointerUp(event) {
-  if (stemDecalDragState) {
-    finishStemDecalDrag(true);
-    canvasPointerStart = null;
-    return;
-  }
   if (!canvasPointerStart || event.button !== 0) {
     canvasPointerStart = null;
     return;
@@ -8976,6 +9374,7 @@ function detachManipulator() {
 }
 
 function selectSceneObject(object) {
+  clearStemDecalSelection();
   selectedSceneObject = object;
   const label = document.querySelector("#selected-object-name");
   const select = document.querySelector("#object-select");
@@ -9987,6 +10386,8 @@ function removeStemDecals(model) {
   if (model?.traverse) model.traverse(collect);
   if (root?.traverse) root.traverse(collect);
   [...new Set(decals)].forEach((child) => {
+    if (stemDecalDragState?.decal === child || selectedStemDecal === child) stemDecalGesture?.cancel();
+    if (selectedStemDecal === child) clearStemDecalSelection();
     child.geometry?.dispose?.();
     child.material?.dispose?.();
     child.parent?.remove(child);
@@ -10275,13 +10676,15 @@ function writeStoredStemDecalPosition(modelId, placement) {
   if (!modelId || !placement) return;
   const positions = readStoredStemDecalPositions();
   positions[modelId] = {
-    axialRatio: THREE.MathUtils.clamp(Number(placement.axialRatio) || 0.5, 0, 1),
+    axialRatio: THREE.MathUtils.clamp(Number.isFinite(placement.axialRatio) ? placement.axialRatio : 0.5, 0, 1),
     angle: Number(placement.angle) || 0,
   };
   try {
     window.localStorage.setItem(STEM_DECAL_POSITION_STORAGE_KEY, JSON.stringify(positions));
+    return true;
   } catch {
     // Le déplacement reste utilisable même si le stockage local est indisponible.
+    return false;
   }
 }
 
@@ -10300,7 +10703,7 @@ function setStemDecalPlacementCoordinates(placement, axialRatio, angle) {
   if (!placement) return;
   const minT = Math.min(placement.safeMinT, placement.safeMaxT);
   const maxT = Math.max(placement.safeMinT, placement.safeMaxT);
-  const normalizedRatio = THREE.MathUtils.clamp(Number(axialRatio) || 0.5, 0, 1);
+  const normalizedRatio = THREE.MathUtils.clamp(Number.isFinite(Number(axialRatio)) ? Number(axialRatio) : 0.5, 0, 1);
   const normalizedAngle = Number.isFinite(Number(angle)) ? Number(angle) : 0;
   const axialT = THREE.MathUtils.lerp(minT, maxT, normalizedRatio);
   const normal = placement.stemUAxis.clone().multiplyScalar(Math.cos(normalizedAngle))
@@ -10337,7 +10740,7 @@ function rebuildStemDecalGeometry(decal) {
   if (!target?.isMesh || !model || !placement) return false;
   target.updateWorldMatrix(true, false);
   model.updateWorldMatrix(true, true);
-  const geometry = makeStemProjectionGeometry(target, placement);
+  const geometry = makeStemProjectionGeometry(target, placementInWorld(placement, decal.stemDecalFrameWorld, model.matrixWorld));
   if (!geometry.attributes.position || geometry.attributes.position.count === 0) {
     geometry.dispose();
     return false;
@@ -10361,29 +10764,64 @@ function setPointerFromCanvasEvent(event) {
 
 function getStemDecalAtPointer(event) {
   if (!setPointerFromCanvasEvent(event)) return null;
+  root.updateWorldMatrix(true, true);
   const decals = [];
   root.traverse((child) => {
     if (child.isMesh && child.userData?.stemDecal && isObjectVisibleInHierarchy(child)) decals.push(child);
   });
-  return raycaster.intersectObjects(decals, false)[0]?.object || null;
+  const hit = raycaster.intersectObjects(decals, false)[0];
+  // La zone projetée du logo gagne toujours le hit-test. Le listener en phase de
+  // capture bloque ensuite OrbitControls et la sélection du métal placé dessous.
+  return hit || null;
+}
+
+function clearStemDecalSelection() {
+  stemDecalSelectionHelper?.parent?.remove(stemDecalSelectionHelper);
+  stemDecalSelectionHelper?.dispose();
+  stemDecalSelectionHelper = null;
+  selectedStemDecal = null;
+  renderer.domElement.classList.remove("is-decal-selected");
+}
+
+function selectStemDecal(hit) {
+  closeMaterialContextMenu();
+  detachManipulator();
+  selectSceneObject(null);
+  selectedStemDecal = hit.object;
+  stemDecalSelectionHelper = new THREE.BoxHelper(selectedStemDecal, 0xdfb352);
+  stemDecalSelectionHelper.material.depthTest = false;
+  stemDecalSelectionHelper.material.toneMapped = false;
+  stemDecalSelectionHelper.renderOrder = 90;
+  scene.add(stemDecalSelectionHelper);
+  renderer.domElement.classList.add("is-decal-selected");
+  const modelId = selectedStemDecal.userData.decalModelId;
+  document.querySelector("#selected-object-name").textContent = `Logo ROSEBUDS - ${modelDefaults[modelId]?.title || modelId}`;
 }
 
 function syncStemDecalEditMode() {
   const enabled = document.querySelector("#decal-edit-mode")?.checked === true;
   renderer.domElement.classList.toggle("is-decal-editing", enabled);
-  if (!enabled && stemDecalDragState) finishStemDecalDrag(true);
+  if (!enabled) stemDecalGesture?.cancel();
   if (enabled) showNotice("Cliquez sur le logo puis faites-le glisser sur la tige.");
 }
 
-function startStemDecalDrag(event) {
-  if (document.querySelector("#decal-edit-mode")?.checked !== true) return false;
-  const decal = getStemDecalAtPointer(event);
-  if (!decal) return false;
-  stemDecalDragState = { decal, pointerId: event.pointerId };
-  controls.enabled = false;
+function startStemDecalDrag(event, hit) {
+  const decal = hit.object;
+  if (!decal?.parent) return false;
+  decal.stemDecalModel.updateWorldMatrix(true, true);
+  const placement = decal.stemDecalPlacement;
+  const grabbed = pointInPlacementFrame(hit.point, decal.stemDecalFrameWorld, decal.stemDecalModel.matrixWorld);
+  const offset = grabbed.clone().sub(placement.axisOrigin);
+  const hitAngle = Math.atan2(offset.dot(placement.stemVAxis), offset.dot(placement.stemUAxis));
+  const minT = Math.min(placement.safeMinT, placement.safeMaxT);
+  const maxT = Math.max(placement.safeMinT, placement.safeMaxT);
+  stemDecalDragState = {
+    decal, pointerId: event.pointerId,
+    initial: { axialRatio: placement.axialRatio, angle: placement.angle },
+    axialOffset: THREE.MathUtils.lerp(minT, maxT, placement.axialRatio) - grabbed.dot(placement.stemAxis),
+    angleOffset: placement.angle - hitAngle,
+  };
   renderer.domElement.classList.add("is-decal-dragging");
-  renderer.domElement.setPointerCapture?.(event.pointerId);
-  event.preventDefault();
   return true;
 }
 
@@ -10393,39 +10831,46 @@ function handleStemDecalPointerMove(event) {
   const placement = decal.stemDecalPlacement;
   const target = decal.stemDecalTarget;
   if (!placement || !target?.isMesh || !setPointerFromCanvasEvent(event)) return;
+  decal.stemDecalModel.updateWorldMatrix(true, true);
   const hit = raycaster.intersectObject(target, false)[0];
   if (!hit) return;
 
-  const hitT = hit.point.dot(placement.stemAxis);
+  const point = pointInPlacementFrame(hit.point, decal.stemDecalFrameWorld, decal.stemDecalModel.matrixWorld);
+  const hitT = point.dot(placement.stemAxis);
   const minT = Math.min(placement.safeMinT, placement.safeMaxT);
   const maxT = Math.max(placement.safeMinT, placement.safeMaxT);
-  const ratio = maxT - minT > 1e-8 ? THREE.MathUtils.clamp((hitT - minT) / (maxT - minT), 0, 1) : 0.5;
+  const ratio = maxT - minT > 1e-8 ? THREE.MathUtils.clamp((hitT + stemDecalDragState.axialOffset - minT) / (maxT - minT), 0, 1) : 0.5;
   const axisPoint = placement.axisOrigin.clone().addScaledVector(placement.stemAxis, hitT);
-  const radial = hit.point.clone().sub(axisPoint);
+  const radial = point.clone().sub(axisPoint);
   radial.addScaledVector(placement.stemAxis, -radial.dot(placement.stemAxis));
   const angle = radial.lengthSq() > 0.000001
-    ? Math.atan2(radial.dot(placement.stemVAxis), radial.dot(placement.stemUAxis))
+    ? Math.atan2(radial.dot(placement.stemVAxis), radial.dot(placement.stemUAxis)) + stemDecalDragState.angleOffset
     : placement.angle;
+  const previous = { axialRatio: placement.axialRatio, angle: placement.angle };
   setStemDecalPlacementCoordinates(placement, ratio, angle);
-  rebuildStemDecalGeometry(decal);
-  event.preventDefault();
+  if (!rebuildStemDecalGeometry(decal)) setStemDecalPlacementCoordinates(placement, previous.axialRatio, previous.angle);
+  stemDecalSelectionHelper?.update();
 }
 
 function finishStemDecalDrag(persist = true) {
   if (!stemDecalDragState) return;
-  const { decal, pointerId } = stemDecalDragState;
-  if (persist) writeStoredStemDecalPosition(decal.userData?.decalModelId, decal.stemDecalPlacement);
-  renderer.domElement.releasePointerCapture?.(pointerId);
+  const { decal, initial } = stemDecalDragState;
+  const saved = persist && writeStoredStemDecalPosition(decal.userData?.decalModelId, decal.stemDecalPlacement);
+  if (!persist) {
+    setStemDecalPlacementCoordinates(decal.stemDecalPlacement, initial.axialRatio, initial.angle);
+    rebuildStemDecalGeometry(decal);
+  }
   renderer.domElement.classList.remove("is-decal-dragging");
-  controls.enabled = true;
   stemDecalDragState = null;
-  if (persist) showNotice("Position du logo mémorisée pour ce plug.");
+  if (persist) showNotice(saved ? "Position du logo mémorisée pour ce plug." : "Position modifiée ; stockage du navigateur indisponible.");
 }
 
 function resetCurrentStemDecalPosition() {
-  const modelId = settings.modelId;
+  const modelId = selectedStemDecal?.userData.decalModelId || settings.modelId;
+  const selectedModel = selectedStemDecal?.stemDecalModel;
+  stemDecalGesture?.cancel();
   clearStoredStemDecalPosition(modelId);
-  let model = null;
+  let model = selectedModel || null;
   root.traverse((child) => {
     if (!model && child.userData?.catalogModelId === modelId && child.userData?.meshOptions?.classicPlugVolumeMaterials) model = child;
   });
@@ -10494,6 +10939,7 @@ function addStemDecalToClassicPlug(model, meshOptions = {}) {
   decal.stemDecalModel = model;
   decal.stemDecalTarget = targetEntry.mesh;
   decal.stemDecalPlacement = placement;
+  decal.stemDecalFrameWorld = model.matrixWorld.clone();
   decal.userData.nonMaterialEditable = true;
   decal.userData.ignoreRaycastSelection = true;
   decal.renderOrder = 82;
@@ -10641,7 +11087,10 @@ function normalizeImportedModel(model, meshOptions = {}) {
     model.position.x -= fittedCenter.x;
     model.position.z -= fittedCenter.z;
     model.position.y += floor.position.y - fittedMin.y + 0.08;
+    model.userData.sceneUnitsPerMillimeter = scale;
     model.updateWorldMatrix(true, true);
+  } else {
+    model.userData.sceneUnitsPerMillimeter = 1;
   }
 
   const volumeAssignedMeshes = assignClassicPlugMaterialsByVolume(model, meshOptions);
@@ -11507,8 +11956,6 @@ function getGemChannelIors(preset = {}, material = null) {
 
 const DIAMOND_RT_DEFAULT_BOUNCES = 8;
 const DIAMOND_RT_MAX_BOUNCES = 16;
-const DIAMOND_RT_VERTEX_BUDGET = 96;
-const DIAMOND_RT_EPSILON = 0.00045;
 const DIAMOND_RT_DEFAULT_BEER_ABSORPTION = 0.006;
 const DIAMOND_RT_MAX_BEER_ABSORPTION = 0.05;
 const DIAMOND_MICRO_ROUGHNESS_MAX = 0.08;
@@ -11560,12 +12007,6 @@ function getDiamondEnvironmentIntensity() {
   return THREE.MathUtils.clamp(Number.isFinite(value) ? value : 1, 0, 4);
 }
 
-const DIAMOND_STUDIO_RAYS = [
-  { dir: new THREE.Vector3(-0.48, -0.82, 0.31).normalize(), power: 1.0 },
-  { dir: new THREE.Vector3(0.62, -0.66, -0.43).normalize(), power: 0.78 },
-  { dir: new THREE.Vector3(0.16, -0.94, 0.23).normalize(), power: 1.15 },
-  { dir: new THREE.Vector3(-0.18, -0.38, -0.91).normalize(), power: 0.52 },
-];
 let diamondBVHModule = null;
 let diamondBVHShaderGLSL = null;
 let diamondBVHModulePromise = null;
@@ -11574,17 +12015,22 @@ let diamondRayTracingBusy = false;
 let diamondRayTraceTimer = null;
 const diamondRayTraceQueue = new Set();
 let diamondRayTraceGeneration = 0;
+let diamondRayTraceAbortController = null;
+let diamondCalculationHadFailure = false;
 
 function resetDiamondRayTraceQueue(reason = "reset") {
   diamondRayTraceGeneration += 1;
+  diamondRayTraceAbortController?.abort();
   diamondRayTraceQueue.clear();
   if (diamondRayTraceTimer) {
     clearTimeout(diamondRayTraceTimer);
     diamondRayTraceTimer = null;
   }
-  if (diamondCalculationProgressActive && !diamondRayTracingBusy) {
-    finishDiamondCalculationProgress("Calcul optique annulé");
-  }
+  diamondCalculationProgressActive = false;
+  diamondWorkStarted = false;
+  diamondCalculationProgressTotal = 0;
+  diamondCalculationProgressCompleted = 0;
+  diamondCalculationHadFailure = false;
   logDebug("diamond-rt", "File de lancer de rayons du diamant vidée.", { reason, generation: diamondRayTraceGeneration });
 }
 
@@ -11618,7 +12064,7 @@ function loadDiamondBVHModule() {
   if (diamondBVHModule) return Promise.resolve(diamondBVHModule);
   if (diamondBVHFailed) return Promise.resolve(null);
   if (!diamondBVHModulePromise) {
-    showDiamondCalculationProgress("Chargement du moteur de lancer de rayons", 94);
+    showDiamondCalculationProgress("Chargement du moteur de lancer de rayons", 1);
     diamondBVHModulePromise = import("three-mesh-bvh")
       .then((module) => {
         diamondBVHModule = module;
@@ -11628,7 +12074,7 @@ function loadDiamondBVHModule() {
           bvh_ray_functions: module.shaderIntersectFunction,
         };
         THREE.Mesh.prototype.raycast = module.acceleratedRaycast || THREE.Mesh.prototype.raycast;
-        showDiamondCalculationProgress("Moteur optique chargé", 95);
+        showDiamondCalculationProgress("Moteur optique chargé", 3);
         logDebug("diamond-rt", "Module three-mesh-bvh chargé : ray tracing diamant actif.", {
           gpuShader: Boolean(module.MeshBVHUniformStruct && module.shaderStructs && module.shaderIntersectFunction),
           exports: Object.keys(module).filter((key) => /BVH|shader|Raycast/i.test(key)).slice(0, 18),
@@ -11639,7 +12085,8 @@ function loadDiamondBVHModule() {
       .catch((error) => {
         diamondBVHFailed = true;
         logDebug("diamond-rt", "BVH indisponible, fallback shader optique conserve.", { error: String(error) });
-        finishDiamondCalculationProgress("Rendu optique de secours prêt");
+        diamondRayTraceQueue.clear();
+        finishDiamondCalculationProgress("Rendu rapide actif — moteur optique indisponible");
         return null;
       });
   }
@@ -11710,7 +12157,7 @@ function scheduleDiamondInternalRayTracing(mesh, reason = "update") {
   mesh.userData.diamondRayTraceSignature = signature;
   mesh.userData.diamondRayTraceGeneration = diamondRayTraceGeneration;
   const alreadyQueued = diamondRayTraceQueue.has(mesh);
-  showDiamondCalculationProgress("Préparation du lancer de rayons", 93);
+  if (!diamondCalculationProgressActive) showDiamondCalculationProgress("Préparation du lancer de rayons", 0);
   if (!alreadyQueued) diamondCalculationProgressTotal += 1;
   diamondRayTraceQueue.add(mesh);
   loadDiamondBVHModule();
@@ -11730,32 +12177,67 @@ async function processDiamondRayTraceQueue() {
   const mesh = diamondRayTraceQueue.values().next().value;
   diamondRayTraceQueue.delete(mesh);
   const generation = diamondRayTraceGeneration;
-  const total = Math.max(1, diamondCalculationProgressTotal);
-  const completedRatio = diamondCalculationProgressCompleted / total;
+  const geometry = mesh.geometry;
+  const signature = mesh.userData.diamondRayTraceSignature;
+  const controller = new AbortController();
+  diamondRayTraceAbortController = controller;
+  const isCurrent = () => !controller.signal.aborted && generation === diamondRayTraceGeneration
+    && mesh.geometry === geometry && mesh.userData.diamondRayTraceSignature === signature
+    && isObjectAttachedToScene(mesh) && isDiamondRayTraceTarget(mesh);
+  const progress = (stage, fraction) => {
+    if (!isCurrent()) return;
+    const ratio = (diamondCalculationProgressCompleted + fraction) / Math.max(1, diamondCalculationProgressTotal);
+    showDiamondCalculationProgress(stage, 5 + ratio * 94);
+  };
   diamondRayTracingBusy = true;
   try {
-    if (!mesh?.isMesh || mesh.userData.diamondRayTraceGeneration !== generation || !isObjectAttachedToScene(mesh)) return;
-    showDiamondCalculationProgress("Construction de l’accélérateur BVH", 96 + completedRatio * 2);
+    if (!isCurrent()) return;
+    // The model has its provisional material. Start a separate quality progress phase.
+    diamondWorkStarted = true;
+    if (diamondCalculationProgressCompleted === 0) loadingProgress = 0;
+    progress("Rendu haute qualité : préparation du calcul en arrière-plan", 0);
     await waitForProgressPaint();
-    buildDiamondBoundsTree(mesh.geometry);
-    showDiamondCalculationProgress("Compilation du matériau à lancer de rayons", 98 + completedRatio);
+    if (!renderer.extensions.has("KHR_parallel_shader_compile")) {
+      throw new Error("Compilation GPU parallèle non disponible : rendu rapide conservé");
+    }
+    const boundsTree = await buildDiamondBoundsTree(geometry, controller.signal, (value) => {
+      progress("Construction de l’accélérateur BVH en arrière-plan", 0.05 + value * 0.70);
+    });
+    if (!isCurrent()) return;
+    await waitForViewerIdle(controller.signal, isCurrent, () => {
+      progress("Rendu rapide interactif : finalisation en attente", 0.78);
+    });
+    progress("Compilation du matériau à lancer de rayons en arrière-plan", 0.80);
     await waitForProgressPaint();
-    bakeDiamondInternalRayTracing(mesh);
+    const material = await ensureDiamondGpuBVHMaterial(mesh, boundsTree, isCurrent);
+    if (!material) throw new Error("Matériau optique indisponible : rendu rapide conservé");
+    if (!isCurrent()) return;
+    geometry.userData.diamondRayTraceReady = true;
+    geometry.userData.diamondRayTraceBounces = getDiamondInternalBounceCount();
+    geometry.userData.diamondRayTraceVertices = geometry.attributes.position.count;
+    progress("Rendu optique prêt : affichage de la première image", 0.98);
+    await waitForProgressPaint();
   } catch (error) {
-    logDebug("diamond-rt", "Erreur pendant le bake ray tracing diamant.", { mesh: mesh?.name, error: String(error) });
+    if (error.name !== "AbortError" && isCurrent()) {
+      diamondCalculationHadFailure = true;
+      logDebug("diamond-rt", "Rendu rapide conservé sans calcul CPU bloquant.", { mesh: mesh?.name, error: String(error) });
+      showNotice("Le rendu rapide reste actif. La préparation haute qualité n’a pas pu aboutir sur ce navigateur.");
+    }
   } finally {
-    diamondCalculationProgressCompleted += 1;
+    if (generation === diamondRayTraceGeneration) diamondCalculationProgressCompleted += 1;
     diamondRayTracingBusy = false;
+    if (diamondRayTraceAbortController === controller) diamondRayTraceAbortController = null;
     if (diamondRayTraceQueue.size > 0) {
-      requestAnimationFrame(processDiamondRayTraceQueue);
-    } else {
-      showDiamondCalculationProgress("Première image du rendu optique", 99);
-      requestAnimationFrame(() => requestAnimationFrame(() => finishDiamondCalculationProgress()));
+      requestDiamondRayTraceProcessing(0);
+    } else if (generation === diamondRayTraceGeneration) {
+      finishDiamondCalculationProgress(diamondCalculationHadFailure
+        ? "Rendu rapide actif — haute qualité indisponible"
+        : "Rendu à lancer de rayons prêt");
     }
   }
 }
 
-function buildDiamondBoundsTree(geometry) {
+async function buildDiamondBoundsTree(geometry, signal, onProgress) {
   if (!diamondBVHModule?.MeshBVH || !geometry?.attributes?.position) return null;
   const position = geometry.attributes.position;
   const index = geometry.index;
@@ -11773,9 +12255,12 @@ function buildDiamondBoundsTree(geometry) {
     geometry.userData.diamondBvhReuseCount = (geometry.userData.diamondBvhReuseCount || 0) + 1;
     return geometry.boundsTree;
   }
-  if (geometry.boundsTree?.dispose) geometry.boundsTree.dispose();
-  geometry.boundsTree = new diamondBVHModule.MeshBVH(geometry, { maxLeafTris: 8, indirect: false });
-  geometry.userData.diamondBvhGeometrySignature = geometrySignature;
+  const serialized = await buildBVHInWorker(geometry, { signal, onProgress });
+  if (signal?.aborted || geometrySignature !== [geometry.uuid, position.count, position.version || 0,
+    geometry.index?.count || 0, geometry.index?.version || 0].join(":")) throw abortError();
+  geometry.boundsTree = diamondBVHModule.MeshBVH.deserialize(serialized, geometry);
+  geometry.userData.diamondBvhGeometrySignature = [geometry.uuid, position.count, position.version || 0,
+    geometry.index?.count || 0, geometry.index?.version || 0].join(":");
   geometry.userData.diamondBvhBuildCount = (geometry.userData.diamondBvhBuildCount || 0) + 1;
   return geometry.boundsTree;
 }
@@ -12216,43 +12701,63 @@ function syncDiamondRefractionMaterialUniforms(material) {
   material.uniforms.projectionMatrixInverse.value.copy(camera.projectionMatrixInverse);
 }
 
-function ensureDiamondGpuBVHMaterial(mesh, boundsTree) {
+async function ensureDiamondGpuBVHMaterial(mesh, boundsTree, isCurrent = () => isObjectAttachedToScene(mesh)) {
   if (!mesh?.isMesh || !boundsTree || !canUseDiamondGpuBVHShader()) return null;
   const sourceMaterial = getDiamondRayTraceMaterial(mesh);
   if (!sourceMaterial) return null;
-  let bvhUniform = sourceMaterial.userData?.diamondBvhUniform;
-  if (!bvhUniform || sourceMaterial.userData?.diamondBvhGeometryUuid !== mesh.geometry.uuid) {
-    if (bvhUniform?.dispose) {
-      try { bvhUniform.dispose(); } catch {}
-    }
-    bvhUniform = new diamondBVHModule.MeshBVHUniformStruct();
+  if (sourceMaterial.userData?.diamondRefractionMaterial
+    && sourceMaterial.userData.diamondBvhSourceMesh === mesh
+    && sourceMaterial.userData.diamondBvhGeometryUuid === mesh.geometry.uuid
+    && sourceMaterial.userData.diamondBvhGeometrySignature === mesh.geometry.userData.diamondBvhGeometrySignature) {
+    syncDiamondRefractionMaterialUniforms(sourceMaterial);
+    sourceMaterial.userData.diamondRayTraceSignature = mesh.userData.diamondRayTraceSignature;
+    return sourceMaterial;
   }
+  const bvhUniform = new diamondBVHModule.MeshBVHUniformStruct();
   try {
     bvhUniform.updateFrom(boundsTree);
   } catch (error) {
-    logDebug("diamond-rt", "BVH GPU indisponible pour ce maillage, fallback bake CPU conserve.", { mesh: mesh.name, error: String(error) });
+    bvhUniform.dispose();
+    logDebug("diamond-rt", "BVH GPU indisponible pour ce maillage, rendu rapide conservé.", { mesh: mesh.name, error: String(error) });
     return null;
   }
   const preset = getMaterialPresetForGem(sourceMaterial) || {};
-  let nextMaterial = sourceMaterial;
-  if (!sourceMaterial.userData?.diamondRefractionMaterial) {
-    nextMaterial = createDiamondRefractionMaterial(sourceMaterial, preset, bvhUniform);
-    if (!replaceMaterialOnMesh(mesh, sourceMaterial, nextMaterial)) {
-      detachDiamondRuntimeFromMaterial(nextMaterial);
-      nextMaterial.dispose?.();
-      logDebug("diamond-rt", "Substitution du matériau BVH annulée : le matériau source n'est plus assigné.", { mesh: mesh.name });
-      return null;
-    }
-    if (!materialRegistry.diamonds.includes(nextMaterial)) materialRegistry.diamonds.push(nextMaterial);
-  }
+  const nextMaterial = createDiamondRefractionMaterial(sourceMaterial, preset, bvhUniform);
   nextMaterial.userData.diamondBvhUniform = bvhUniform;
   nextMaterial.userData.diamondBvhGeometryUuid = mesh.geometry.uuid;
+  nextMaterial.userData.diamondBvhGeometrySignature = mesh.geometry.userData.diamondBvhGeometrySignature;
   nextMaterial.userData.diamondBvhSourceMesh = mesh;
   nextMaterial.userData.diamondGpuBvhEnabled = true;
   nextMaterial.userData.diamondRayTraceSignature = mesh.userData.diamondRayTraceSignature || "";
   if (nextMaterial.uniforms?.bvh) nextMaterial.uniforms.bvh.value = bvhUniform;
   syncDiamondRefractionMaterialUniforms(nextMaterial);
-  nextMaterial.needsUpdate = true;
+  const candidate = new THREE.Mesh(mesh.geometry, nextMaterial);
+  candidate.receiveShadow = mesh.receiveShadow;
+  candidate.castShadow = mesh.castShadow;
+  const started = performance.now();
+  const pendingMessage = window.setInterval(() => {
+    if (isCurrent()) showDiamondCalculationProgress(
+      `Compilation du matériau à lancer de rayons en arrière-plan (${Math.round((performance.now() - started) / 1000)} s)`,
+      loadingProgress,
+    );
+  }, 1000);
+  try {
+    await compileBeforeSwap({
+      renderer, candidate, camera, scene, renderTarget: composer.readBuffer,
+      isCurrent: () => isCurrent() && getObjectMaterialList(mesh.material).includes(sourceMaterial),
+      install: () => {
+        if (!replaceMaterialOnMesh(mesh, sourceMaterial, nextMaterial)) return false;
+        materialRegistry.diamonds.push(nextMaterial);
+        return true;
+      },
+      dispose: () => {
+        detachDiamondRuntimeFromMaterial(nextMaterial);
+        nextMaterial.dispose();
+      },
+    });
+  } finally {
+    window.clearInterval(pendingMessage);
+  }
   logDebug("diamond-rt", "Matériau diamant GPU-BVH appliqué.", { mesh: mesh.name, bounces: getDiamondInternalBounceCount(), webgl2: renderer.capabilities.isWebGL2 });
   return nextMaterial;
 }
@@ -12267,202 +12772,6 @@ function updateDiamondGpuBvhUniforms() {
       visited.add(material.uuid);
       syncDiamondRefractionMaterialUniforms(material);
     });
-  });
-}
-
-function raycastFirstBVH(boundsTree, ray) {
-  if (!boundsTree?.raycastFirst) return null;
-  let hit = null;
-  try {
-    hit = boundsTree.raycastFirst(ray, THREE.DoubleSide);
-  } catch {
-    hit = boundsTree.raycastFirst(ray);
-  }
-  if (!hit || hit.distance <= DIAMOND_RT_EPSILON) return null;
-  return hit;
-}
-
-function refractVector(incident, normal, eta) {
-  const cosi = THREE.MathUtils.clamp(incident.dot(normal), -1, 1);
-  const k = 1 - eta * eta * (1 - cosi * cosi);
-  if (k < 0) return null;
-  return incident.clone().multiplyScalar(eta).sub(normal.clone().multiplyScalar(eta * cosi + Math.sqrt(k))).normalize();
-}
-
-function fresnelDielectric(cosTheta, ior) {
-  const r0 = ((ior - 1) / (ior + 1)) ** 2;
-  return r0 + (1 - r0) * ((1 - clamp01(cosTheta)) ** 5);
-}
-
-function sampleDiamondStudioEnvironment(direction) {
-  const dir = direction.clone().normalize();
-  const horizon = 1 - Math.abs(dir.y);
-  const overheadSoftbox = Math.pow(clamp01(dir.y * 0.5 + 0.62), 8.0);
-  const sideSoftbox = Math.pow(clamp01(1 - Math.abs(dir.x * 0.72 + dir.z * 0.46)), 5.5) * clamp01(horizon + 0.18);
-  const strip = Math.pow(clamp01(1 - Math.abs(dir.x * 0.18 - dir.z * 0.98)), 18.0);
-  const darkPanel = Math.pow(clamp01(1 - Math.abs(dir.x * 0.9 - dir.z * 0.22)), 7.0) * clamp01(0.82 - Math.abs(dir.y));
-  const warmRim = Math.pow(clamp01(dir.z * 0.5 + 0.5), 9.0) * 0.42;
-  const white = overheadSoftbox * 1.8 + sideSoftbox * 1.25 + strip * 2.4;
-  const proceduralStudio = new THREE.Vector3(
-    0.028 + white + warmRim - darkPanel * 0.42,
-    0.03 + white * 0.98 + warmRim * 0.72 - darkPanel * 0.46,
-    0.04 + white * 1.06 + strip * 0.25 - darkPanel * 0.50,
-  ).max(new THREE.Vector3(0.002, 0.002, 0.002));
-
-  const hdriStrength = getDiamondHdriReflectionStrength() * getDiamondEnvironmentIntensity();
-  const skyPanel = Math.pow(clamp01(dir.y * 0.58 + 0.54), 5.5);
-  const longSoftbox = Math.pow(clamp01(1 - Math.abs(dir.x * 0.22 + dir.z * 0.96)), 26.0);
-  const verticalSoftbox = Math.pow(clamp01(1 - Math.abs(dir.x * 0.92 - dir.z * 0.18)), 14.0) * clamp01(0.92 - Math.abs(dir.y));
-  const champagneBounce = Math.pow(clamp01(dir.z * 0.48 + 0.5), 6.0) * clamp01(horizon + 0.2);
-  const negativeFill = Math.pow(clamp01(1 - Math.abs(dir.x * 0.68 - dir.z * 0.72)), 9.0) * clamp01(0.86 - Math.abs(dir.y));
-  const hdriProbe = new THREE.Vector3(
-    0.018 + longSoftbox * 2.65 + verticalSoftbox * 1.18 + skyPanel * 0.42 + champagneBounce * 0.34 - negativeFill * 0.36,
-    0.02 + longSoftbox * 2.55 + verticalSoftbox * 1.12 + skyPanel * 0.46 + champagneBounce * 0.22 - negativeFill * 0.40,
-    0.026 + longSoftbox * 2.72 + verticalSoftbox * 1.24 + skyPanel * 0.58 + champagneBounce * 0.12 - negativeFill * 0.44,
-  ).max(new THREE.Vector3(0.0015, 0.0015, 0.0015));
-
-  return proceduralStudio.add(hdriProbe.multiplyScalar(0.42 + hdriStrength * 0.58));
-}
-
-function traceDiamondChannel(boundsTree, surfacePoint, surfaceNormal, studioRay, ior, channel, maxBounces = getDiamondInternalBounceCount(), beerAbsorption = getDiamondBeerAbsorption()) {
-  const normal = surfaceNormal.clone().normalize();
-  const entryDirection = refractVector(studioRay.dir, normal, 1 / ior) || studioRay.dir.clone().reflect(normal).normalize();
-  const ray = new THREE.Ray(
-    surfacePoint.clone().addScaledVector(normal, -DIAMOND_RT_EPSILON * 5),
-    entryDirection.clone().normalize(),
-  );
-  let energy = studioRay.power;
-  let result = 0;
-  let travel = 0;
-
-  for (let bounce = 0; bounce < maxBounces; bounce += 1) {
-    const hit = raycastFirstBVH(boundsTree, ray);
-    if (!hit) {
-      const env = sampleDiamondStudioEnvironment(ray.direction);
-      result += energy * env.getComponent(channel) * 0.18;
-      break;
-    }
-
-    travel += hit.distance;
-    const channelAbsorption = beerAbsorption * (channel === 0 ? 1.04 : channel === 1 ? 1.0 : 0.96);
-    energy *= Math.exp(-hit.distance * channelAbsorption);
-    let hitNormal = hit.face?.normal?.clone() || normal.clone();
-    hitNormal.normalize();
-    if (hitNormal.dot(ray.direction) < 0) hitNormal.negate();
-
-    const cosExit = clamp01(ray.direction.dot(hitNormal));
-    const fresnel = fresnelDielectric(cosExit, ior);
-    const refractedOut = refractVector(ray.direction, hitNormal.clone().negate(), ior);
-    if (refractedOut) {
-      const env = sampleDiamondStudioEnvironment(refractedOut);
-      const exitGain = 0.48 + bounce * 0.115;
-      result += energy * (1 - fresnel) * env.getComponent(channel) * exitGain;
-      energy *= fresnel * 0.96;
-    } else {
-      // Total internal reflection: no exit, but the trapped ray increases fire on later exits.
-      energy *= 0.96;
-      result += energy * (0.018 + bounce * 0.012);
-    }
-
-    if (energy < 0.012) break;
-    ray.direction.reflect(hitNormal).normalize();
-    ray.origin.copy(hit.point).addScaledVector(ray.direction, DIAMOND_RT_EPSILON * 8);
-  }
-
-  const distanceFalloff = Math.exp(-travel * beerAbsorption * 0.35);
-  return result * distanceFalloff;
-}
-
-function bakeDiamondInternalRayTracing(mesh) {
-  if (!isDiamondRayTraceTarget(mesh) || !diamondBVHModule || !isObjectAttachedToScene(mesh)) return;
-  const geometry = mesh.geometry;
-  const position = geometry.getAttribute("position");
-  if (!geometry.getAttribute("normal")) geometry.computeVertexNormals();
-  const normal = geometry.getAttribute("normal");
-  ensureDiamondRayColorAttribute(geometry, 0.04);
-  const rayColor = geometry.getAttribute("diamondRayColor");
-  const boundsTree = buildDiamondBoundsTree(geometry);
-  if (!boundsTree) return;
-  const gpuMaterial = ensureDiamondGpuBVHMaterial(mesh, boundsTree);
-  if (gpuMaterial) {
-    geometry.userData.diamondRayTraceReady = true;
-    geometry.userData.diamondRayTraceBounces = getDiamondInternalBounceCount();
-    geometry.userData.diamondRayTraceBeerAbsorption = getDiamondBeerAbsorption();
-    geometry.userData.diamondRayTraceMicroRoughness = getDiamondMicroRoughness();
-    geometry.userData.diamondRayTraceHdriReflection = getDiamondHdriReflectionStrength();
-    geometry.userData.diamondRayTraceVertices = position.count;
-    logDebug("diamond-rt", "Lancer de rayons GPU-BVH actif, calcul CPU évité.", {
-      mesh: mesh.name,
-      vertices: position.count,
-      bvhBuilds: geometry.userData.diamondBvhBuildCount || 0,
-      bvhReuses: geometry.userData.diamondBvhReuseCount || 0,
-      bounces: getDiamondInternalBounceCount(),
-    });
-    return;
-  }
-
-  const fallbackMaterial = getDiamondRayTraceMaterial(mesh) || (Array.isArray(mesh.material) ? mesh.material[0] : mesh.material);
-  const fallbackPreset = getMaterialPresetForGem(fallbackMaterial) || {};
-  const fallbackOptical = getGemOpticalQualityProfile(fallbackPreset, fallbackMaterial);
-  if (fallbackOptical.isCabochon || fallbackOptical.ior < 1.72) {
-    geometry.userData.diamondRayTraceReady = false;
-    logDebug("diamond-rt", "Shader optique PBR conservé : bake CPU évité pour préserver la fluidité.", {
-      mesh: mesh.name,
-      cabochon: fallbackOptical.isCabochon,
-      ior: fallbackOptical.ior,
-    });
-    return;
-  }
-
-  const p = new THREE.Vector3();
-  const n = new THREE.Vector3();
-  const channelValues = [0, 0, 0];
-  const totalPower = DIAMOND_STUDIO_RAYS.reduce((sum, ray) => sum + ray.power, 0);
-  const count = position.count;
-  const material = getDiamondRayTraceMaterial(mesh) || (Array.isArray(mesh.material) ? mesh.material[0] : mesh.material);
-  const preset = getMaterialPresetForGem(material) || {};
-  const channelIors = getGemChannelIors(preset, material);
-  const bounceCount = getDiamondInternalBounceCount();
-  const beerAbsorption = getDiamondBeerAbsorption();
-  const stride = Math.max(1, Math.ceil(count / DIAMOND_RT_VERTEX_BUDGET));
-  const lastColor = [0.05, 0.055, 0.065];
-
-  for (let i = 0; i < count; i += 1) {
-    if (stride > 1 && i % stride !== 0) {
-      rayColor.setXYZ(i, lastColor[0], lastColor[1], lastColor[2]);
-      continue;
-    }
-    p.fromBufferAttribute(position, i);
-    n.fromBufferAttribute(normal, i).normalize();
-    if (n.lengthSq() < 0.0001) n.set(0, 1, 0);
-    for (let channel = 0; channel < 3; channel += 1) {
-      let value = 0;
-      for (const studioRay of DIAMOND_STUDIO_RAYS) {
-        value += traceDiamondChannel(boundsTree, p, n, studioRay, channelIors[channel], channel, bounceCount, beerAbsorption);
-      }
-      channelValues[channel] = Math.min(2.2, Math.pow(Math.max(0, value / totalPower), 0.72) * 1.38);
-    }
-    lastColor[0] = channelValues[0];
-    lastColor[1] = channelValues[1];
-    lastColor[2] = channelValues[2];
-    rayColor.setXYZ(i, channelValues[0], channelValues[1], channelValues[2]);
-  }
-
-  rayColor.needsUpdate = true;
-  geometry.userData.diamondRayTraceReady = true;
-  geometry.userData.diamondRayTraceBounces = bounceCount;
-  geometry.userData.diamondRayTraceBeerAbsorption = beerAbsorption;
-  geometry.userData.diamondRayTraceMicroRoughness = getDiamondMicroRoughness();
-  geometry.userData.diamondRayTraceHdriReflection = getDiamondHdriReflectionStrength();
-  geometry.userData.diamondRayTraceVertices = count;
-  logDebug("diamond-rt", "Ray tracing interne diamant calcule sur BVH.", {
-    mesh: mesh.name,
-    vertices: count,
-    bounces: bounceCount,
-    beerAbsorption,
-    microRoughness: getDiamondMicroRoughness(),
-    hdriReflection: getDiamondHdriReflectionStrength(),
-    ior: channelIors,
   });
 }
 
@@ -13091,7 +13400,11 @@ function showNotice(message) {
 
 function animate() {
   const elapsed = clock.getElapsedTime();
-  controls.update();
+  if (!stemDecalGesture?.busy) controls.update();
+  if (selectedStemDecal) {
+    if (selectedStemDecal.parent) stemDecalSelectionHelper?.update();
+    else { stemDecalGesture?.cancel(); clearStemDecalSelection(); }
+  }
   reflectionRig.children.forEach((child, index) => {
     if (child.isMesh && centerGemMesh) {
       child.rotation.y = centerGemMesh.rotation.y + Math.sin(elapsed * 0.45 + index) * 0.012;
@@ -13155,7 +13468,7 @@ function startJewelryConfigurator() {
       document.body.dataset.viewerReady = "true";
     })
     .catch((error) => console.error("Initialisation de la bibliothèque impossible", error))
-    .finally(() => loaderEl.classList.add("is-hidden"));
+    .finally(() => finishLoading());
   animate();
 }
 
@@ -13167,7 +13480,51 @@ function applyThumbnailCaptureComposition(params) {
   controls.update();
 }
 
-function applyWelcomeLaunchConfiguration(params) {
+let rosebudsProductUrlsPromise = null;
+
+async function updateViewerProductInformation(params, meta) {
+  const plugSize = params.get("plugSize") || meta.size || "";
+  const plugSizeParts = plugSize.split("-");
+  const metalFinish = params.get("metalFinish") || settings.metalPreset || "";
+  const metalFamily = params.get("metalFamily") || (metalFinish.startsWith("aluminum-") ? "alu" : "inox");
+  const configuration = {
+    catalogModel: settings.modelId,
+    modelLabel: String(modelDefaults[settings.modelId]?.title || meta.label || settings.modelId).replace(/\bclassique\b/gi, "Originale"),
+    modelFamily: params.get("modelFamily") || meta.modelFamily,
+    classicHead: params.get("classicHead") || (normalizeCatalogText(meta.source).includes("sans tete") ? "sans-tete" : "avec-tete"),
+    plugSize,
+    plugSizeLabel: plugSizeParts[0] || meta.metalSizeClass || "Plug",
+    plugDiameterMm: Number(plugSizeParts.at(-1)) || meta.diameterMm || null,
+    crystalSize: params.get("crystalSize") || "",
+    metalFamily,
+    metalFinish,
+    ornament: params.get("ornament") || (meta.ornamentFamilies.includes("crystal") ? "crystal" : meta.ornamentFamilies[0] || "none"),
+    ornamentFinish: params.get("ornamentFinish") || "",
+  };
+  const summary = document.querySelector("#viewer-product-summary");
+  if (summary) summary.textContent = buildViewerProductSummary(configuration);
+
+  const link = document.querySelector("#viewer-product-link");
+  if (!link) return;
+  try {
+    rosebudsProductUrlsPromise ||= fetch("./assets/data/rosebuds-products.json")
+      .then((response) => response.ok ? response.json() : Promise.reject(new Error(`Catalogue HTTP ${response.status}`)))
+      .then((payload) => Array.isArray(payload?.urls) ? payload.urls : []);
+    const productUrls = await rosebudsProductUrlsPromise;
+    const result = resolveRosebudsProductLink(configuration, productUrls);
+    link.href = result.url;
+    link.textContent = result.label;
+    link.dataset.custom = String(result.custom);
+  } catch (error) {
+    const result = resolveRosebudsProductLink(configuration, []);
+    link.href = result.url;
+    link.textContent = result.label;
+    link.dataset.custom = String(result.custom);
+    logDebug("catalog", "Catalogue public Rosebuds indisponible, lien de repli utilisé.", { message: error?.message || String(error) });
+  }
+}
+
+async function applyWelcomeLaunchConfiguration(params) {
   const meta = getCatalogModelMeta(settings.modelId, modelDefaults[settings.modelId]?.title || "");
   const metalFamily = params.get("metalFamily");
   const metalFinish = params.get("metalFinish");
@@ -13195,12 +13552,20 @@ function applyWelcomeLaunchConfiguration(params) {
 
   const ornamentFamily = params.get("ornament");
   const ornamentFinish = params.get("ornamentFinish");
-  if (!ornamentFamily || !ornamentFinish || ornamentFamily === "none"
-    || !catalogModelSupportsOrnament(meta, ornamentFamily, metalFamily)) return;
-  applyCatalogGemPreset(ornamentFamily, ornamentFinish, { reason: "configuration accueil" });
+  if (ornamentFamily && ornamentFinish && ornamentFamily !== "none"
+    && catalogModelSupportsOrnament(meta, ornamentFamily, metalFamily)) {
+    applyCatalogGemPreset(ornamentFamily, ornamentFinish, { reason: "configuration accueil" });
+  }
+  await updateViewerProductInformation(params, meta);
 }
 
-window.addEventListener("pagehide", () => stopCameraAR(false));
+window.addEventListener("pagehide", () => {
+  stopCameraAR(false);
+  optimizedRenderWorker?.terminate();
+  optimizedRenderWorker = null;
+  const imageUrl = document.querySelector("#optimized-render-image")?.dataset.objectUrl;
+  if (imageUrl) URL.revokeObjectURL(imageUrl);
+});
 
 startJewelryConfigurator();
 

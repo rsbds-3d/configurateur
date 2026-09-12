@@ -1,8 +1,8 @@
 :root {
-  color-scheme: dark;
+  color-scheme: light;
   font-family: Inter, "Segoe UI", Arial, sans-serif;
-  background: #080808;
-  color: #f1eadb;
+  background: #ffffff;
+  color: #111111;
   font-synthesis: none;
 }
 
@@ -24,9 +24,7 @@ body {
 body.is-welcome {
   min-height: 100vh;
   overflow-x: hidden;
-  background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px) 0 0 / 120px 120px,
-    #080808;
+  background: #ffffff;
 }
 
 
@@ -57,7 +55,7 @@ button {
   gap: 32px;
   align-items: end;
   padding-bottom: 28px;
-  border-bottom: 1px solid #38342e;
+  border-bottom: 1px solid #dedede;
 }
 
 .welcome-brand {
@@ -71,8 +69,8 @@ button {
   height: auto;
   object-fit: contain;
   object-position: left center;
-  filter: brightness(0) invert(1);
-  mix-blend-mode: difference;
+  filter: none;
+  mix-blend-mode: normal;
 }
 
 .welcome-brand-copy {
@@ -82,7 +80,7 @@ button {
 .welcome-signature,
 .welcome-kicker {
   margin: 0 0 8px;
-  color: #d9ad59;
+  color: #ed2b86;
   font-size: 12px;
   font-weight: 750;
   letter-spacing: 0;
@@ -96,13 +94,13 @@ button {
   font-weight: 400;
   line-height: 0.98;
   letter-spacing: 0;
-  color: #fff4df;
+  color: #111111;
 }
 
 .welcome-intro {
   max-width: 440px;
   margin: 0;
-  color: #bdb5a8;
+  color: #4f4f4f;
   font-size: 16px;
   line-height: 1.55;
 }
@@ -116,16 +114,182 @@ button {
 .app-version {
   display: inline-flex;
   padding: 4px 8px;
-  border: 1px solid #4a4338;
+  border: 1px solid #ed2b86;
   border-radius: 4px;
-  color: #d9ad59;
-  background: rgba(20, 18, 15, 0.7);
+  color: #c10f62;
+  background: #fff5fa;
   font-size: 11px;
   font-weight: 700;
 }
 
 .welcome-main {
   padding-top: 24px;
+}
+
+.catalog-mode-selector {
+  display: inline-grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2px;
+  width: min(680px, 100%);
+  margin: 0 0 18px;
+  padding: 3px;
+  border: 1px solid #d7d7d7;
+  border-radius: 6px;
+  background: #f4f4f4;
+}
+
+.catalog-mode-selector legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.catalog-mode-selector label {
+  position: relative;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.catalog-mode-selector input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.catalog-mode-selector span {
+  display: grid;
+  place-items: center;
+  min-height: 42px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  color: #333333;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.catalog-mode-selector input:checked + span {
+  color: #ffffff;
+  background: #ed2b86;
+}
+
+.catalog-mode-selector input:focus-visible + span {
+  outline: 2px solid #111111;
+  outline-offset: 2px;
+}
+
+.welcome-mode-panel {
+  display: grid;
+  grid-template-columns: minmax(230px, 0.34fr) minmax(0, 0.66fr);
+  gap: clamp(22px, 4vw, 54px);
+  padding: clamp(22px, 3vw, 36px) 0;
+  border-top: 1px solid #e3e3e3;
+  border-bottom: 1px solid #e3e3e3;
+}
+
+.welcome-mode-heading h2 {
+  margin: 0 0 10px;
+  color: #111111;
+  font-size: clamp(23px, 3vw, 34px);
+  line-height: 1.12;
+  letter-spacing: 0;
+}
+
+.welcome-mode-heading > p:last-child {
+  margin: 0;
+  color: #5e5e5e;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.welcome-multifilter-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.welcome-multifilter-fields label,
+.welcome-ai-form {
+  display: grid;
+  gap: 7px;
+}
+
+.welcome-multifilter-fields label > span,
+.welcome-ai-form > label {
+  color: #333333;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.welcome-multifilter-fields select,
+.welcome-ai-form textarea {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 12px;
+  border: 1px solid #cfcfcf;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #111111;
+}
+
+.welcome-multifilter-fields select:focus,
+.welcome-ai-form textarea:focus {
+  outline: 2px solid rgba(237, 43, 134, 0.22);
+  border-color: #ed2b86;
+}
+
+.welcome-multifilter-fields select:disabled {
+  color: #8a8a8a;
+  background: #f2f2f2;
+}
+
+.welcome-ai-form textarea {
+  min-height: 126px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.welcome-ai-form > button {
+  justify-self: start;
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1px solid #ed2b86;
+  border-radius: 4px;
+  background: #ed2b86;
+  color: #ffffff;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.welcome-ai-form > button:disabled {
+  cursor: progress;
+  opacity: 0.58;
+}
+
+.welcome-ai-progress {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 7px 14px;
+  color: #454545;
+  font-size: 12px;
+}
+
+.welcome-ai-progress > i {
+  grid-column: 1 / -1;
+  display: block;
+  height: 2px;
+  overflow: hidden;
+  background: #e1e1e1;
+}
+
+.welcome-ai-progress > i > b {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: #ed2b86;
+  transition: width 180ms ease;
 }
 
 .welcome-progress {
@@ -138,9 +302,9 @@ button {
   min-height: 46px;
   margin-bottom: 18px;
   padding: 10px 0;
-  background: rgba(8, 8, 8, 0.94);
+  background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(10px);
-  color: #d6ccbc;
+  color: #242424;
   font-size: 13px;
   font-weight: 650;
 }
@@ -149,14 +313,14 @@ button {
   width: min(320px, 46vw);
   height: 3px;
   overflow: hidden;
-  background: #35312b;
+  background: #e4e4e4;
 }
 
 .welcome-progress-track i {
   display: block;
   width: 8%;
   height: 100%;
-  background: #d9ad59;
+  background: #ed2b86;
   transition: width 260ms ease;
 }
 
@@ -171,7 +335,7 @@ button {
   grid-template-columns: minmax(230px, 0.34fr) minmax(0, 0.66fr);
   gap: clamp(22px, 4vw, 54px);
   padding: clamp(22px, 3vw, 36px) 0;
-  border-bottom: 1px solid #2d2a26;
+  border-bottom: 1px solid #e3e3e3;
   animation: welcome-reveal 320ms ease both;
 }
 
@@ -184,7 +348,7 @@ button {
 .welcome-step h2,
 .welcome-results h2 {
   margin: 0 0 10px;
-  color: #f4ebdc;
+  color: #111111;
   font-size: clamp(23px, 3vw, 34px);
   font-weight: 600;
   line-height: 1.12;
@@ -194,7 +358,7 @@ button {
 .welcome-step-copy > p:last-child,
 .welcome-results-heading p {
   margin: 0;
-  color: #a9a196;
+  color: #5e5e5e;
   font-size: 14px;
   line-height: 1.55;
 }
@@ -233,9 +397,9 @@ button {
   gap: 13px;
   min-height: 92px;
   padding: 13px;
-  border: 1px solid #37332e;
+  border: 1px solid #d5d5d5;
   border-radius: 6px;
-  background: #12110f;
+  background: #ffffff;
   text-align: left;
   cursor: pointer;
   transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
@@ -244,14 +408,14 @@ button {
 .welcome-choice:hover,
 .welcome-choice:focus-visible {
   outline: none;
-  border-color: #a77d39;
-  background: #181510;
+  border-color: #ed2b86;
+  background: #fff7fb;
   transform: translateY(-1px);
 }
 
 .welcome-choice.is-selected {
-  border-color: #d9ad59;
-  background: #211a10;
+  border-color: #ed2b86;
+  background: #fff0f7;
 }
 
 .welcome-choice-visual {
@@ -261,9 +425,9 @@ button {
   width: 64px;
   height: 64px;
   overflow: hidden;
-  border: 1px solid #484239;
+  border: 1px solid #d8d8d8;
   border-radius: 5px;
-  background: #090909;
+  background: #fafafa;
 }
 
 .welcome-choice-visual i {
@@ -282,14 +446,14 @@ button {
 }
 
 .welcome-choice-copy strong {
-  color: #f1e8d9;
+  color: #111111;
   font-size: 14px;
   line-height: 1.2;
 }
 
 .welcome-choice-copy small {
   margin-top: 6px;
-  color: #938b7f;
+  color: #606060;
   font-size: 11px;
   line-height: 1.35;
 }
@@ -301,7 +465,7 @@ button {
 }
 
 .welcome-choice.is-selected .welcome-choice-check {
-  color: #d9ad59;
+  color: #ed2b86;
 }
 
 .welcome-choice-visual[class*="size-"]::before,
@@ -311,7 +475,7 @@ button {
   left: 10px;
   top: 27px;
   height: 10px;
-  border: 2px solid #d7d2c8;
+  border: 2px solid #242424;
   border-radius: 50%;
 }
 
@@ -324,7 +488,7 @@ button {
   top: 23px;
   width: 18px;
   height: 18px;
-  background: #292722;
+  background: #ffffff;
 }
 
 .profile-classic::before,
@@ -334,9 +498,9 @@ button {
   position: absolute;
   inset: 12px 7px;
   background:
-    radial-gradient(ellipse 19px 24px at 68px 24px, #26231f 0 62%, #d7d2c8 64% 70%, transparent 72%),
-    linear-gradient(#d7d2c8, #d7d2c8) 22px 21px / 44px 5px no-repeat,
-    radial-gradient(ellipse 7px 25px at 18px 24px, #26231f 0 55%, #d7d2c8 58% 69%, transparent 72%);
+    radial-gradient(ellipse 19px 24px at 68px 24px, #ffffff 0 62%, #242424 64% 70%, transparent 72%),
+    linear-gradient(#242424, #242424) 22px 21px / 44px 5px no-repeat,
+    radial-gradient(ellipse 7px 25px at 18px 24px, #ffffff 0 55%, #242424 58% 69%, transparent 72%);
 }
 
 .profile-with-head::before,
@@ -348,7 +512,7 @@ button {
   top: 29px;
   height: 5px;
   border-radius: 999px;
-  background: #d7d2c8;
+  background: #242424;
 }
 
 .profile-with-head::after {
@@ -358,9 +522,9 @@ button {
   top: 13px;
   width: 28px;
   height: 34px;
-  border: 3px solid #d7d2c8;
+  border: 3px solid #242424;
   border-radius: 50%;
-  background: #26231f;
+  background: #ffffff;
 }
 
 .profile-without-head::after {
@@ -368,7 +532,7 @@ button {
   position: absolute;
   right: 5px;
   bottom: 5px;
-  color: #8d8579;
+  color: #666666;
   font-size: 7px;
   font-weight: 700;
 }
@@ -380,7 +544,7 @@ button {
   position: absolute;
   right: 7px;
   bottom: 5px;
-  color: #8d8579;
+  color: #666666;
   font-size: 7px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -389,17 +553,17 @@ button {
 .profile-new-medium::before {
   inset: 14px 6px;
   background:
-    radial-gradient(ellipse 17px 22px at 68px 22px, #26231f 0 62%, #d7d2c8 64% 70%, transparent 72%),
-    linear-gradient(#d7d2c8, #d7d2c8) 19px 20px / 48px 4px no-repeat,
-    radial-gradient(ellipse 6px 22px at 15px 22px, #26231f 0 55%, #d7d2c8 58% 69%, transparent 72%);
+    radial-gradient(ellipse 17px 22px at 68px 22px, #ffffff 0 62%, #242424 64% 70%, transparent 72%),
+    linear-gradient(#242424, #242424) 19px 20px / 48px 4px no-repeat,
+    radial-gradient(ellipse 6px 22px at 15px 22px, #ffffff 0 55%, #242424 58% 69%, transparent 72%);
 }
 
 .profile-new-small::before {
   inset: 17px 7px;
   background:
-    radial-gradient(ellipse 14px 18px at 66px 18px, #26231f 0 62%, #d7d2c8 64% 70%, transparent 72%),
-    linear-gradient(#d7d2c8, #d7d2c8) 18px 16px / 47px 3px no-repeat,
-    radial-gradient(ellipse 5px 18px at 14px 18px, #26231f 0 55%, #d7d2c8 58% 69%, transparent 72%);
+    radial-gradient(ellipse 14px 18px at 66px 18px, #ffffff 0 62%, #242424 64% 70%, transparent 72%),
+    linear-gradient(#242424, #242424) 18px 16px / 47px 3px no-repeat,
+    radial-gradient(ellipse 5px 18px at 14px 18px, #ffffff 0 55%, #242424 58% 69%, transparent 72%);
 }
 
 .metal-alu::before,
@@ -493,9 +657,9 @@ button {
   min-height: 320px;
   padding: 0;
   overflow: hidden;
-  border: 1px solid #3c3730;
+  border: 1px solid #d8d8d8;
   border-radius: 6px;
-  background: #11100e;
+  background: #ffffff;
   text-align: left;
   cursor: pointer;
   transition: transform 180ms ease, border-color 180ms ease;
@@ -504,7 +668,7 @@ button {
 .welcome-model:hover,
 .welcome-model:focus-visible {
   outline: none;
-  border-color: #d9ad59;
+  border-color: #ed2b86;
   transform: translateY(-2px);
 }
 
@@ -513,7 +677,7 @@ button {
   display: block;
   min-height: 190px;
   overflow: hidden;
-  background: #080808;
+  background: #f4f4f4;
 }
 
 .welcome-model-visual img {
@@ -544,14 +708,14 @@ button {
 }
 
 .welcome-model-copy strong {
-  color: #f3e9d9;
+  color: #111111;
   font-size: 16px;
   line-height: 1.25;
 }
 
 .welcome-model-copy small {
   margin-top: 7px;
-  color: #9e968a;
+  color: #5f5f5f;
   font-size: 12px;
   line-height: 1.4;
 }
@@ -559,7 +723,7 @@ button {
 .welcome-model-action {
   align-self: end;
   margin: 0 16px 16px;
-  color: #d9ad59;
+  color: #ed2b86;
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
@@ -568,8 +732,8 @@ button {
 .welcome-empty {
   margin: 0;
   padding: 24px;
-  border: 1px solid #3b352d;
-  color: #c4bbad;
+  border: 1px solid #dddddd;
+  color: #555555;
 }
 
 .viewer-back {
@@ -578,10 +742,10 @@ button {
   left: 18px;
   bottom: 18px;
   padding: 10px 14px;
-  border: 1px solid rgba(223, 177, 93, 0.65);
+  border: 1px solid #ed2b86;
   border-radius: 6px;
-  background: rgba(13, 12, 10, 0.88);
-  color: #f1e6d3;
+  background: rgba(255, 255, 255, 0.92);
+  color: #111111;
   text-decoration: none;
   backdrop-filter: blur(8px);
 }
@@ -600,6 +764,11 @@ button {
   .welcome-step {
     grid-template-columns: 1fr;
     gap: 18px;
+  }
+
+  .welcome-mode-panel {
+    grid-template-columns: 1fr;
+    gap: 20px;
   }
 
   .welcome-step-copy {
@@ -637,6 +806,11 @@ button {
   .welcome-options--head,
   .welcome-options--family,
   .welcome-gallery {
+    grid-template-columns: 1fr;
+  }
+
+  .catalog-mode-selector,
+  .welcome-multifilter-fields {
     grid-template-columns: 1fr;
   }
 

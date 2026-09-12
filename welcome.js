@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const VIEWER_VERSION = "20260902-release-v03";
+  const VIEWER_VERSION = "20260911-nonblocking-tools-v04";
   const ALUMINUM_FINISHES_BY_SIZE_CLASS = Object.freeze({
     SMALL: Object.freeze(["aluminum-gray", "aluminum-black", "aluminum-red", "aluminum-violet"]),
     MEDIUM: Object.freeze(["aluminum-gray", "aluminum-black", "aluminum-red", "aluminum-violet", "aluminum-pink", "aluminum-green", "aluminum-blue", "aluminum-gold", "aluminum-orange"]),
@@ -92,13 +92,29 @@
     const count = document.querySelector("#welcome-results-count");
     const progressValue = document.querySelector("#welcome-progress-value");
     const progressBar = document.querySelector("#welcome-progress-bar");
+    const progress = document.querySelector(".welcome-progress");
+    const modeSelector = document.querySelector("#catalog-mode-selector");
+    const multifilterPanel = document.querySelector("#welcome-multifilter");
+    const multifilterFields = document.querySelector("#welcome-multifilter-fields");
+    const aiPanel = document.querySelector("#welcome-ai-search");
+    const aiForm = document.querySelector("#welcome-ai-form");
+    const aiPrompt = document.querySelector("#welcome-ai-prompt");
+    const aiProgress = document.querySelector("#welcome-ai-progress");
+    const aiProgressLabel = document.querySelector("#welcome-ai-progress-label");
+    const aiProgressPercent = document.querySelector("#welcome-ai-progress-percent");
+    const aiProgressBar = document.querySelector("#welcome-ai-progress-bar");
     if (!stepsRoot || !results || !gallery) return;
 
     const models = readModels();
+    let catalogMode = "guided";
+    let aiHasRun = false;
+    let aiEngine = null;
+    let catalogAiModule = null;
     const state = {
       family: "",
       head: "",
-      size: "",
+      plugSize: "",
+      crystalSize: "",
       metal: "",
       metalFinish: "",
       ornament: "",
@@ -112,20 +128,20 @@
     const modelFamilies = [
       {
         id: "Classique",
-        label: "Classique",
+        label: "Originale",
         description: "Profil historique Rosebuds, avec une assiette affirmée et un corps généreux.",
         visual: "profile-classic",
       },
       {
         id: "NEW MEDIUM",
         label: "NEW MEDIUM",
-        description: "Profil intermédiaire à tige affinée, décliné pour plusieurs diamètres de cristal.",
+        description: "Profil intermédiaire à tige affinée, décliné pour plusieurs diamètres de plug.",
         visual: "profile-new-medium",
       },
       {
         id: "NEW SMALL",
         label: "NEW SMALL",
-        description: "Profil compact à tige fine, conçu autour du cristal de 18 mm.",
+        description: "Profil compact à tige fine, conçu autour d'un ornement de petit diamètre.",
         visual: "profile-new-small",
       },
     ];
@@ -204,25 +220,35 @@
       {
         key: "head",
         eyebrow: "Tête du plug",
-        title: "Votre modèle classique doit-il avoir une tête ?",
+        title: "Votre modèle Originale doit-il avoir une tête ?",
         description: "Ce choix distingue les modèles complets avec logement d'ornement des corps de plug sans tête.",
         visible: () => state.family === "Classique",
         options: () => classicHeadOptions,
       },
       {
-        key: "size",
-        eyebrow: "02 · Taille du cristal",
+        key: "plugSize",
+        eyebrow: "02 · Taille du plug",
+        title: "Quelle taille de plug recherchez-vous ?",
+        description: "L'appellation Rosebuds est conservée. Le diamètre réel du corps du plug est indiqué sous chaque taille.",
+        options: () => getPlugSizeOptions(models, state),
+      },
+      {
+        key: "crystalSize",
+        eyebrow: "03 · Taille du cristal",
         title: "Quelle taille de cristal recherchez-vous ?",
-        description: "Le diamètre du cristal détermine les géométries de plug et les ornements réellement disponibles.",
+        description: "Une même taille de plug peut accepter plusieurs diamètres de cristal. Seules les dimensions présentes dans les modèles Rhino sont proposées.",
+        visible: () => state.family !== "Classique" || state.head !== "sans-tete",
         options: () => sortPhysicalSizes(unique(models
-          .filter((model) => model.family === state.family && matchesClassicHead(model, state.family, state.head))
-          .map((model) => model.size))).map((size) => ({
+          .filter((model) => model.family === state.family
+            && matchesClassicHead(model, state.family, state.head)
+            && model.plugSize === state.plugSize)
+          .map((model) => model.crystalSize))).map((size) => ({
           id: size, label: size, description: describeSize(size), visual: `size-${size.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
         })),
       },
       {
         key: "metal",
-        eyebrow: "03 · Corps du plug",
+        eyebrow: "04 · Corps du plug",
         title: "Quel métal souhaitez-vous ?",
         description: "Le matériau pilote le poids visuel, les reflets et la gamme de finitions.",
         options: () => metalFamilies.filter((family) => getCandidateModels(models, state)
@@ -230,7 +256,7 @@
       },
       {
         key: "metalFinish",
-        eyebrow: "04 · Finition du métal",
+        eyebrow: "05 · Finition du métal",
         title: "Quelle finition doit recevoir le plug ?",
         description: "Chaque échantillon correspond au matériau qui sera appliqué dans le viewer.",
         options: () => getAvailableMetalFinishes(models, state, metalFinishes)
@@ -238,14 +264,14 @@
       },
       {
         key: "ornament",
-        eyebrow: "05 · Ornement",
+        eyebrow: "06 · Ornement",
         title: "Quel type d'ornement souhaitez-vous ?",
         description: "Seuls les ornements présents dans au moins un modèle de cette taille sont proposés.",
-        options: () => availableOrnaments(models, state.family, state.head, state.size, state.metal).map((id) => ({ id, ...ornaments[id] })),
+        options: () => availableOrnaments(models, state).map((id) => ({ id, ...ornaments[id] })),
       },
       {
         key: "ornamentFinish",
-        eyebrow: "06 · Couleur et matière",
+        eyebrow: "07 · Couleur et matière",
         title: "Quelle finition d'ornement vous convient ?",
         description: "La teinte sera transmise au rendu optique du cristal, de la gemme ou du décor.",
         options: () => getAvailableOrnamentFinishes(models, state, ornamentFinishes)
@@ -270,6 +296,60 @@
       });
     });
 
+    modeSelector?.addEventListener("change", (event) => {
+      if (!event.target.matches('input[name="catalog-mode"]')) return;
+      catalogMode = event.target.value;
+      render();
+    });
+
+    multifilterFields?.addEventListener("change", (event) => {
+      const select = event.target.closest("select[data-catalog-filter]");
+      if (!select) return;
+      state[select.dataset.catalogFilter] = select.value;
+      keepOnlyPossibleSelections(select.dataset.catalogFilter);
+      render();
+    });
+
+    aiForm?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const prompt = aiPrompt?.value.trim() || "";
+      if (!prompt) {
+        aiPrompt?.focus();
+        return;
+      }
+      setAiProgress(2, "Préparation de l’analyse locale…", true);
+      const submit = document.querySelector("#welcome-ai-submit");
+      if (submit) submit.disabled = true;
+      try {
+        catalogAiModule ||= await import(`./assets/js/catalog-ai.js?v=${VIEWER_VERSION}`);
+        if (!aiEngine) {
+          aiEngine = catalogAiModule.createCatalogAiEngine({
+            onProgress: (message) => setAiProgress(message.progress || 0, message.label || "Analyse en cours…", true),
+          });
+        }
+        const schema = buildAiSchema();
+        const immediate = catalogAiModule.parseCatalogPrompt(prompt, schema);
+        Object.keys(state).forEach((key) => { state[key] = ""; });
+        Object.assign(state, immediate);
+        aiHasRun = true;
+        setAiProgress(10, "Premiers résultats prêts. Le modèle local affine la recherche…", true);
+        render();
+        results.scrollIntoView({ behavior: "smooth", block: "start" });
+        const interpreted = await aiEngine.analyze(prompt, schema);
+        Object.keys(state).forEach((key) => { state[key] = ""; });
+        Object.assign(state, interpreted);
+        setAiProgress(100, "Résultats compatibles prêts à être ouverts.", true);
+        render();
+      } catch (error) {
+        console.error("Recherche IA indisponible", error);
+        setAiProgress(100, "L’IA complète est indisponible. L’analyse locale rapide a été utilisée.", true);
+        aiHasRun = true;
+        render();
+      } finally {
+        if (submit) submit.disabled = false;
+      }
+    });
+
     gallery.addEventListener("click", (event) => {
       const button = event.target.closest("[data-open-model]");
       if (!button) return;
@@ -279,6 +359,19 @@
     render();
 
     function render() {
+      stepsRoot.hidden = catalogMode !== "guided";
+      if (progress) progress.hidden = catalogMode !== "guided";
+      if (multifilterPanel) multifilterPanel.hidden = catalogMode !== "multi";
+      if (aiPanel) aiPanel.hidden = catalogMode !== "ai";
+      if (catalogMode === "multi") {
+        renderMultifilters();
+        renderResults(true, state);
+        return;
+      }
+      if (catalogMode === "ai") {
+        renderResults(aiHasRun, state, true);
+        return;
+      }
       const activeQuestions = getActiveQuestions();
       let visibleQuestions = 1;
       for (let index = 0; index < activeQuestions.length - 1; index += 1) {
@@ -305,29 +398,27 @@
       const shownStep = Math.min(answered + 1, activeQuestions.length);
       progressValue.textContent = completed ? "Configuration complète" : `Étape ${shownStep} sur ${activeQuestions.length}`;
       progressBar.style.width = `${Math.max(8, (answered / activeQuestions.length) * 100)}%`;
-      renderResults(completed);
+      renderResults(completed, state);
     }
 
-    function renderResults(completed) {
-      results.hidden = !completed;
-      if (!completed) return;
-      const compatible = models.filter((model) => model.family === state.family
-        && matchesClassicHead(model, state.family, state.head)
-        && model.size === state.size
-        && modelSupportsMetalFinish(model, state.metal, state.metalFinish)
-        && modelSupportsOrnament(model, state.ornament, state.metal)
-        && modelSupportsOrnamentFinish(model, state.ornament, state.ornamentFinish));
+    function renderResults(show, filters, allowClosest = false) {
+      results.hidden = !show;
+      if (!show) return;
+      let compatible = models.filter((model) => modelMatchesFilters(model, filters));
+      if (!compatible.length && allowClosest) compatible = findClosestModels(filters);
       count.textContent = `${compatible.length} modèle${compatible.length > 1 ? "s" : ""}`;
       gallery.innerHTML = compatible.length ? compatible.map((model) => {
-        const finish = getSelectedLabel(ornamentFinishes[state.ornament], state.ornamentFinish);
-        const metal = getSelectedLabel(metalFinishes[state.metal], state.metalFinish);
+        const resolved = resolveConfigurationForModel(model, filters);
+        const finish = getSelectedLabel(ornamentFinishes[resolved.ornament], resolved.ornamentFinish);
+        const metal = getSelectedLabel(metalFinishes[resolved.metal], resolved.metalFinish);
+        const crystal = resolved.crystalSize ? ` · Cristal ${resolved.crystalSize}` : "";
         return `<button type="button" class="welcome-model" data-open-model="${escapeHtml(model.id)}">
           <span class="welcome-model-visual">
             <img src="./assets/previews/models/${escapeHtml(model.id)}.png?v=${VIEWER_VERSION}" alt="Vue 3D en perspective du ${escapeHtml(model.label)}" loading="lazy" decoding="async" />
           </span>
           <span class="welcome-model-copy">
             <strong>${escapeHtml(model.label)}</strong>
-            <small>${escapeHtml(`${model.family} · ${state.size} · ${metal} · ${finish}`)}</small>
+            <small>${escapeHtml(`${getFamilyDisplayLabel(model.family)} · ${model.plugSizeLabel} · Ø plug ${model.plugDiameterMm} mm${crystal} · ${metal} · ${finish}`)}</small>
           </span>
           <span class="welcome-model-action">Ouvrir le viewer 3D</span>
         </button>`;
@@ -350,17 +441,180 @@
     }
 
     function openViewer(modelId) {
+      const model = models.find((entry) => entry.id === modelId);
+      const resolved = resolveConfigurationForModel(model, state);
       const url = new URL(window.location.href);
       url.search = "";
       url.searchParams.set("viewer", "1");
       url.searchParams.set("catalogModel", modelId);
-      url.searchParams.set("modelFamily", state.family);
-      url.searchParams.set("classicHead", state.head);
-      url.searchParams.set("metalFamily", state.metal);
-      url.searchParams.set("metalFinish", state.metalFinish);
-      url.searchParams.set("ornament", state.ornament);
-      url.searchParams.set("ornamentFinish", state.ornamentFinish);
+      url.searchParams.set("modelFamily", resolved.family);
+      url.searchParams.set("classicHead", resolved.head);
+      url.searchParams.set("plugSize", resolved.plugSize);
+      url.searchParams.set("crystalSize", resolved.crystalSize);
+      url.searchParams.set("metalFamily", resolved.metal);
+      url.searchParams.set("metalFinish", resolved.metalFinish);
+      url.searchParams.set("ornament", resolved.ornament);
+      url.searchParams.set("ornamentFinish", resolved.ornamentFinish);
       window.location.assign(url.toString());
+    }
+
+    function renderMultifilters() {
+      if (!multifilterFields) return;
+      const fields = [
+        ["family", "Gamme"],
+        ["head", "Tête (Originale)"],
+        ["plugSize", "Taille du plug"],
+        ["crystalSize", "Taille du cristal"],
+        ["metal", "Métal"],
+        ["metalFinish", "Finition du métal"],
+        ["ornament", "Ornement"],
+        ["ornamentFinish", "Finition de l’ornement"],
+      ];
+      multifilterFields.innerHTML = fields.map(([key, label]) => {
+        const options = getFacetOptions(key);
+        const disabled = key === "head" && state.family && state.family !== "Classique";
+        return `<label>
+          <span>${escapeHtml(label)}</span>
+          <select data-catalog-filter="${escapeHtml(key)}"${disabled ? " disabled" : ""}>
+            <option value="">Toutes les possibilités</option>
+            ${options.map((option) => `<option value="${escapeHtml(option.id)}"${state[key] === option.id ? " selected" : ""}>${escapeHtml(option.label)}</option>`).join("")}
+          </select>
+        </label>`;
+      }).join("");
+    }
+
+    function getFacetOptions(key) {
+      const options = getAllFilterOptions(key);
+      const base = { ...state, [key]: "" };
+      return options.filter((option) => models.some((model) => modelMatchesFilters(model, { ...base, [key]: option.id })));
+    }
+
+    function getAllFilterOptions(key) {
+      if (key === "family") return modelFamilies;
+      if (key === "head") return classicHeadOptions;
+      if (key === "metal") return metalFamilies;
+      if (key === "ornament") return Object.entries(ornaments).map(([id, option]) => ({ id, ...option }));
+      if (key === "plugSize") {
+        const bySize = new Map();
+        models.forEach((model) => bySize.set(model.plugSize, {
+          id: model.plugSize,
+          label: `${model.plugSizeLabel} - Ø ${model.plugDiameterMm} mm`,
+          diameter: model.plugDiameterMm,
+        }));
+        return [...bySize.values()].sort((left, right) => left.diameter - right.diameter);
+      }
+      if (key === "crystalSize") return sortPhysicalSizes(unique(models.map((model) => model.crystalSize))).map((id) => ({ id, label: id }));
+      if (key === "metalFinish") return uniqueOptions(Object.values(metalFinishes).flat().map(([id, label]) => ({ id, label })));
+      if (key === "ornamentFinish") return uniqueOptions(Object.values(ornamentFinishes).flat().map(([id, label]) => ({ id, label })));
+      return [];
+    }
+
+    function uniqueOptions(options) {
+      const found = new Map();
+      options.forEach((option) => { if (!found.has(option.id)) found.set(option.id, option); });
+      return [...found.values()];
+    }
+
+    function modelMatchesFilters(model, filters) {
+      if (filters.family && model.family !== filters.family) return false;
+      if (filters.head && (model.family !== "Classique" || model.head !== filters.head)) return false;
+      if (filters.plugSize && model.plugSize !== filters.plugSize) return false;
+      if (filters.crystalSize && model.crystalSize !== filters.crystalSize) return false;
+
+      const metalCandidates = filters.metal
+        ? [filters.metal]
+        : filters.metalFinish?.startsWith("aluminum-") ? ["alu"]
+          : filters.metalFinish?.startsWith("stainless-") ? ["inox"] : ["alu", "inox"];
+      const ornamentCandidates = filters.ornament
+        ? [filters.ornament]
+        : Object.keys(ornaments).filter((ornament) => !filters.ornamentFinish || finishBelongsToOrnament(ornament, filters.ornamentFinish));
+
+      return metalCandidates.some((metal) => {
+        if (!modelSupportsMetalFamily(model, metal)) return false;
+        if (filters.metalFinish && !modelSupportsMetalFinish(model, metal, filters.metalFinish)) return false;
+        return ornamentCandidates.some((ornament) => modelSupportsOrnament(model, ornament, metal)
+          && (!filters.ornamentFinish || (finishBelongsToOrnament(ornament, filters.ornamentFinish)
+            && modelSupportsOrnamentFinish(model, ornament, filters.ornamentFinish))));
+      });
+    }
+
+    function finishBelongsToOrnament(ornament, finishId) {
+      return (ornamentFinishes[ornament] || []).some(([id]) => id === finishId);
+    }
+
+    function keepOnlyPossibleSelections(changedKey) {
+      if (state.family !== "Classique") state.head = "";
+      if (models.some((model) => modelMatchesFilters(model, state))) return;
+      const keys = ["ornamentFinish", "ornament", "metalFinish", "metal", "crystalSize", "plugSize", "head", "family"];
+      for (const key of keys) {
+        if (key === changedKey || !state[key]) continue;
+        state[key] = "";
+        if (models.some((model) => modelMatchesFilters(model, state))) break;
+      }
+    }
+
+    function resolveConfigurationForModel(model, filters = {}) {
+      if (!model) return { ...state };
+      const resolved = {
+        family: model.family,
+        head: model.head,
+        plugSize: model.plugSize,
+        crystalSize: model.crystalSize,
+        metal: filters.metal,
+        metalFinish: filters.metalFinish,
+        ornament: filters.ornament,
+        ornamentFinish: filters.ornamentFinish,
+      };
+      if (!resolved.metal || !modelSupportsMetalFamily(model, resolved.metal)) {
+        resolved.metal = ["inox", "alu"].find((metal) => modelSupportsMetalFamily(model, metal)) || "inox";
+      }
+      if (!resolved.metalFinish || !modelSupportsMetalFinish(model, resolved.metal, resolved.metalFinish)) {
+        const allowed = getFinishRules(resolved.metal, model.metalSizeClass, model.family);
+        resolved.metalFinish = allowed?.[0] || metalFinishes[resolved.metal]?.[0]?.[0] || "";
+      }
+      if (!resolved.ornament || !modelSupportsOrnament(model, resolved.ornament, resolved.metal)) {
+        resolved.ornament = ["crystal", "gem", "pressed-glass", "bronze", "none"]
+          .find((ornament) => modelSupportsOrnament(model, ornament, resolved.metal)) || "none";
+      }
+      if (!resolved.ornamentFinish || !finishBelongsToOrnament(resolved.ornament, resolved.ornamentFinish)
+        || !modelSupportsOrnamentFinish(model, resolved.ornament, resolved.ornamentFinish)) {
+        resolved.ornamentFinish = (ornamentFinishes[resolved.ornament] || [])
+          .find(([id]) => modelSupportsOrnamentFinish(model, resolved.ornament, id))?.[0] || "none";
+      }
+      return resolved;
+    }
+
+    function findClosestModels(filters) {
+      return models.map((model) => {
+        let score = 0;
+        if (filters.family && model.family === filters.family) score += 8;
+        if (filters.head && model.head === filters.head) score += 4;
+        if (filters.plugSize && model.plugSize === filters.plugSize) score += 8;
+        if (filters.crystalSize && model.crystalSize === filters.crystalSize) score += 5;
+        if (filters.metal && modelSupportsMetalFamily(model, filters.metal)) score += 3;
+        if (filters.metalFinish && ["alu", "inox"].some((metal) => modelSupportsMetalFinish(model, metal, filters.metalFinish))) score += 3;
+        if (filters.ornament && model.ornaments.includes(filters.ornament)) score += 5;
+        if (filters.ornamentFinish && Object.keys(ornaments).some((ornament) => finishBelongsToOrnament(ornament, filters.ornamentFinish)
+          && modelSupportsOrnamentFinish(model, ornament, filters.ornamentFinish))) score += 3;
+        return { model, score };
+      }).sort((left, right) => right.score - left.score).slice(0, 9).map((entry) => entry.model);
+    }
+
+    function buildAiSchema() {
+      return Object.fromEntries(["family", "head", "plugSize", "crystalSize", "metal", "metalFinish", "ornament", "ornamentFinish"]
+        .map((key) => [key, getAllFilterOptions(key).map((option) => ({ id: option.id, label: option.label, diameter: option.diameter }))]));
+    }
+
+    function setAiProgress(value, label, visible) {
+      const percent = Math.max(0, Math.min(100, Math.round(Number(value) || 0)));
+      if (aiProgress) aiProgress.hidden = !visible;
+      if (aiProgressLabel) aiProgressLabel.textContent = label;
+      if (aiProgressPercent) aiProgressPercent.textContent = `${percent} %`;
+      if (aiProgressBar) aiProgressBar.style.width = `${percent}%`;
+    }
+
+    function getFamilyDisplayLabel(family) {
+      return family === "Classique" ? "Originale" : family;
     }
 
     function getActiveQuestions() {
@@ -383,17 +637,20 @@
         if (normalized.includes("cabochon")) ornaments.push("gem", "pressed-glass");
         if (normalized.includes("avec pierre") || normalized.includes("avec assiette")) {
           ornaments.push("crystal");
-          if (getMetalSizeClass(label) === "SMALL") ornaments.push("gem", "pressed-glass");
+          if (getMetalSizeClass(label, option.value) === "SMALL") ornaments.push("gem", "pressed-glass");
         }
         if (normalized.includes("bronze")) ornaments.push("bronze");
         if (!ornaments.length) ornaments.push("none");
         return {
           id: option.value,
           label,
-          size: getPhysicalSize(label),
           family: getModelFamily(label),
           head: getModelHead(option.value),
-          metalSizeClass: getMetalSizeClass(label),
+          plugSize: getPlugSize(option.value),
+          plugSizeLabel: getPlugSizeLabel(option.value),
+          plugDiameterMm: getPlugDiameterMm(option.value),
+          crystalSize: getCrystalSize(option.value),
+          metalSizeClass: getMetalSizeClass(label, option.value),
           ornaments: unique(ornaments),
           previewClass: normalized.includes("new medium") ? "is-new-medium" : normalized.includes("new small") ? "is-new-small" : "is-classic",
         };
@@ -401,14 +658,44 @@
       .filter((model) => model.id.startsWith("plug-") && model.id !== "plug-decalcomanie");
   }
 
-  function getPhysicalSize(label) {
-    const text = normalize(label).toUpperCase();
-    if (text.includes("NEW SMALL")) return "18 mm";
-    const explicitDiameter = text.match(/\b(100|90|80|70|67|60|55|50|45|35|30|18)\b/)?.[1];
-    if (explicitDiameter) return `${explicitDiameter} mm`;
-    if (text.includes("SMALL")) return "18 mm";
-    if (text.includes("MEDIUM")) return "30 mm";
-    return "Autre";
+  function getPlugDiameterMm(id) {
+    const text = String(id || "").toLowerCase();
+    if (text.includes("new-small") || text.includes("classique-small")) return 25;
+    if (text.includes("new-medium")) return Number(text.match(/-(67|60|55|50|45|35|30)-/)?.[1] || 30);
+    if (text.includes("classique-55-")) return 55;
+    if (text.includes("classique-67-")) return 67;
+    if (text.includes("classique-large")) return 35;
+    if (text.includes("classique-medium")) return 30;
+    if (text.includes("classique-xl-45")) return 45;
+    if (text.includes("classique-xl")) return 40;
+    if (text.includes("classique-xxl")) return 50;
+    if (text.includes("classique-xxxl")) return Number(text.match(/-(100|90|80|70|60)(?:-|$)/)?.[1] || 60);
+    return 0;
+  }
+
+  function getPlugSizeLabel(id) {
+    const diameter = getPlugDiameterMm(id);
+    if (diameter <= 25) return "SMALL";
+    if (diameter <= 30) return "MEDIUM";
+    if (diameter <= 35) return "LARGE";
+    if (diameter <= 45) return "XL";
+    if (diameter <= 50) return "XXL";
+    return "XXXL";
+  }
+
+  function getPlugSize(id) {
+    return `${getPlugSizeLabel(id)}-${getPlugDiameterMm(id)}`;
+  }
+
+  function getCrystalSize(id) {
+    if (CLASSIC_MODELS_WITHOUT_HEAD.has(id)) return "";
+    const text = String(id || "").toLowerCase();
+    if (text.includes("new-small") || text.includes("new-medium")) return "9 mm";
+    if (text.includes("classique-small-18")) return "18 mm";
+    if (text.includes("classique-small")) return "16 mm";
+    if (text.includes("classique-xl-35") || text.includes("classique-xxl-35")) return "35 mm";
+    if (text.includes("classique-xxxl")) return "50 mm";
+    return "27 mm";
   }
 
   function getModelFamily(label) {
@@ -428,20 +715,21 @@
     return family !== "Classique" || !head || model.head === head;
   }
 
-  function getMetalSizeClass(label) {
+  function getMetalSizeClass(label, id = "") {
     const text = normalize(label).toUpperCase();
     if (text.includes("NEW SMALL")) return "SMALL";
     if (text.includes("NEW MEDIUM")) return "MEDIUM";
     for (const sizeClass of ["XXXL", "XXL", "XL", "LARGE", "MEDIUM", "SMALL"]) {
       if (new RegExp(`\\b${sizeClass}\\b`).test(text)) return sizeClass;
     }
-    return "";
+    return id ? getPlugSizeLabel(id) : "";
   }
 
   function getCandidateModels(models, state) {
     return models.filter((model) => model.family === state.family
       && matchesClassicHead(model, state.family, state.head)
-      && (!state.size || model.size === state.size));
+      && (!state.plugSize || model.plugSize === state.plugSize)
+      && (!state.crystalSize || model.crystalSize === state.crystalSize));
   }
 
   function getFinishRules(metalFamily, sizeClass, modelFamily = "") {
@@ -523,17 +811,33 @@
     });
   }
 
-  function availableOrnaments(models, family, head, size, metalFamily) {
-    const found = unique(models
-      .filter((model) => model.family === family && matchesClassicHead(model, family, head) && model.size === size
-        && modelSupportsMetalFamily(model, metalFamily))
-      .flatMap((model) => model.ornaments.filter((ornament) => modelSupportsOrnament(model, ornament, metalFamily))));
+  function getPlugSizeOptions(models, state) {
+    const options = new Map();
+    models
+      .filter((model) => model.family === state.family && matchesClassicHead(model, state.family, state.head))
+      .forEach((model) => {
+        if (options.has(model.plugSize)) return;
+        options.set(model.plugSize, {
+          id: model.plugSize,
+          label: model.plugSizeLabel,
+          diameter: model.plugDiameterMm,
+          description: `Diamètre du plug : ${model.plugDiameterMm} mm.`,
+          visual: `plug-size-${model.plugSize.toLowerCase()}`,
+        });
+      });
+    return [...options.values()].sort((left, right) => left.diameter - right.diameter);
+  }
+
+  function availableOrnaments(models, state) {
+    const found = unique(getCandidateModels(models, state)
+      .filter((model) => modelSupportsMetalFamily(model, state.metal))
+      .flatMap((model) => model.ornaments.filter((ornament) => modelSupportsOrnament(model, ornament, state.metal))));
     return ["crystal", "gem", "pressed-glass", "bronze", "none"].filter((id) => found.includes(id));
   }
 
   function describeSize(size) {
     const diameter = size.match(/\d+/)?.[0];
-    return diameter ? `Diamètre de référence ${diameter} mm. Plusieurs familles compatibles pourront être proposées.` : "Géométrie de plug disponible.";
+    return diameter ? `Diamètre du cristal : ${diameter} mm.` : "Cristal compatible avec cette géométrie de plug.";
   }
 
   function finishDescription(id) {

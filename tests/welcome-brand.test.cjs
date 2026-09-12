@@ -21,7 +21,10 @@ assert(html.includes('alt="ROSEBUDS"'), "Le logo doit avoir un nom accessible.")
 assert(html.includes('class="viewer-rosebuds-logo"'), "Le logo ROSEBUDS doit rester visible dans le viewer 3D.");
 assert(!/CHARLES THIERRY DE VILLE D'AVRAY/i.test(html), "Le nom personnel ne doit plus apparaître dans l'accueil ni dans le viewer.");
 assert(viewerCss.includes(".viewer-rosebuds-logo"), "Le viewer doit définir une présentation dédiée au logo ROSEBUDS.");
-assert(css.includes("filter: brightness(0) invert(1)"), "Le logo doit être blanc sur le fond sombre.");
-assert(css.includes("mix-blend-mode: difference"), "Le logo doit conserver un contraste noir ou blanc selon le fond.");
+assert(css.includes("background: #ffffff"), "L'accueil doit reprendre le fond blanc du site Rosebuds.");
+assert(css.includes("color: #111111"), "L'accueil doit utiliser un texte noir contrasté.");
+assert(css.includes("#ed2b86"), "L'accueil doit reprendre l'accent fuchsia Rosebuds.");
+assert(css.includes("mix-blend-mode: normal"), "Le logo noir doit conserver son rendu d'origine sur fond blanc.");
+assert(viewerCss.includes("filter: brightness(0)"), "Le logo du viewer doit rester noir sur son panneau clair.");
 
 console.log("Welcome brand regression test OK");

@@ -1,4 +1,4 @@
-$ErrorActionPreference = 'Stop'
+﻿$ErrorActionPreference = 'Stop'
 
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $outputRoot = Join-Path $PSScriptRoot 'dist'
@@ -27,17 +27,17 @@ Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'auth.js') -Destination $outputR
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'online.css') -Destination $outputRoot
 
 $indexPath = Join-Path $outputRoot 'index.html'
-$index = Get-Content -LiteralPath $indexPath -Raw
+$index = Get-Content -LiteralPath $indexPath -Raw -Encoding UTF8
 $index = $index.Replace(
-  '<link rel="stylesheet" href="./welcome.css?v=20260902-release-v03" />',
-  '<link rel="stylesheet" href="./welcome.css?v=20260902-release-v03" />' + [Environment]::NewLine + '    <link rel="stylesheet" href="./online.css?v=20260902-release-v03" />'
+  '<link rel="stylesheet" href="./welcome.css?v=20260911-nonblocking-tools-v04" />',
+  '<link rel="stylesheet" href="./welcome.css?v=20260911-nonblocking-tools-v04" />' + [Environment]::NewLine + '    <link rel="stylesheet" href="./online.css?v=20260911-nonblocking-tools-v04" />'
 )
 
 $gateMarkup = @'
   <body class="is-welcome auth-locked">
     <section id="access-gate" class="access-gate" aria-labelledby="access-title">
       <div class="access-gate__panel">
-        <img class="access-gate__logo" src="./assets/brand/rosebuds-logo.png?v=20260902-release-v03" alt="ROSEBUDS" width="284" height="117" />
+        <img class="access-gate__logo" src="./assets/brand/rosebuds-logo.png?v=20260911-nonblocking-tools-v04" alt="ROSEBUDS" width="284" height="117" />
         <div>
           <p class="access-gate__eyebrow">ESPACE PROFESSIONNEL</p>
           <h1 id="access-title">Accéder au configurateur</h1>
@@ -62,8 +62,8 @@ $gateMarkup = @'
 
 $index = $index.Replace('  <body class="is-welcome">', $gateMarkup)
 $index = $index.Replace(
-  '<script src="./welcome.js?v=20260902-release-v03" defer></script>',
-  '<script src="./auth.js?v=20260902-release-v03" defer></script>'
+  '<script src="./welcome.js?v=20260911-nonblocking-tools-v04" defer></script>',
+  '<script src="./auth.js?v=20260911-nonblocking-tools-v04" defer></script>'
 )
 
 [IO.File]::WriteAllText($indexPath, $index, [Text.UTF8Encoding]::new($false))

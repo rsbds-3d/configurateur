@@ -45,6 +45,10 @@ assert(!app.includes("new THREE.PlaneGeometry(widthWorld / scalar, heightWorld /
 assert(app.includes("addStemDecalToClassicPlug(model, meshOptions)"), "La décalcomanie doit être ajoutée aux imports Rhino de plugs.");
 assert(app.includes("addStemDecalToClassicPlug(group, { classicPlugVolumeMaterials: true })"), "La décalcomanie doit aussi exister dans le plug de secours.");
 assert(app.includes("child.userData.stemDecal"), "La décalcomanie doit être ignorée par les listes d'objets et calculs de boîte.");
+assert(html.includes('id="material-visibility-toggle"'), "La bibliothèque volumineuse doit être ouverte explicitement.");
+assert(/id="material-visibility-table"[^>]+hidden/.test(html), "Les milliers de contrôles de matériaux doivent rester absents de l'affichage initial.");
+assert(app.includes("toggleMaterialVisibilityLibrary"), "Le chargement de la bibliothèque de matériaux doit être paresseux.");
+assert(!/ensureMaterialSelectSwatches\(\);\s*buildMaterialVisibilityLibrary\(\);\s*restoreMenuPanelWidth/.test(app), "La bibliothèque ne doit plus être construite pendant le démarrage du viewer.");
 
 assert(html.includes('id="model-compare-control"'), "Le contrôle de comparaison de plugs doit exister.");
 assert(app.includes("function loadModelComparisonFromSelection"), "Le chargement multi-plugs doit être implémenté.");

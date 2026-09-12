@@ -1,6 +1,6 @@
 # Cahier des charges - Configurateur de bijoux
 
-Version : **v0.3-260902**
+Version : **v0.4-260911**
 
 ## Objectifs
 
@@ -11,20 +11,21 @@ Version : **v0.3-260902**
 
 ## Parcours catalogue
 
-1. Famille de modèle : `Classique`, `NEW MEDIUM` ou `NEW SMALL`, illustrée par un schéma 2D de profil.
-2. Pour la famille `Classique` uniquement : présence d'une tête (`Avec tête` ou `Sans tête`).
-3. Taille physique du cristal en millimètres, filtrée selon la famille et la présence de tête choisies.
-4. Famille de métal : aluminium ou inox.
-5. Finition compatible du métal.
-6. Type d'ornement compatible.
-7. Finition ou couleur compatible de l'ornement.
-8. Galerie finale des modèles compatibles, avec miniature réelle et nom du modèle.
+1. Gamme de modèle : `Originale`, `NEW MEDIUM` ou `NEW SMALL`, illustrée par un schéma 2D de profil.
+2. Pour la gamme `Originale` uniquement : présence d'une tête (`Avec tête` ou `Sans tête`).
+3. Taille commerciale du plug, avec diamètre informatif.
+4. Taille physique du cristal en millimètres, indépendante de la taille du plug.
+5. Famille de métal : aluminium ou inox.
+6. Finition compatible du métal.
+7. Type d'ornement compatible.
+8. Finition ou couleur compatible de l'ornement.
+9. Galerie finale des modèles compatibles, avec miniature réelle et nom du modèle.
 
 Les familles `NEW SMALL` et `NEW MEDIUM` ne sont jamais des tailles. Le choix de famille précède celui du diamètre et contraint immédiatement les tailles, ornements et géométries disponibles.
 
-Le parcours comporte six choix pour `NEW SMALL` et `NEW MEDIUM`, et sept pour `Classique`. La question conditionnelle ne doit jamais apparaître pour les familles NEW. Les branches `Avec tête` et `Sans tête` reposent sur deux listes explicites de fichiers Rhino validés; aucun modèle Classique inconnu ne doit être classé automatiquement à partir de son seul libellé.
+Le catalogue propose un parcours progressif, un multifiltre à facettes croisées et une recherche en langage naturel. La question conditionnelle ne doit jamais apparaître pour les familles NEW. Les branches `Avec tête` et `Sans tête` reposent sur deux listes explicites de fichiers Rhino validés; aucun modèle Originale inconnu ne doit être classé automatiquement à partir de son seul libellé.
 
-Modèles Classiques `Avec tête` validés : `LARGE 35`, `MEDIUM`, `SMALL 18`, `SMALL`, `XL 35`, `XL 45 avec assiette`, `XL`, `XXL 35`, `XXL`, `XXXL 60`, `XXXL 70`, `XXXL 80`, `XXXL 90` et `XXXL 100`.
+Modèles Originale `Avec tête` validés : `LARGE 35`, `MEDIUM`, `SMALL 18`, `SMALL`, `XL 35`, `XL 45 avec assiette`, `XL`, `XXL 35`, `XXL`, `XXXL 60`, `XXXL 70`, `XXXL 80`, `XXXL 90` et `XXXL 100`.
 
 ## Viewer
 
@@ -35,15 +36,20 @@ Modèles Classiques `Avec tête` validés : `LARGE 35`, `MEDIUM`, `SMALL 18`, `S
 - Matériaux de sol PBR, support masquable et menu contextuel.
 - Sélection d'objet et changement de matériau sans altérer la géométrie.
 - Chargement avec progression et journal de débogage.
+- Rendu rapide interactif conservé pendant la construction BVH en worker; compilation GPU différée tant que l'utilisateur manipule la caméra.
 - Mode AR par caméra sur téléphone ou ordinateur, avec flux vidéo intégré comme arrière-plan Three.js et conservation stricte du pipeline PBR du viewer normal.
 - Déplacement visuel de la décalcomanie sur la tige, contrainte à la surface métallique, avec mémorisation distincte par modèle.
+- Rendu optimisé à la demande par capture haute définition et super-résolution open source côté client.
+- Objets 3D de comparaison à dimensions réelles : pièce de monnaie, bouteilles 33 cl et 1,5 l, règle graduée 20 cm.
+- Téléchargement PNG et partage de la vue courante.
+- Résumé du produit et lien vers la fiche Rosebuds la plus proche ou le formulaire sur mesure prérempli.
 
 ## Règles métier
 
 - Le plus grand solide d'un plug est traité comme métal lorsque plusieurs volumes sont présents.
 - Le petit solide identifié comme ornement reçoit le matériau de pierre/cristal.
 - La matrice aluminium est contrainte par classe : `SMALL` = gris/noir/rouge/violet, `MEDIUM` = neuf couleurs, `LARGE` = noir/rouge et `XL` = noir/rouge/violet/orange.
-- Les modèles Classiques jusqu'au `XL` inclus proposent aluminium et inox; les Classiques `XXL` et `XXXL` proposent uniquement l'inox.
+- Les modèles Originale jusqu'au `XL` inclus proposent aluminium et inox; les Originale `XXL` et `XXXL` proposent uniquement l'inox.
 - La famille `NEW SMALL` surcharge la règle `SMALL` : aluminium noir uniquement.
 - L'inox propose le poli miroir sur toutes les tailles et le flash or 1 micron uniquement sur `MEDIUM`.
 - Le cristal est compatible avec toutes les familles à tête. Gemme et verre pressé sont limités à `SMALL`, `NEW SMALL` et `NEW MEDIUM`; la gemme est interdite sur `NEW SMALL` aluminium.
@@ -64,6 +70,7 @@ Modèles Classiques `Avec tête` validés : `LARGE 35`, `MEDIUM`, `SMALL 18`, `S
 - Application Windows lancée par un véritable EXE autonome, sans appel à un BAT ni dépendance à Node.js.
 - Version web générée et publiée indépendamment de l'application Windows, avec parité fonctionnelle.
 - Écran d'identification chargé avant le catalogue et le viewer sur la version en ligne uniquement.
+- Les modèles IA fonctionnent côté client, sans API payante; un repli déterministe doit maintenir la recherche si le modèle n'est pas disponible.
 
 ## Tests exigés
 
@@ -71,7 +78,7 @@ Modèles Classiques `Avec tête` validés : `LARGE 35`, `MEDIUM`, `SMALL 18`, `S
 - Non-régression des matériaux et de la classification métal/pierre.
 - Persistance du shader BVH après changement de matériau.
 - Catalogue : choix visuel de la famille avant la taille physique, les deux critères restant strictement séparés.
-- Catalogue Classique : sous-question avec ou sans tête immédiatement après la famille, avec filtrage des tailles, ornements et résultats.
+- Catalogue Originale : sous-question avec ou sans tête immédiatement après la famille, avec filtrage des tailles, ornements et résultats.
 - Matrice métal/ornement : validation unitaire de chaque classe aluminium, de l'inox MEDIUM, de l'exception NEW SMALL et de la disponibilité des ornements.
 - Contrôle des textes mal encodés.
 - Affichage cohérent de la version.
@@ -79,6 +86,8 @@ Modèles Classiques `Avec tête` validés : `LARGE 35`, `MEDIUM`, `SMALL 18`, `S
 - Déplacements de décalcomanie persistants, bornés à la tige et isolés par identifiant de modèle.
 - Lanceur Windows : signature PE valide, serveur local fourni par l'EXE et raccourcis ciblant l'exécutable.
 - Version en ligne : paquet autonome, écran d'accès actif, application non chargée avant validation et workflow GitHub Pages présent.
+- Catalogue : trois modes cohérents donnant accès aux mêmes combinaisons compatibles.
+- Viewer : rendu provisoire conservé pendant le BVH, priorité des interactions avant compilation, objets d'échelle et export/partage PNG.
 
 ## À poursuivre
 

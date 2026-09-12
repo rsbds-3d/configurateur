@@ -1,6 +1,6 @@
 # Configurateur de Bijoux Rosebuds
 
-Version actuelle : **v0.3-260902**
+Version actuelle : **v0.4-260911**
 
 Configurateur de plugs Rosebuds avec catalogue guidé, import de modèles Rhino 3DM, matériaux métalliques PBR, pierres transparentes avec shader optique BVH et mode caméra AR.
 
@@ -41,14 +41,18 @@ La barrière d'accès GitHub Pages est exécutée côté navigateur. Elle empêc
 
 ## Fonctionnalités
 
-- Choix progressif par famille, tête, diamètre, métal, finition et ornement.
-- Matrices de compatibilité propres aux modèles Classique, NEW SMALL et NEW MEDIUM.
+- Trois recherches du catalogue : choix successifs, multifiltres croisés et prompt en langage naturel.
+- Choix distincts de la gamme, de la taille du plug et de la taille du cristal.
+- Matrices de compatibilité propres aux modèles Originale, NEW SMALL et NEW MEDIUM.
 - Miniatures réelles et chargement différé du viewer 3D.
 - Import Rhino 3DM avec classification métal/pierre par volume.
 - Matériaux métalliques PBR et pierres transparentes avec réfraction, Fresnel, dispersion, TIR et BVH.
-- Barre de progression des calculs lourds.
-- Déplacement et mémorisation de la décalcomanie par modèle.
+- Rendu rapide manipulable, calcul BVH en worker et progression des calculs lourds.
+- Recherche IA locale avec Transformers.js et repli déterministe hors ligne.
+- Rendu optimisé à la demande avec lissage PBR et super-résolution Swin2SR locale.
+- Déplacement prioritaire de la décalcomanie par appui long et mémorisation par modèle.
 - Mode AR par caméra avec conservation du rendu Three.js.
+- Objets d'échelle réels, export PNG et partage natif de la vue.
 - Affichage parallèle de plusieurs plugs.
 
 ## Tests
@@ -57,4 +61,4 @@ La barrière d'accès GitHub Pages est exécutée côté navigateur. Elle empêc
 Get-ChildItem tests/*.test.cjs | ForEach-Object { node $_.FullName }
 ```
 
-La version `v0.3-260902` possède 21 tests unitaires et de non-régression.
+La version `v0.4-260911` possède 27 tests unitaires et de non-régression.

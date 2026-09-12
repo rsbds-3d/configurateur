@@ -1,6 +1,6 @@
 # Planning et suivi
 
-Version : **v0.3-260902**
+Version : **v0.4-260911**
 
 | Date | Travail | État | Durée |
 |---|---|---|---|
@@ -24,9 +24,17 @@ Version : **v0.3-260902**
 | 2026-09-02 | Préparation et publication du dépôt public et du site GitHub Pages | Terminé et vérifié en HTTPS | Non mesurée |
 | 2026-09-02 | Compilation de l'EXE, génération de l'installateur v0.3, réinstallation et contrôle du serveur intégré | Terminé et testé | Non mesurée |
 | 2026-09-02 | Maintien du logo officiel ROSEBUDS dans le viewer 3D et en AR | Terminé et testé | Non mesurée |
+| 2026-09-03 | Connexion publique, parcours NEW SMALL, transfert des filtres et ressources HTTP | Vérifiés ; 21 tests Node réussis | Non mesurée |
+| 2026-09-03 | Capture du rendu public et interaction 3D | Non validées : délais du navigateur de test ; AR réel restant à tester | Non mesurée |
+| 2026-09-04 | Retrait du nom personnel des en-têtes, conservation de ROSEBUDS | Publié, réponse publique et 21 tests vérifiés | Non mesurée |
+| 2026-09-10 | Taille du plug séparée de la taille du cristal, résumé produit et liens Rosebuds | Terminé et testé | Non mesurée |
+| 2026-09-10 | Glisser-déposer prioritaire de la décalcomanie par appui long et persistance par modèle | Terminé et testé | Non mesurée |
+| 2026-09-10 | Modes guidé, multifiltres croisés et recherche IA locale | Terminé et testé | Non mesurée |
+| 2026-09-10 | Rendu optimisé local, objets d'échelle, téléchargement et partage PNG | Terminé et testé | Non mesurée |
+| 2026-09-11 | BVH en worker, compilation au repos, bibliothèque de matériaux paresseuse et barre d'actions responsive | Terminé et testé | Non mesurée |
 
 ## Prochaines priorités
 
-1. Profiler le temps de construction BVH sur les modèles les plus lourds.
+1. Profiler sur plusieurs téléphones la compilation GPU finale des modèles les plus lourds.
 2. Compléter les miniatures réelles au fil des nouveaux modèles importés.
 3. Étudier un cache persistant des maillages convertis et des BVH.

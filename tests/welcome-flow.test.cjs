@@ -13,14 +13,17 @@ assert(!index.includes('<script type="module" src="./app.js'), "Le moteur 3D ne 
 assert(welcome.includes('params.get("viewer") === "1"'), "Le viewer doit être chargé uniquement sur demande.");
 assert(welcome.includes('import(`./app.js?v=${VIEWER_VERSION}`)'), "Le moteur 3D doit être importé dynamiquement.");
 assert(welcome.includes('url.searchParams.set("catalogModel", modelId)'), "Le modèle choisi doit être transmis au viewer.");
-assert(welcome.includes('url.searchParams.set("metalFinish", state.metalFinish)'), "La finition métal choisie doit être transmise.");
+assert(welcome.includes('url.searchParams.set("metalFinish", resolved.metalFinish)'), "La finition métal compatible doit être transmise.");
 const familyQuestionIndex = welcome.indexOf('title: "Quel modèle de plug recherchez-vous ?"');
-const classicHeadQuestionIndex = welcome.indexOf('title: "Votre modèle classique doit-il avoir une tête ?"');
+const classicHeadQuestionIndex = welcome.indexOf('title: "Votre modèle Originale doit-il avoir une tête ?"');
+const plugSizeQuestionIndex = welcome.indexOf('title: "Quelle taille de plug recherchez-vous ?"');
 const crystalSizeQuestionIndex = welcome.indexOf('title: "Quelle taille de cristal recherchez-vous ?"');
 assert(familyQuestionIndex >= 0, "La première question doit permettre de choisir la famille du modèle.");
 assert(classicHeadQuestionIndex > familyQuestionIndex, "Le choix avec ou sans tête doit suivre le choix de la famille.");
-assert(crystalSizeQuestionIndex > classicHeadQuestionIndex, "La taille du cristal doit être demandée après le choix avec ou sans tête.");
+assert(plugSizeQuestionIndex > classicHeadQuestionIndex, "La taille commerciale du plug doit être demandée après le choix avec ou sans tête.");
+assert(crystalSizeQuestionIndex > plugSizeQuestionIndex, "La taille du cristal doit rester une étape distincte après la taille du plug.");
 assert(welcome.includes('id: "Classique"'), "La famille Classique doit être proposée.");
+assert(welcome.includes('label: "Originale"'), "Le libellé présenté au client doit être Originale.");
 assert(welcome.includes('id: "NEW MEDIUM"'), "La famille NEW MEDIUM doit être proposée.");
 assert(welcome.includes('id: "NEW SMALL"'), "La famille NEW SMALL doit être proposée.");
 assert(welcome.includes('visual: "profile-classic"'), "Le modèle Classique doit avoir un schéma de profil.");
@@ -32,9 +35,9 @@ assert(welcome.includes('const activeQuestions = getActiveQuestions();'), "Le no
 assert(welcome.includes('head: getModelHead(option.value)'), "Chaque modèle doit être classé avec ou sans tête depuis son identifiant stable.");
 assert(welcome.includes('model.family === state.family'), "Les tailles et résultats doivent être filtrés par famille.");
 assert(welcome.includes('matchesClassicHead(model, state.family, state.head)'), "Les tailles et résultats classiques doivent respecter le choix de tête.");
-assert(welcome.includes('availableOrnaments(models, state.family, state.head, state.size, state.metal)'), "Les ornements doivent dépendre de la famille, de la tête, de la taille et du métal choisis.");
-assert(index.includes('id="welcome-progress-value">Étape 1 sur 6'), "Le parcours d'accueil doit annoncer six étapes.");
-assert(!welcome.includes("Quelle taille de plug recherchez-vous ?"), "L'ancien libellé sur la taille du plug ne doit plus apparaître.");
+assert(welcome.includes('availableOrnaments(models, state)'), "Les ornements doivent dépendre de la famille, de la tête, des deux tailles et du métal choisis.");
+assert(index.includes('id="welcome-progress-value">Étape 1 sur 7'), "Le parcours d'accueil doit annoncer sept étapes hors question Classique conditionnelle.");
+assert(welcome.includes('visible: () => state.family !== "Classique" || state.head !== "sans-tete"'), "Le choix du cristal doit être masqué pour un Classique sans tête.");
 
 const restoreIndex = app.indexOf('.then(() => restorePersistentModelLibrary())');
 const welcomeConfigIndex = app.indexOf('.then(() => applyWelcomeLaunchConfiguration(launchParams))');
@@ -45,12 +48,13 @@ assert(welcome.includes('./assets/previews/models/${escapeHtml(model.id)}.png'),
 assert(!welcome.includes('welcome-model-body"></i>'), "Les silhouettes CSS imaginees ne doivent plus etre utilisees.");
 assert(welcome.includes('params.get("thumbnail") === "1"'), "Le viewer doit proposer un mode de prise de vue sans interface.");
 assert(app.includes('document.body.dataset.viewerReady = "true"'), "Le pipeline de capture doit connaitre la fin reelle du chargement.");
-assert(welcome.includes("size: getPhysicalSize(label)"), "Le premier filtre doit utiliser le diametre physique du plug.");
+assert(welcome.includes("plugSize: getPlugSize(option.value)"), "Chaque modèle doit avoir une taille commerciale de plug indépendante.");
+assert(welcome.includes("plugDiameterMm: getPlugDiameterMm(option.value)"), "Chaque taille de plug doit afficher son diamètre réel.");
+assert(welcome.includes("crystalSize: getCrystalSize(option.value)"), "Chaque modèle à tête doit conserver son diamètre de cristal.");
 assert(welcome.includes("family: getModelFamily(label)"), "La famille du modele doit rester une propriete distincte du diametre.");
-assert(welcome.includes('if (text.includes("NEW SMALL")) return "18 mm";'), "NEW SMALL doit etre classe dans la taille physique 18 mm.");
 assert(!welcome.includes("function getSize(label)"), "L'ancien classement des familles comme tailles ne doit plus etre utilise.");
 assert(welcome.includes("sortPhysicalSizes"), "Les tailles physiques doivent etre presentees dans l'ordre numerique.");
-assert(welcome.includes("`${model.family} · ${state.size} · ${metal} · ${finish}`"), "La famille doit etre affichee seulement dans la selection finale des modeles.");
+assert(welcome.includes("`${getFamilyDisplayLabel(model.family)} · ${model.plugSizeLabel} · Ø plug ${model.plugDiameterMm} mm${crystal} · ${metal} · ${finish}`"), "La galerie finale doit distinguer diamètre du plug et diamètre du cristal.");
 
 const expectedClassicModelsWithHead = [
   "plug-classique-large-35",

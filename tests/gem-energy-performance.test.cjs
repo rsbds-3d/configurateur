@@ -9,8 +9,8 @@ assert(
   "Le shader GPU-BVH doit couvrir toutes les pierres optiques suffisamment transparentes."
 );
 assert(
-  app.includes("fallbackOptical.isCabochon || fallbackOptical.ior < 1.72"),
-  "Le bake CPU doit rester reserve aux pierres facettees a fort indice de refraction."
+  !app.includes("function bakeDiamondInternalRayTracing"),
+  "Le bake CPU bloquant doit etre absent pour toutes les pierres."
 );
 assert(
   app.includes("THREE.MathUtils.clamp(optical.envMapIntensity * reflectionBoost * studioBoost, 0.55, 4.8)"),
@@ -29,12 +29,12 @@ assert(
   "La BVH doit etre reutilisee tant que la geometrie de la pierre ne change pas."
 );
 assert(
-  app.includes('"Lancer de rayons GPU-BVH actif, calcul CPU évité."'),
-  "Le chemin GPU ne doit pas relancer le bake CPU sommet par sommet."
+  app.includes("await buildBVHInWorker(geometry, { signal, onProgress })"),
+  "La construction BVH doit utiliser un worker avec progression et annulation."
 );
 assert(
-  app.includes("if (gpuMaterial) {") && app.includes("const p = new THREE.Vector3();"),
-  "Le bake CPU doit rester uniquement un fallback quand le shader GPU-BVH est indisponible."
+  app.includes("await compileBeforeSwap({") && !app.includes("function traceDiamondChannel"),
+  "Le rendu GPU doit etre precompile sans remplacer le materiau visible ni relancer un bake CPU."
 );
 
 console.log("gem-energy-performance.test.cjs: OK");

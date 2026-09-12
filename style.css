@@ -1292,7 +1292,8 @@ input[type="color"] {
   min-height: 40px;
 }
 
-canvas.is-decal-editing {
+canvas.is-decal-editing,
+canvas.is-decal-selected {
   cursor: grab;
 }
 
@@ -1326,9 +1327,8 @@ canvas.is-decal-dragging {
 
 .loader__meta span {
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .loader__meta strong {
@@ -2103,4 +2103,437 @@ canvas.is-decal-dragging {
 
 .model-compare__item .model-compare__thumb-name {
   flex: 1 1 auto;
+}
+
+/* Habillage du viewer aligne sur l'identite visuelle du site Rosebuds. */
+.brand-panel {
+  max-width: min(430px, calc(100vw - 36px));
+  padding: 16px 18px 18px;
+  border-left: 3px solid #ed2b86;
+  border-radius: 0 6px 6px 0;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.2);
+  color: #111;
+  text-shadow: none;
+  backdrop-filter: blur(14px) saturate(0.92);
+}
+
+.viewer-rosebuds-logo {
+  width: min(172px, 40vw);
+  margin-bottom: 10px;
+  filter: brightness(0);
+  mix-blend-mode: normal;
+}
+
+.brand-panel #viewer-product-summary {
+  max-width: 390px;
+  color: #111;
+  font-family: "Optima", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.05rem, 2vw, 1.45rem);
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.brand-panel #viewer-product-description {
+  max-width: 390px;
+  margin-top: 8px;
+  color: #555;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+#viewer-product-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  margin-top: 12px;
+  padding: 0 14px;
+  border: 1px solid #ed2b86;
+  border-radius: 4px;
+  background: #ed2b86;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 750;
+  text-decoration: none;
+  pointer-events: auto;
+}
+
+#viewer-product-link:hover,
+#viewer-product-link:focus-visible {
+  background: #111;
+  border-color: #111;
+  outline: 2px solid rgba(237, 43, 134, 0.28);
+  outline-offset: 2px;
+}
+
+.controls {
+  --panel: rgba(255, 255, 255, 0.96);
+  --panel-strong: #fff;
+  --chrome: rgba(17, 17, 17, 0.3);
+  --chrome-soft: rgba(17, 17, 17, 0.13);
+  --line: rgba(17, 17, 17, 0.14);
+  --text: #111;
+  --ivory: #111;
+  --muted: #666;
+  --gold: #ed2b86;
+  --focus: #ed2b86;
+  border-color: rgba(17, 17, 17, 0.18);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.22);
+  color: #111;
+  backdrop-filter: blur(22px) saturate(0.92);
+}
+
+.controls::before {
+  background: #ed2b86;
+}
+
+.controls.is-collapsed {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.controls .eyebrow,
+.controls .viewer-version {
+  color: #ed2b86;
+}
+
+.controls .icon-button {
+  border-color: rgba(17, 17, 17, 0.18);
+  background: #111;
+  color: #fff;
+}
+
+.controls .accordion-section,
+.controls .material-editor,
+.controls .reflection-editor,
+.controls .model-compare,
+.controls .effect-status,
+.controls .facet-texture,
+.controls .rhino-remesh,
+.controls .library-actions,
+.controls .toggles,
+.controls .file-loader {
+  border-color: rgba(17, 17, 17, 0.13);
+  background: #fff;
+  color: #111;
+}
+
+.material-visibility__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.material-visibility__actions button {
+  min-height: 34px;
+  border: 1px solid rgba(17, 17, 17, 0.18);
+  border-radius: 4px;
+  background: #fff;
+  color: #111;
+  cursor: pointer;
+}
+
+#material-visibility-toggle[aria-expanded="true"] {
+  border-color: #ed2b86;
+  color: #c10f62;
+}
+
+.controls .accordion-section[open] summary {
+  border-bottom-color: rgba(17, 17, 17, 0.1);
+  background: rgba(237, 43, 134, 0.055);
+}
+
+.controls select,
+.viewer-actions select {
+  border-color: rgba(17, 17, 17, 0.18);
+  background: #fff;
+  color: #111;
+  box-shadow: none;
+}
+
+.controls input[type="range"] {
+  accent-color: #ed2b86;
+}
+
+.controls input[type="checkbox"] {
+  accent-color: #ed2b86;
+}
+
+.viewer-actions {
+  position: fixed;
+  z-index: 6;
+  right: calc(var(--control-width) + clamp(18px, 2vw, 34px));
+  bottom: clamp(18px, 3vh, 32px);
+  left: 170px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: 0;
+  pointer-events: none;
+}
+
+.viewer-actions > * {
+  flex: 0 0 auto;
+  pointer-events: auto;
+  white-space: nowrap;
+}
+
+body:has(.controls.is-collapsed) .viewer-actions {
+  right: 92px;
+}
+
+.viewer-actions button,
+.viewer-actions select,
+.viewer-scale-toggle,
+.viewer-back,
+.ar-toggle {
+  min-height: 42px;
+  border: 1px solid rgba(17, 17, 17, 0.18);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
+  color: #111;
+  backdrop-filter: blur(12px);
+}
+
+.viewer-actions button,
+.viewer-actions select {
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+.viewer-actions select {
+  width: auto;
+  min-width: 210px;
+  max-width: min(260px, 34vw);
+}
+
+.viewer-actions button:first-child {
+  border-color: #ed2b86;
+  background: #ed2b86;
+  color: #fff;
+}
+
+.viewer-actions button:hover,
+.viewer-actions button:focus-visible,
+.viewer-back:hover,
+.viewer-back:focus-visible,
+.ar-toggle:hover,
+.ar-toggle:focus-visible {
+  border-color: #ed2b86;
+  outline: 2px solid rgba(237, 43, 134, 0.26);
+  outline-offset: 2px;
+}
+
+.viewer-scale-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.viewer-scale-toggle input {
+  width: 17px;
+  height: 17px;
+  accent-color: #ed2b86;
+}
+
+.viewer-back {
+  position: fixed;
+  z-index: 7;
+  bottom: clamp(18px, 3vh, 32px);
+  left: 20px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.ar-toggle {
+  bottom: clamp(72px, 9vh, 92px);
+  color: #111;
+}
+
+.ar-toggle[aria-pressed="true"] {
+  border-color: #ed2b86;
+  background: #ed2b86;
+  color: #fff;
+}
+
+.optimized-render-dialog {
+  width: min(980px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid rgba(17, 17, 17, 0.18);
+  border-radius: 6px;
+  background: #fff;
+  color: #111;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.35);
+}
+
+.optimized-render-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.64);
+  backdrop-filter: blur(8px);
+}
+
+.optimized-render-dialog header,
+.optimized-render-dialog footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.optimized-render-dialog header {
+  border-bottom: 1px solid #ddd;
+}
+
+.optimized-render-dialog header div {
+  display: grid;
+  gap: 3px;
+}
+
+.optimized-render-dialog header span {
+  color: #666;
+  font-size: 0.76rem;
+}
+
+.optimized-render-dialog header button {
+  width: 38px;
+  height: 38px;
+  border: 0;
+  background: transparent;
+  color: #111;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.optimized-render-dialog img {
+  display: block;
+  width: 100%;
+  max-height: calc(100vh - 166px);
+  object-fit: contain;
+  background: #111;
+}
+
+.optimized-render-dialog footer {
+  justify-content: flex-end;
+  border-top: 1px solid #ddd;
+}
+
+.optimized-render-dialog footer button {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid #ed2b86;
+  border-radius: 4px;
+  background: #ed2b86;
+  color: #fff;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.loader__meta strong {
+  color: #ed2b86;
+}
+
+.loader__bar span {
+  background: #ed2b86;
+  box-shadow: 0 0 10px rgba(237, 43, 134, 0.42);
+}
+
+@media (max-width: 1180px) {
+  .viewer-actions {
+    right: 92px;
+    left: 140px;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding-bottom: 3px;
+  }
+
+  .viewer-actions > * {
+    flex: 0 0 auto;
+  }
+}
+
+@media (max-width: 900px) {
+  .viewer-actions {
+    right: 72px;
+    bottom: 70px;
+    left: 10px;
+  }
+
+  .viewer-back {
+    bottom: 14px;
+  }
+
+  .ar-toggle {
+    right: 72px;
+    bottom: 14px;
+  }
+}
+
+@media (max-width: 720px) {
+  .brand-panel {
+    top: 12px;
+    left: 12px;
+    max-width: min(360px, calc(100vw - 78px));
+    padding: 11px 12px 12px;
+  }
+
+  .viewer-rosebuds-logo {
+    width: 122px;
+    margin-bottom: 7px;
+  }
+
+  .brand-panel #viewer-product-summary {
+    font-size: 0.95rem;
+  }
+
+  .brand-panel #viewer-product-description {
+    display: none;
+  }
+
+  #viewer-product-link {
+    min-height: 34px;
+    margin-top: 8px;
+  }
+
+  .viewer-actions {
+    right: 10px;
+    bottom: 70px;
+    left: 10px;
+    padding: 4px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.84);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.16);
+  }
+
+  .viewer-actions button,
+  .viewer-actions select,
+  .viewer-scale-toggle {
+    min-height: 38px;
+    box-shadow: none;
+  }
+
+  .viewer-back {
+    bottom: 14px;
+    left: 10px;
+  }
+
+  .ar-toggle {
+    right: 10px;
+    bottom: 14px;
+  }
+
+  .ar-status {
+    right: 10px;
+    bottom: 62px;
+  }
 }

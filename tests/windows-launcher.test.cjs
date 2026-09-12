@@ -7,7 +7,7 @@ const launcherPath = path.join(root, "Configurateur de Bijoux Rosebuds.exe");
 const launcherSource = fs.readFileSync(path.join(root, "launcher", "Program.cs"), "utf8");
 const shortcutScript = fs.readFileSync(path.join(root, "install-configurateur.ps1"), "utf8");
 const installerSource = fs.readFileSync(
-  path.join(root, "FICHIER D'INSTALLATION", "CODE SOURCE INSTALLEUR", "Configurateur de Bijoux v0.3-260902.iss"),
+  path.join(root, "FICHIER D'INSTALLATION", "CODE SOURCE INSTALLEUR", "Configurateur de Bijoux v0.4-260911.iss"),
   "utf8"
 );
 

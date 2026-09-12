@@ -14,6 +14,7 @@ assert(auth.includes("sessionStorage"), "L'autorisation en ligne doit rester lim
 assert(/CREDENTIAL_HASH = "[a-f0-9]{64}"/.test(auth), "La version publiée doit stocker uniquement une empreinte SHA-256 des identifiants.");
 assert(!auth.includes("passwordInput.value ==="), "Le mot de passe ne doit pas être comparé directement dans le JavaScript publié.");
 assert(build.includes("assets"), "Le paquet en ligne doit embarquer toutes les fonctions et ressources du configurateur.");
+assert(build.includes("-Raw -Encoding UTF8"), "La construction Windows doit conserver les accents UTF-8.");
 assert(!build.includes("'MODELES 3D'") && !build.includes("'MATERIAUX'"), "Les anciens exemples et le classeur métier ne doivent pas être publiés dans le site.");
 assert(workflow.includes("actions/deploy-pages@v4"), "Le déploiement GitHub Pages doit être configuré.");
 assert(!desktopIndex.includes("access-gate"), "L'application Windows doit rester indépendante de l'écran d'accès en ligne.");
