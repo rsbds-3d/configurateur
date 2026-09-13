@@ -25,7 +25,9 @@ v0.4-260911, VERSION = 0.4, cache 20260911-nonblocking-tools-v04.
 - 12 septembre : encodage UTF-8 de la construction web corrige, 27 tests passes, accents du HTML genere verifies.
 
 ## Travail en cours
-Mise a niveau Windows v0.4 reussie le 12 septembre, code Inno 0. Desinstallation prealable refusee (code 1, sans journal) : installation sur place, pas de desinstallation complete. EXE installe identique au livrable, HTTP 200, en-tete et interface v0.4 verifies. Publication GitHub en cours.
+Mise a niveau Windows v0.4 reussie le 12 septembre, code Inno 0. Desinstallation prealable refusee (code 1, sans journal) : installation sur place, pas de desinstallation complete. EXE installe identique au livrable, HTTP 200, en-tete et interface v0.4 verifies.
+Sources publiees : be8c390b02172175fd5bb68f390737eb3ae9385c. GitHub Pages run 34710847482 reussi. Site public et connexion verifies le 13 septembre : https://rsbds-3d.github.io/configurateur/.
+Release : https://github.com/rsbds-3d/configurateur/releases/tag/v0.4-260911 ; installateur 22441193 octets, SHA256 B408990632EDB39F8BAAFDC517DF60DF96467D1B83AD1AD167DCF92DDC976534, digest distant identique.
 
 ## Decisions et problemes connus
 - Conserver le shader BVH des pierres ; grand solide metallique, petit solide gemme.
@@ -48,10 +50,13 @@ Inno : C:\Program Files (x86)\Inno Setup 6\ISCC.exe.
 
 ## Tests restant a faire
 Validation prolongee mobile et AR camera reelle ; partage natif PNG ; resultat complet de super-resolution IA ; geste decalcomanie dans navigateur en complement des tests unitaires.
+13 septembre : export PNG clique dans le navigateur integre, evenement download non recu en 20 secondes, aucun fichier confirme. Ne pas presenter ce controle comme reussi ; distinguer limitation du navigateur et bug applicatif.
+Catalogue public : multifiltre NEW SMALL aluminium propose uniquement noir, cristal/verre presse, deux modeles. Viewer charge visuellement avec corps noir et petite pierre claire, puis retour au catalogue. Onglet conserve comme apercu.
 
 ## Prochaines actions prioritaires
-1. Publier master, verifier GitHub Pages et Release avec installateur.
-2. Completer les controles reels du viewer et de l'IA mentionnes ci-dessus.
+1. Completer les controles reels du viewer et de l'IA mentionnes ci-dessus, notamment PNG dans Chrome et glisser-deposer du logo.
+2. Finaliser le moteur generatif hyperrealiste demande, sans confondre super-resolution et generation.
+3. Clarifier la protection serveur si une confidentialite forte est attendue pour le site.
 
 ## Interdictions / points de vigilance
 Aucun reset, nouveau worktree ou changement de branche. Ne pas publier de mot de passe en clair. Auth gh fonctionne hors sandbox (diagnostic sandbox faux negatif reseau). Ne pas annoncer ComfyUI ou une authentification serveur comme termines.
