@@ -12,7 +12,7 @@ Terminer, verifier, reinstaller et publier les demandes du catalogue et du viewe
 master, origin https://github.com/rsbds-3d/configurateur.git. Modifications locales preservees.
 
 ## Version actuelle
-v0.5-260914, VERSION = 0.5, cache 20260914-png-preview-v05. Publication v0.5 en cours le 15 septembre ; v0.4 reste la derniere publication confirmee tant que les controles distants ne sont pas effectues.
+v0.5-260914, VERSION = 0.5, cache 20260914-png-preview-v05. Installee et publiee le 15 septembre.
 
 ## Travail termine
 - Catalogue blanc/noir/fuchsia : modes guide, multifiltre et prompt IA, tailles plug et cristal separees, famille Originale et restrictions metier.
@@ -25,6 +25,7 @@ v0.5-260914, VERSION = 0.5, cache 20260914-png-preview-v05. Publication v0.5 en 
 - 12 septembre : encodage UTF-8 de la construction web corrige, 27 tests passes, accents du HTML genere verifies.
 
 ## Travail en cours
+Publication v0.5 confirmee : commit cc981b585843ae340b50c8e85fc5472b233ef846, GitHub Pages run 34970005153 reussi. Site public HTTP 200, version v0.5, dialogue PNG et auth.js verifies. Release : https://github.com/rsbds-3d/configurateur/releases/tag/v0.5-260914.
 15 septembre : apercu PNG persistant ajoute, ouverture/enregistrement explicites, nettoyage des URL, prevention des doubles clics. 28 tests reussis. Capture reelle 1600 x 900 non vide verifiee dans Codex, affichage mobile 390 x 844 lisible. Telechargement sur disque et partage natif non confirmes.
 Paquet web et installateur v0.5 compiles. Desinstallation v0.4 retourne encore 1 ; mise a jour sur place v0.5 reussie (code 0). EXE source/installe SHA256 4B1139786147CD5C7E7EF4F50D2F1C44D84CE409701DB5342DDF75725CD7D605. Serveur installe HTTP 200, en-tete et interface v0.5 verifies. Installateur SHA256 13A9DD9E7BF4FD90BBA40BE595C8DDF609290355BFBC85FDF841B38CAF7E9FB3.
 
@@ -58,7 +59,7 @@ Validation prolongee mobile et AR camera reelle ; partage natif PNG ; resultat c
 Catalogue public : multifiltre NEW SMALL aluminium propose uniquement noir, cristal/verre presse, deux modeles. Viewer charge visuellement avec corps noir et petite pierre claire, puis retour au catalogue. Onglet conserve comme apercu.
 
 ## Prochaines actions prioritaires
-1. Completer les controles reels du viewer et de l'IA mentionnes ci-dessus, notamment PNG dans Chrome et glisser-deposer du logo.
+1. Completer les controles reels du viewer et de l'IA mentionnes ci-dessus, notamment fichier PNG enregistre sur disque et glisser-deposer du logo. L'apercu PNG est valide ; ne pas recommencer sa mise en place.
 2. Finaliser le moteur generatif hyperrealiste demande, sans confondre super-resolution et generation.
 3. Clarifier la protection serveur si une confidentialite forte est attendue pour le site.
 
