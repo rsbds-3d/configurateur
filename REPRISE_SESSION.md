@@ -12,7 +12,7 @@ Terminer, verifier, reinstaller et publier les demandes du catalogue et du viewe
 master, origin https://github.com/rsbds-3d/configurateur.git. Modifications locales preservees.
 
 ## Version actuelle
-v0.4-260911, VERSION = 0.4, cache 20260911-nonblocking-tools-v04.
+v0.5-260914, VERSION = 0.5, cache 20260914-png-preview-v05. Publication v0.5 en cours le 15 septembre ; v0.4 reste la derniere publication confirmee tant que les controles distants ne sont pas effectues.
 
 ## Travail termine
 - Catalogue blanc/noir/fuchsia : modes guide, multifiltre et prompt IA, tailles plug et cristal separees, famille Originale et restrictions metier.
@@ -25,6 +25,10 @@ v0.4-260911, VERSION = 0.4, cache 20260911-nonblocking-tools-v04.
 - 12 septembre : encodage UTF-8 de la construction web corrige, 27 tests passes, accents du HTML genere verifies.
 
 ## Travail en cours
+15 septembre : apercu PNG persistant ajoute, ouverture/enregistrement explicites, nettoyage des URL, prevention des doubles clics. 28 tests reussis. Capture reelle 1600 x 900 non vide verifiee dans Codex, affichage mobile 390 x 844 lisible. Telechargement sur disque et partage natif non confirmes.
+Paquet web et installateur v0.5 compiles. Desinstallation v0.4 retourne encore 1 ; mise a jour sur place v0.5 reussie (code 0). EXE source/installe SHA256 4B1139786147CD5C7E7EF4F50D2F1C44D84CE409701DB5342DDF75725CD7D605. Serveur installe HTTP 200, en-tete et interface v0.5 verifies. Installateur SHA256 13A9DD9E7BF4FD90BBA40BE595C8DDF609290355BFBC85FDF841B38CAF7E9FB3.
+
+Historique v0.4 :
 Mise a niveau Windows v0.4 reussie le 12 septembre, code Inno 0. Desinstallation prealable refusee (code 1, sans journal) : installation sur place, pas de desinstallation complete. EXE installe identique au livrable, HTTP 200, en-tete et interface v0.4 verifies.
 Sources publiees : be8c390b02172175fd5bb68f390737eb3ae9385c. GitHub Pages run 34710847482 reussi. Site public et connexion verifies le 13 septembre : https://rsbds-3d.github.io/configurateur/.
 Release : https://github.com/rsbds-3d/configurateur/releases/tag/v0.4-260911 ; installateur 22441193 octets, SHA256 B408990632EDB39F8BAAFDC517DF60DF96467D1B83AD1AD167DCF92DDC976534, digest distant identique.
@@ -46,7 +50,7 @@ Lanceur : launcher/build-launcher.ps1.
 Inno : C:\Program Files (x86)\Inno Setup 6\ISCC.exe.
 
 ## Tests realises
-27 tests Node reussis. Controles navigateur precedents : catalogue, multifiltre NEW SMALL noir, prompt, Originale XXXL90 avec progression et rendu optique, regle visible. Syntaxe app.js et welcome.js valide.
+28 tests Node reussis le 15 septembre. Controles navigateur precedents : catalogue, multifiltre NEW SMALL noir, prompt, Originale XXXL90 avec progression et rendu optique, regle visible. Capture PNG et affichage mobile verifies pour v0.5.
 
 ## Tests restant a faire
 Validation prolongee mobile et AR camera reelle ; partage natif PNG ; resultat complet de super-resolution IA ; geste decalcomanie dans navigateur en complement des tests unitaires.

@@ -7361,19 +7361,52 @@ function downloadBlob(blob, filename) {
   const anchor = document.createElement("a");
   anchor.href = url;
   anchor.download = filename;
+  anchor.hidden = true;
+  document.body.append(anchor);
   anchor.click();
-  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  anchor.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+
+let pngExportUrl = null;
+
+function clearPngExport() {
+  if (pngExportUrl) URL.revokeObjectURL(pngExportUrl);
+  pngExportUrl = null;
+  document.querySelector("#png-export-image")?.removeAttribute("src");
+  document.querySelector("#png-export-open")?.removeAttribute("href");
+  document.querySelector("#png-export-save")?.removeAttribute("href");
+}
+
+function showPngExport(blob, filename) {
+  const dialog = document.querySelector("#png-export-dialog");
+  clearPngExport();
+  pngExportUrl = URL.createObjectURL(blob);
+  document.querySelector("#png-export-image").src = pngExportUrl;
+  document.querySelector("#png-export-caption").textContent = filename;
+  document.querySelector("#png-export-open").href = pngExportUrl;
+  const save = document.querySelector("#png-export-save");
+  save.href = pngExportUrl;
+  save.download = filename;
+  if (!dialog.open) dialog.showModal();
 }
 
 async function downloadCurrentView() {
+  const button = document.querySelector("#download-view-png");
+  if (button?.disabled) return;
+  if (button) button.disabled = true;
   try {
     showAuxiliaryProgress(12, "Capture de la vue 3D");
     const blob = await renderCanvasToPngBlob();
-    downloadBlob(blob, `rosebuds-${settings.modelId || "plug"}.png`);
-    finishAuxiliaryProgress("Image PNG téléchargée");
+    const filename = `rosebuds-${settings.modelId || "plug"}.png`;
+    showPngExport(blob, filename);
+    downloadBlob(blob, filename);
+    finishAuxiliaryProgress("Image PNG prête");
   } catch (error) {
     finishAuxiliaryProgress("Capture impossible");
     showNotice("Impossible de capturer la vue 3D dans ce navigateur.");
+  } finally {
+    if (button) button.disabled = false;
   }
 }
 
@@ -7560,6 +7593,9 @@ function wireInterface() {
   document.querySelector("#scale-reference-enabled")?.addEventListener("change", refreshScaleReference);
   document.querySelector("#scale-reference-type")?.addEventListener("change", refreshScaleReference);
   document.querySelector("#download-view-png")?.addEventListener("click", downloadCurrentView);
+  document.querySelector("#png-export-close")?.addEventListener("click", () => document.querySelector("#png-export-dialog")?.close());
+  document.querySelector("#png-export-dialog")?.addEventListener("close", clearPngExport);
+  window.addEventListener("pagehide", clearPngExport);
   document.querySelector("#share-view")?.addEventListener("click", shareCurrentView);
   document.querySelector("#optimized-render")?.addEventListener("click", createOptimizedRender);
   document.querySelector("#optimized-render-close")?.addEventListener("click", () => document.querySelector("#optimized-render-dialog")?.close());

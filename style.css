@@ -2428,7 +2428,12 @@ body:has(.controls.is-collapsed) .viewer-actions {
   border-top: 1px solid #ddd;
 }
 
-.optimized-render-dialog footer button {
+.optimized-render-dialog footer button,
+.optimized-render-dialog footer a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
   min-height: 40px;
   padding: 0 14px;
   border: 1px solid #ed2b86;
@@ -2437,6 +2442,25 @@ body:has(.controls.is-collapsed) .viewer-actions {
   color: #fff;
   font-weight: 750;
   cursor: pointer;
+}
+
+#png-export-dialog footer {
+  flex-wrap: wrap;
+}
+
+#png-export-dialog header div {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+#png-export-dialog header button {
+  flex-shrink: 0;
+}
+
+#png-export-open {
+  background: #fff;
+  color: #111;
+  border-color: #bbb;
 }
 
 .loader__meta strong {

@@ -19,7 +19,7 @@ assert(app.includes('supportMaterial: "rhino-wood-olivier-poli"'), "Le sol par d
 assert(app.includes("setControlsPanelCollapsed(true);"), "Le panneau de réglages doit être réduit par défaut.");
 assert(/<aside class="controls is-collapsed"/.test(html), "Le panneau doit être réduit dès le HTML initial.");
 assert(/id="toggle-panel"[^>]+aria-label="Ouvrir le panneau"[^>]+aria-expanded="false"/.test(html), "Le bouton du panneau doit annoncer l'état réduit.");
-assert(html.includes("20260911-nonblocking-tools-v04"), "Le cache-buster HTML doit pointer vers la version courante du parcours catalogue.");
+assert(html.includes("20260914-png-preview-v05"), "Le cache-buster HTML doit pointer vers la version courante du parcours catalogue.");
 assert(html.includes('id="compare-models-enabled"'), "Le mode plusieurs plugs doit avoir une case d'activation.");
 assert(html.includes('id="compare-model-list"'), "Le mode plusieurs plugs doit avoir une liste de choix multiples.");
 assert(app.includes('compareModelSpacingMm: 100'), "Le jeu par défaut entre plugs doit être 100 mm.");

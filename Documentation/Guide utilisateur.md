@@ -1,6 +1,6 @@
 # Guide utilisateur - Configurateur de bijoux
 
-Version : **v0.4-260911**
+Version : **v0.5-260914**
 
 ## Objectif
 
@@ -54,7 +54,8 @@ Les noms de couleurs de cristal conservent leur appellation commerciale d'origin
 - Appui long directement sur le logo ROSEBUDS : saisit prioritairement la décalcomanie, même lorsqu'un maillage se trouve derrière, puis permet de la faire glisser sur la tige. Sa position est mémorisée séparément pour chaque modèle dans le navigateur.
 - `Rendu optimisé` : lisse temporairement les métaux, capture la vue en haute définition et applique, lorsqu'il est disponible, le modèle open source Swin2SR dans un worker local.
 - `Objet d'échelle` : affiche une pièce de 1 euro, une bouteille de 33 cl, une bouteille de 1,5 l ou une règle graduée de 20 cm à la même échelle que le plug.
-- `Télécharger PNG` et `Partager` : produisent une image de la vue courante; le partage utilise la fonction native du navigateur lorsqu'elle existe.
+- `Télécharger PNG` : produit une image de la vue courante et ouvre son aperçu. Si le téléchargement automatique est bloqué, utilisez `Enregistrer le PNG` ou `Ouvrir l’image`. L’image reste accessible jusqu’à la fermeture de l’aperçu.
+- `Partager` : utilise la fonction native du navigateur lorsqu'elle existe.
 
 Les pierres transparentes utilisent un shader optique accéléré par BVH avec Fresnel, réfraction, réflexion totale interne, dispersion RGB et rebonds internes. Un rendu PBR rapide reste visible immédiatement. Le BVH est construit dans un worker et la compilation GPU finale attend la fin des interactions; une fine barre en bas indique l'étape et le pourcentage.
 
@@ -75,6 +76,8 @@ Les BREP et polysurfaces Rhino sont convertis en maillages d'affichage par `Rhin
 ## Limites
 
 Le viewer est un rendu temps réel WebGL. Il simule plusieurs phénomènes optiques dans la pierre, mais ne remplace pas un rendu spectral hors ligne de type Cycles.
+
+Le rendu optimisé emploie une super-résolution Swin2SR, pas encore un moteur de génération d’images ComfyUI. Les poids IA sont téléchargés au premier usage puis mis en cache ; ils ne sont pas intégralement embarqués dans l’installateur.
 
 ## Version en ligne
 

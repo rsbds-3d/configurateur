@@ -1,6 +1,6 @@
 # Planning et suivi
 
-Version : **v0.4-260911**
+Version : **v0.5-260914**
 
 | Date | Travail | État | Durée |
 |---|---|---|---|
@@ -34,6 +34,9 @@ Version : **v0.4-260911**
 | 2026-09-11 | BVH en worker, compilation au repos, bibliothèque de matériaux paresseuse et barre d'actions responsive | Terminé et testé | Non mesurée |
 
 ## Prochaines priorités
+
+- 2026-09-14 : préparation v0.5, aperçu PNG et tests de non-régression. Durée non mesurée.
+- 2026-09-15 : 28 tests réussis, capture PNG 1600 × 900 vérifiée dans le navigateur intégré ; paquet et publication en cours. Durée non mesurée.
 
 1. Profiler sur plusieurs téléphones la compilation GPU finale des modèles les plus lourds.
 2. Compléter les miniatures réelles au fil des nouveaux modèles importés.

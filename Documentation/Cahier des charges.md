@@ -1,6 +1,6 @@
 # Cahier des charges - Configurateur de bijoux
 
-Version : **v0.4-260911**
+Version : **v0.5-260914**
 
 ## Objectifs
 
@@ -90,6 +90,10 @@ Modèles Originale `Avec tête` validés : `LARGE 35`, `MEDIUM`, `SMALL 18`, `SM
 - Viewer : rendu provisoire conservé pendant le BVH, priorité des interactions avant compilation, objets d'échelle et export/partage PNG.
 
 ## À poursuivre
+
+- Export PNG : aperçu persistant avec liens d’ouverture et d’enregistrement, libération des URL temporaires et protection contre les doubles clics. Tests automatisés requis sur les erreurs et le nettoyage.
+- Finaliser le rendu génératif hyperréaliste demandé, distinct de la super-résolution Swin2SR actuelle.
+- Valider le partage natif et l’AR sur téléphone réel, ainsi que le geste de décalcomanie dans le navigateur.
 
 - Génération automatisée de miniatures pour chaque nouvelle combinaison importée.
 - Profilage GPU sur appareils mobiles modestes.
