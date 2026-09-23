@@ -31,6 +31,8 @@ assert.strictEqual(dimensions.getPlugSizeLabel("plug-classique-xl-35"), "XL");
 assert.strictEqual(dimensions.getCrystalSize("plug-classique-xl"), "27 mm");
 assert.strictEqual(dimensions.getCrystalSize("plug-classique-xl-35"), "35 mm");
 assert.strictEqual(dimensions.getPlugSize("plug-classique-xl-45-avec-assiette"), "XL-45");
+assert.strictEqual(dimensions.getPlugSizeLabel("plug-classique-xl-45-avec-assiette"), "XL Plus");
+assert.strictEqual(dimensions.getCrystalSize("plug-classique-xl-45-avec-assiette"), "27 mm");
 
 assert.strictEqual(dimensions.getPlugSize("plug-classique-xxl"), "XXL-50");
 assert.strictEqual(dimensions.getPlugSize("plug-classique-xxl-35"), "XXL-50");
@@ -45,8 +47,8 @@ assert.strictEqual(dimensions.getPlugSizeLabel("plug-classique-medium"), "MEDIUM
 assert.strictEqual(dimensions.getCrystalSize("plug-classique-xxxl-100"), "50 mm");
 
 assert.strictEqual(dimensions.getPlugSize("plug-new-small-cristal"), "SMALL-25");
-assert.strictEqual(dimensions.getCrystalSize("plug-new-small-cristal"), "9 mm");
+assert.strictEqual(dimensions.getCrystalSize("plug-new-small-cristal"), "12 mm");
 assert.strictEqual(dimensions.getPlugSize("plug-new-medium-xl-45-sans-tete-cristal"), "XL-45");
-assert.strictEqual(dimensions.getCrystalSize("plug-new-medium-xl-45-sans-tete-cristal"), "9 mm");
+assert.strictEqual(dimensions.getCrystalSize("plug-new-medium-xl-45-sans-tete-cristal"), "12 mm");
 
 console.log("Catalog plug and crystal dimensions regression test OK");

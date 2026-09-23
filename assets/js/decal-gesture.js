@@ -57,9 +57,10 @@ export function attachDecalGesture(element, {
     if (!state.active) {
       if (Math.hypot(event.clientX - state.event.clientX, event.clientY - state.event.clientY) > tolerance) {
         unschedule(state.timer);
-        state.cancelled = true;
+        if (state.event.pointerType === "touch") state.cancelled = true;
+        else activate();
       }
-      return;
+      if (!state.active) return;
     }
     state.lastMove = event;
     if (state.frame == null) state.frame = frame(flush);

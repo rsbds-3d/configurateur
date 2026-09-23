@@ -54,7 +54,7 @@ assert(welcome.includes("crystalSize: getCrystalSize(option.value)"), "Chaque mo
 assert(welcome.includes("family: getModelFamily(label)"), "La famille du modele doit rester une propriete distincte du diametre.");
 assert(!welcome.includes("function getSize(label)"), "L'ancien classement des familles comme tailles ne doit plus etre utilise.");
 assert(welcome.includes("sortPhysicalSizes"), "Les tailles physiques doivent etre presentees dans l'ordre numerique.");
-assert(welcome.includes("`${getFamilyDisplayLabel(model.family)} · ${model.plugSizeLabel} · Ø plug ${model.plugDiameterMm} mm${crystal} · ${metal} · ${finish}`"), "La galerie finale doit distinguer diamètre du plug et diamètre du cristal.");
+assert(welcome.includes("`${getFamilyDisplayLabel(model.family)} · ${model.plugSizeLabel} · Ø plug ${model.plugDiameterMm} mm${crystal}`"), "La galerie finale doit distinguer diamètre du plug et diamètre du cristal.");
 
 const expectedClassicModelsWithHead = [
   "plug-classique-large-35",

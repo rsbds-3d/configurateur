@@ -1,6 +1,17 @@
 # Cahier des charges - Configurateur de bijoux
 
-Version : **v0.5-260914**
+Version : **v0.6-260923**
+
+## Révision du 23 septembre 2026
+
+- Les règles récentes priment : gemme/verre pressé pour SMALL et NEW SMALL dans les deux métaux, NEW MEDIUM en inox seulement.
+- Cristal XL : 27 ou 35 mm ; cristal NEW : 12 mm. Seconde taille XL renommée XL Plus, identifiant historique XL-45 préservé.
+- Noms commerciaux anglais conservés. Résultats par combinaison valide de matériaux, 60 cartes par lot, lien exact par carte. Les captures existantes restent des références de géométrie.
+- Déplacement du logo : glissement souris sans attente obligatoire ; appui long tactile ; priorité sur sélection et orbite ; stockage local indépendant par modèle.
+- Exports PNG : logo détouré répété en diagonale, après le traitement IA éventuel, jamais dans son entrée.
+- Objet d'échelle : fichier original Bouteille_1L_cristal.glb, pas le fichier visionneuse3D. Chargement différé, respect des mètres glTF (hauteur 258,23 mm), texture intégrée, annulation logique si changement de choix pendant le chargement.
+- Ouverture directe du HTML : détection de `file:///`, test du serveur Windows local, conservation des paramètres du modèle et reprise automatique sur HTTP. Si le serveur est arrêté, une aide explicite remplace la scène noire.
+- Tests : matrice identique catalogue/viewer, configuration exacte par vignette, unités et isolation du cache GLB, geste souris/tactile, filigrane et conservation des sorties existantes.
 
 ## Objectifs
 
@@ -40,7 +51,7 @@ Modèles Originale `Avec tête` validés : `LARGE 35`, `MEDIUM`, `SMALL 18`, `SM
 - Mode AR par caméra sur téléphone ou ordinateur, avec flux vidéo intégré comme arrière-plan Three.js et conservation stricte du pipeline PBR du viewer normal.
 - Déplacement visuel de la décalcomanie sur la tige, contrainte à la surface métallique, avec mémorisation distincte par modèle.
 - Rendu optimisé à la demande par capture haute définition et super-résolution open source côté client.
-- Objets 3D de comparaison à dimensions réelles : pièce de monnaie, bouteilles 33 cl et 1,5 l, règle graduée 20 cm.
+- Objets 3D de comparaison à dimensions réelles : pièce de monnaie, bouteille détaillée de 1 L issue du fichier fourni et règle graduée 20 cm.
 - Téléchargement PNG et partage de la vue courante.
 - Résumé du produit et lien vers la fiche Rosebuds la plus proche ou le formulaire sur mesure prérempli.
 

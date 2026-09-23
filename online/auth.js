@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const APP_SCRIPT = "./welcome.js?v=20260914-png-preview-v05";
+  const APP_SCRIPT = "./welcome.js?v=20260923-catalog-logo-v06";
   const SESSION_KEY = "rosebuds-online-access-v03";
   const CREDENTIAL_SALT = "rosebuds-configurator-v1";
   const CREDENTIAL_HASH = "773378c2ea078c94a654dac3bc5aba02721f3e4cc682f7160cce46c653873e9c";

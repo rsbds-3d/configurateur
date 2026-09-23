@@ -29,15 +29,15 @@ Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'online.css') -Destination $outp
 $indexPath = Join-Path $outputRoot 'index.html'
 $index = Get-Content -LiteralPath $indexPath -Raw -Encoding UTF8
 $index = $index.Replace(
-  '<link rel="stylesheet" href="./welcome.css?v=20260914-png-preview-v05" />',
-  '<link rel="stylesheet" href="./welcome.css?v=20260914-png-preview-v05" />' + [Environment]::NewLine + '    <link rel="stylesheet" href="./online.css?v=20260914-png-preview-v05" />'
+  '<link rel="stylesheet" href="./welcome.css?v=20260923-catalog-logo-v06" />',
+  '<link rel="stylesheet" href="./welcome.css?v=20260923-catalog-logo-v06" />' + [Environment]::NewLine + '    <link rel="stylesheet" href="./online.css?v=20260923-catalog-logo-v06" />'
 )
 
 $gateMarkup = @'
   <body class="is-welcome auth-locked">
     <section id="access-gate" class="access-gate" aria-labelledby="access-title">
       <div class="access-gate__panel">
-        <img class="access-gate__logo" src="./assets/brand/rosebuds-logo.png?v=20260914-png-preview-v05" alt="ROSEBUDS" width="284" height="117" />
+        <img class="access-gate__logo" src="./assets/brand/rosebuds-logo.png?v=20260923-catalog-logo-v06" alt="ROSEBUDS" width="284" height="117" />
         <div>
           <p class="access-gate__eyebrow">ESPACE PROFESSIONNEL</p>
           <h1 id="access-title">Accéder au configurateur</h1>
@@ -62,8 +62,8 @@ $gateMarkup = @'
 
 $index = $index.Replace('  <body class="is-welcome">', $gateMarkup)
 $index = $index.Replace(
-  '<script src="./welcome.js?v=20260914-png-preview-v05" defer></script>',
-  '<script src="./auth.js?v=20260914-png-preview-v05" defer></script>'
+  '<script src="./welcome.js?v=20260923-catalog-logo-v06" defer></script>',
+  '<script src="./auth.js?v=20260923-catalog-logo-v06" defer></script>'
 )
 
 [IO.File]::WriteAllText($indexPath, $index, [Text.UTF8Encoding]::new($false))

@@ -44,7 +44,7 @@ assert(welcome.includes('model.family === "Classique" && ["XXL", "XXXL"].include
 assert(welcome.includes('function modelSupportsMetalFamily'), "Le choix du métal doit être filtré avant la finition.");
 assert(app.includes('modelFamily === "Classique" && ["XXL", "XXXL"].includes(metalSizeClass)'), "Les métadonnées du viewer doivent réserver les classiques XXL et XXXL à l'inox.");
 
-assert(welcome.includes('model.family === "NEW SMALL" && metalFamily === "alu" && ornament === "gem"'), "La gemme doit etre bloquee sur NEW SMALL aluminium.");
+assert(welcome.includes('model.family === "NEW MEDIUM" && metalFamily === "alu" && ["gem", "pressed-glass"].includes(ornament)'), "NEW MEDIUM reserve gem et verre presse a l'inox.");
 assert(welcome.includes('["gem", "pressed-glass"].includes(ornament)'), "Gem et verre presse doivent partager une restriction de famille explicite.");
 assert(welcome.includes('model.metalSizeClass === "SMALL"') && welcome.includes('model.family === "NEW MEDIUM"'), "Gem et verre presse doivent etre reserves a SMALL, NEW SMALL et NEW MEDIUM.");
 assert(welcome.includes('if (getMetalSizeClass(label, option.value) === "SMALL") ornaments.push("gem", "pressed-glass")'), "Gem et verre presse doivent etre limites aux geometries SMALL compatibles.");

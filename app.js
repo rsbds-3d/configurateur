@@ -16,7 +16,9 @@ import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js"
 import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
 import { MeshoptDecoder } from "meshoptimizer";
 import { buildBVHInWorker, compileBeforeSwap, abortError } from "./assets/js/diamond/background-bvh.js";
-import { attachDecalGesture } from "./assets/js/decal-gesture.js";
+import { attachDecalGesture } from "./assets/js/decal-gesture.js?v=20260923-catalog-logo-v06";
+import { watermarkPngBlob } from "./assets/js/png-watermark.js";
+import { createBottleReference } from "./assets/js/bottle-reference.js";
 import { pointInPlacementFrame, placementInWorld } from "./assets/js/decal-placement.js";
 import { buildViewerProductSummary, resolveRosebudsProductLink } from "./assets/js/rosebuds-product-link.js";
 
@@ -1096,7 +1098,7 @@ const gemPresets = {
     attenuation: "#8a55d7",
   },
   aquamarine: {
-    label: "Aigue-marine",
+    label: "Aquamarine",
     color: "#80e8ff",
     fire: "#d9ffff",
     ior: 1.58,
@@ -4171,7 +4173,7 @@ function catalogModelSupportsOrnament(meta, ornament, metalFamily) {
       || meta.modelFamily === "NEW MEDIUM";
     if (!supportsCabochon) return false;
   }
-  return !(meta.modelFamily === "NEW SMALL" && metalFamily === "alu" && ornament === "gem");
+  return !(meta.modelFamily === "NEW MEDIUM" && metalFamily === "alu" && ["gem", "pressed-glass"].includes(ornament));
 }
 
 function getCatalogCrystalFinishRules(meta) {
@@ -7252,22 +7254,22 @@ function makeCoinReference(unit) {
   return group;
 }
 
-function makeBottleReference(unit, large = false) {
-  const height = (large ? 320 : 180) * unit;
-  const radius = (large ? 45 : 30) * unit;
-  const group = new THREE.Group();
-  const plastic = makeScaleReferenceMaterial({ color: "#d8f2f5", roughness: 0.18, transmission: 0.72, thickness: 1.2, opacity: 0.72 });
-  const body = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.88, radius, height * 0.78, 64, 3), plastic);
-  body.position.y = floor.position.y + height * 0.39;
-  const shoulder = new THREE.Mesh(new THREE.SphereGeometry(radius * 0.9, 64, 32, 0, Math.PI * 2, 0, Math.PI * 0.5), plastic.clone());
-  shoulder.scale.y = 0.52;
-  shoulder.position.y = floor.position.y + height * 0.78;
-  const neck = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.28, radius * 0.38, height * 0.14, 48), plastic.clone());
-  neck.position.y = floor.position.y + height * 0.9;
-  const cap = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.3, radius * 0.3, height * 0.06, 48), makeScaleReferenceMaterial({ color: "#ed2b86", metalness: 0, roughness: 0.48 }));
-  cap.position.y = floor.position.y + height * 0.99;
-  group.add(body, shoulder, neck, cap);
-  return group;
+let bottleReferencePromise = null;
+let scaleReferenceRequest = 0;
+
+async function makeBottleReference(unit) {
+  bottleReferencePromise ||= new GLTFLoader().loadAsync("./assets/models/references/Bouteille_1L_cristal.glb")
+    .then((gltf) => gltf.scene)
+    .catch((error) => { bottleReferencePromise = null; throw error; });
+  return createBottleReference(await bottleReferencePromise, unit, floor.position.y);
+}
+
+function disposeScaleReference(object) {
+  object.traverse((child) => {
+    child.geometry?.dispose?.();
+    const materials = Array.isArray(child.material) ? child.material : [child.material];
+    materials.forEach((material) => material?.dispose?.());
+  });
 }
 
 function makeRulerTexture() {
@@ -7324,22 +7326,36 @@ function frameModelAndScaleReference() {
   controls.update();
 }
 
-function refreshScaleReference() {
+async function refreshScaleReference() {
+  const request = ++scaleReferenceRequest;
   clearScaleReference();
   const enabled = document.querySelector("#scale-reference-enabled")?.checked === true;
   const select = document.querySelector("#scale-reference-type");
   scaleReferenceGroup.visible = enabled;
   if (select) select.disabled = !enabled;
   if (!enabled) {
+    finishAuxiliaryProgress("Objet d’échelle masqué");
     frameImportedModel(root);
     return;
   }
   const unit = getSceneUnitsPerMillimeter();
   const type = select?.value || "coin";
-  const object = type === "coin" ? makeCoinReference(unit)
-    : type === "bottle-small" ? makeBottleReference(unit, false)
-      : type === "bottle-large" ? makeBottleReference(unit, true)
-        : makeRulerReference(unit);
+  let object;
+  try {
+    if (type === "bottle-1l") showAuxiliaryProgress(5, "Chargement de la bouteille 1 L");
+    object = type === "coin" ? makeCoinReference(unit)
+      : type === "bottle-1l" ? await makeBottleReference(unit) : makeRulerReference(unit);
+  } catch (error) {
+    if (request !== scaleReferenceRequest) return;
+    scaleReferenceGroup.visible = false;
+    document.querySelector("#scale-reference-enabled").checked = false;
+    if (select) select.disabled = true;
+    finishAuxiliaryProgress("Bouteille indisponible");
+    showNotice("Le chargement de la bouteille a échoué. Vous pouvez réessayer.");
+    logDebug("scale-reference", "Chargement impossible", { message: error.message });
+    return;
+  }
+  if (request !== scaleReferenceRequest) { disposeScaleReference(object); return; }
   const modelBox = getVisibleMeshBox(root);
   const objectBox = new THREE.Box3().setFromObject(object);
   const margin = Math.max(unit * 12, 0.08);
@@ -7347,13 +7363,15 @@ function refreshScaleReference() {
   scaleReferenceGroup.add(object);
   scaleReferenceGroup.updateWorldMatrix(true, true);
   frameModelAndScaleReference();
+  finishAuxiliaryProgress("Objet d’échelle prêt");
 }
 
-function renderCanvasToPngBlob() {
+async function renderCanvasToPngBlob(withWatermark = true) {
   composer.render();
-  return new Promise((resolve, reject) => {
+  const blob = await new Promise((resolve, reject) => {
     renderer.domElement.toBlob((blob) => blob ? resolve(blob) : reject(new Error("Capture PNG vide")), "image/png", 1);
   });
+  return withWatermark ? watermarkPngBlob(blob) : blob;
 }
 
 function downloadBlob(blob, filename) {
@@ -7483,7 +7501,7 @@ async function createOptimizedRender() {
     composer.setSize(window.innerWidth, window.innerHeight);
     showAuxiliaryProgress(18, "Calcul de l’éclairage PBR haute définition");
     await waitForProgressPaint();
-    const sourceBlob = await renderCanvasToPngBlob();
+    const sourceBlob = await renderCanvasToPngBlob(false);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     composer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight, false);
@@ -7518,7 +7536,7 @@ async function createOptimizedRender() {
       return sourceBlob;
     });
     const aiApplied = enhanced !== sourceBlob;
-    showOptimizedRender(enhanced, aiApplied ? "Lissage PBR et super-résolution Swin2SR locale" : "Rendu PBR haute définition (repli sans IA)");
+    showOptimizedRender(await watermarkPngBlob(enhanced), aiApplied ? "Lissage PBR et super-résolution Swin2SR locale" : "Rendu PBR haute définition (repli sans IA)");
     finishAuxiliaryProgress(aiApplied ? "Rendu optimisé par IA prêt" : "Rendu haute définition prêt");
   } catch (error) {
     logDebug("optimized-render", "Création du rendu optimisé impossible.", { message: error?.message || String(error) });
@@ -13529,9 +13547,9 @@ async function updateViewerProductInformation(params, meta) {
     modelFamily: params.get("modelFamily") || meta.modelFamily,
     classicHead: params.get("classicHead") || (normalizeCatalogText(meta.source).includes("sans tete") ? "sans-tete" : "avec-tete"),
     plugSize,
-    plugSizeLabel: plugSizeParts[0] || meta.metalSizeClass || "Plug",
+    plugSizeLabel: plugSize === "XL-45" ? "XL Plus" : plugSizeParts[0] || meta.metalSizeClass || "Plug",
     plugDiameterMm: Number(plugSizeParts.at(-1)) || meta.diameterMm || null,
-    crystalSize: params.get("crystalSize") || "",
+    crystalSize: ["NEW SMALL", "NEW MEDIUM"].includes(meta.modelFamily) ? "12 mm" : params.get("crystalSize") || "",
     metalFamily,
     metalFinish,
     ornament: params.get("ornament") || (meta.ornamentFamilies.includes("crystal") ? "crystal" : meta.ornamentFamilies[0] || "none"),

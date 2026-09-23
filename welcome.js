@@ -1,7 +1,8 @@
 (function () {
   "use strict";
 
-  const VIEWER_VERSION = "20260914-png-preview-v05";
+  const VIEWER_VERSION = "20260923-catalog-logo-v06";
+  const LOCAL_APPLICATION_URL = "http://localhost:8080/";
   const ALUMINUM_FINISHES_BY_SIZE_CLASS = Object.freeze({
     SMALL: Object.freeze(["aluminum-gray", "aluminum-black", "aluminum-red", "aluminum-violet"]),
     MEDIUM: Object.freeze(["aluminum-gray", "aluminum-black", "aluminum-red", "aluminum-violet", "aluminum-pink", "aluminum-green", "aluminum-blue", "aluminum-gold", "aluminum-orange"]),
@@ -55,12 +56,73 @@
   ]);
   const params = new URLSearchParams(window.location.search);
 
+  if (window.location.protocol === "file:") {
+    recoverDirectFileLaunch();
+    return;
+  }
+
   if (params.get("viewer") === "1") {
     startViewer();
     return;
   }
 
   startWelcome();
+
+  function recoverDirectFileLaunch() {
+    const targetUrl = new URL(LOCAL_APPLICATION_URL);
+    targetUrl.search = window.location.search;
+    targetUrl.hash = window.location.hash;
+
+    document.body.className = "direct-file-launch";
+    document.body.replaceChildren();
+
+    const panel = document.createElement("main");
+    panel.style.cssText = "max-width:620px;margin:12vh auto;padding:32px;border:1px solid #dedede;border-left:4px solid #f22987;background:#fff;color:#111;font:16px/1.55 Arial,sans-serif;box-shadow:0 16px 45px rgba(0,0,0,.12)";
+
+    const title = document.createElement("h1");
+    title.textContent = "Ouverture du configurateur Rosebuds";
+    title.style.cssText = "margin:0 0 14px;font:700 28px/1.2 Arial,sans-serif";
+
+    const status = document.createElement("p");
+    status.textContent = "Connexion au moteur 3D local en cours…";
+    status.setAttribute("role", "status");
+    status.style.margin = "0 0 22px";
+
+    const retry = document.createElement("button");
+    retry.type = "button";
+    retry.textContent = "Réessayer dans l’application";
+    retry.style.cssText = "border:0;border-radius:3px;padding:12px 18px;background:#f22987;color:#fff;font:700 15px Arial,sans-serif;cursor:pointer";
+
+    const probeServer = () => {
+      status.textContent = "Connexion au moteur 3D local en cours…";
+      retry.disabled = true;
+      const probe = new Image();
+      let settled = false;
+      const timeout = window.setTimeout(() => finish(false), 2500);
+      const finish = (available) => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timeout);
+        probe.onload = null;
+        probe.onerror = null;
+        if (available) {
+          status.textContent = "Moteur 3D disponible. Ouverture du modèle…";
+          window.location.replace(targetUrl.href);
+          return;
+        }
+        status.textContent = "Le moteur 3D n’est pas démarré. Lancez « Configurateur de Bijoux Rosebuds » depuis le menu Démarrer, puis cliquez sur le bouton ci-dessous.";
+        retry.disabled = false;
+      };
+      probe.onload = () => finish(true);
+      probe.onerror = () => finish(false);
+      probe.src = `${LOCAL_APPLICATION_URL}assets/brand/rosebuds-logo.png?probe=${Date.now()}`;
+    };
+
+    retry.addEventListener("click", probeServer);
+    panel.append(title, status, retry);
+    document.body.appendChild(panel);
+    probeServer();
+  }
 
   function startViewer() {
     const welcome = document.querySelector("#welcome-screen");
@@ -110,6 +172,8 @@
     let aiHasRun = false;
     let aiEngine = null;
     let catalogAiModule = null;
+    let resultVariants = [];
+    let visibleResultCount = 60;
     const state = {
       family: "",
       head: "",
@@ -193,15 +257,15 @@
         ["Topaze", "Topaze", "#d99a4f"], ["Capriblue", "Capriblue", "#1986b8"], ["Purple", "Purple", "#793d9c"],
       ],
       gem: [
-        ["Blue Agata", "Agate bleue", "#4b77a8"], ["Red Agata", "Agate rouge", "#a13d38"], ["Green Agate", "Agate verte", "#4b885d"],
-        ["Rhodochrosite", "Rhodochrosite", "#d27988"], ["Malachite", "Malachite", "#237c52"], ["Tiger Eye", "Œil-de-tigre", "#9a6531"],
+        ["Blue Agata", "Blue Agata", "#4b77a8"], ["Red Agata", "Red Agata", "#a13d38"], ["Green Agate", "Green Agate", "#4b885d"],
+        ["Rhodochrosite", "Rhodochrosite", "#d27988"], ["Malachite", "Malachite", "#237c52"], ["Tiger Eye", "Tiger Eye", "#9a6531"],
         ["Onyx", "Onyx", "#171719"], ["Quartz", "Quartz", "#e8e4df"], ["Rubis", "Rubis", "#9d1535"],
         ["Saphir", "Saphir", "#2452b2"], ["Émeraude", "Émeraude", "#16845a"], ["Diamant", "Diamant", "#edf8ff"],
       ],
       "pressed-glass": [
-        ["Outremer", "Outremer", "#254ca5"], ["Red", "Rouge", "#b53639"], ["Green", "Vert", "#3a925d"],
-        ["Topaze", "Topaze", "#c8843e"], ["Jet cabochon", "Jet", "#202126"], ["Purple cabochon", "Pourpre", "#744394"],
-        ["Aquamarine cabochon", "Aigue-marine", "#68c9dc"],
+        ["Outremer", "Outremer", "#254ca5"], ["Red", "Red", "#b53639"], ["Green", "Green", "#3a925d"],
+        ["Topaze", "Topaze", "#c8843e"], ["Jet cabochon", "Jet", "#202126"], ["Purple cabochon", "Purple", "#744394"],
+        ["Aquamarine cabochon", "Aquamarine", "#68c9dc"],
       ],
       bronze: [
         ["Bronze poli", "Bronze poli", "#bd7d3f"], ["Bronze patiné", "Bronze patiné", "#507e70"], ["Bronze doré", "Bronze doré", "#cc9d45"],
@@ -351,9 +415,16 @@
     });
 
     gallery.addEventListener("click", (event) => {
+      if (event.target.closest("[data-more-variants]")) {
+        visibleResultCount += 60;
+        renderVariantPage();
+        gallery.querySelector(`[data-variant-index="${visibleResultCount - 60}"]`)?.focus();
+        return;
+      }
       const button = event.target.closest("[data-open-model]");
       if (!button) return;
-      openViewer(button.dataset.openModel);
+      const variant = resultVariants[Number(button.dataset.variantIndex)];
+      if (variant) openViewer(variant.model.id, variant.resolved);
     });
 
     render();
@@ -405,24 +476,38 @@
       results.hidden = !show;
       if (!show) return;
       let compatible = models.filter((model) => modelMatchesFilters(model, filters));
-      if (!compatible.length && allowClosest) compatible = findClosestModels(filters);
-      count.textContent = `${compatible.length} modèle${compatible.length > 1 ? "s" : ""}`;
-      gallery.innerHTML = compatible.length ? compatible.map((model) => {
-        const resolved = resolveConfigurationForModel(model, filters);
+      const closest = !compatible.length && allowClosest;
+      if (closest) compatible = findClosestModels(filters);
+      resultVariants = compatible.flatMap((model) => closest
+        ? [{ model, resolved: resolveConfigurationForModel(model, filters) }]
+        : enumerateModelConfigurations(model, filters, metalFinishes, ornamentFinishes)
+          .map((resolved) => ({ model, resolved })));
+      visibleResultCount = 60;
+      count.textContent = `${resultVariants.length} configuration${resultVariants.length > 1 ? "s" : ""}${closest ? " proches" : ""}`;
+      renderVariantPage();
+    }
+
+    function renderVariantPage() {
+      gallery.innerHTML = resultVariants.length ? resultVariants.slice(0, visibleResultCount).map(({ model, resolved }, index) => {
         const finish = getSelectedLabel(ornamentFinishes[resolved.ornament], resolved.ornamentFinish);
         const metal = getSelectedLabel(metalFinishes[resolved.metal], resolved.metalFinish);
         const crystal = resolved.crystalSize ? ` · Cristal ${resolved.crystalSize}` : "";
-        return `<button type="button" class="welcome-model" data-open-model="${escapeHtml(model.id)}">
+        return `<button type="button" class="welcome-model" data-open-model="${escapeHtml(model.id)}" data-variant-index="${index}">
           <span class="welcome-model-visual">
             <img src="./assets/previews/models/${escapeHtml(model.id)}.png?v=${VIEWER_VERSION}" alt="Vue 3D en perspective du ${escapeHtml(model.label)}" loading="lazy" decoding="async" />
           </span>
           <span class="welcome-model-copy">
             <strong>${escapeHtml(model.label)}</strong>
-            <small>${escapeHtml(`${getFamilyDisplayLabel(model.family)} · ${model.plugSizeLabel} · Ø plug ${model.plugDiameterMm} mm${crystal} · ${metal} · ${finish}`)}</small>
+            <small>${escapeHtml(`${getFamilyDisplayLabel(model.family)} · ${model.plugSizeLabel} · Ø plug ${model.plugDiameterMm} mm${crystal}`)}</small>
+            <span class="welcome-variant-material"><i style="background:${escapeHtml(getFinishColor(resolved.metalFinish))}" aria-hidden="true"></i>${escapeHtml(`${resolved.metal === "alu" ? "Aluminium" : "Inox"} · ${metal}`)}</span>
+            <span class="welcome-variant-material"><i style="background:${escapeHtml(getFinishColor(resolved.ornamentFinish))}" aria-hidden="true"></i>${escapeHtml(`${ornaments[resolved.ornament].label} · ${finish}`)}</span>
           </span>
           <span class="welcome-model-action">Ouvrir le viewer 3D</span>
         </button>`;
       }).join("") : '<p class="welcome-empty">Aucune géométrie ne correspond à cette combinaison.</p>';
+      if (resultVariants.length > visibleResultCount) {
+        gallery.insertAdjacentHTML("beforeend", `<button type="button" class="welcome-more-results" data-more-variants>Afficher la suite (${visibleResultCount} / ${resultVariants.length})</button>`);
+      }
     }
 
     function renderChoice(key, option, selected) {
@@ -440,9 +525,9 @@
       return all.find(([value]) => value === id)?.[2] || "#d8d5cb";
     }
 
-    function openViewer(modelId) {
+    function openViewer(modelId, configuration) {
       const model = models.find((entry) => entry.id === modelId);
-      const resolved = resolveConfigurationForModel(model, state);
+      const resolved = configuration || resolveConfigurationForModel(model, state);
       const url = new URL(window.location.href);
       url.search = "";
       url.searchParams.set("viewer", "1");
@@ -678,19 +763,21 @@
     if (diameter <= 25) return "SMALL";
     if (diameter <= 30) return "MEDIUM";
     if (diameter <= 35) return "LARGE";
-    if (diameter <= 45) return "XL";
+    if (diameter <= 40) return "XL";
+    if (diameter <= 45) return "XL Plus";
     if (diameter <= 50) return "XXL";
     return "XXXL";
   }
 
   function getPlugSize(id) {
-    return `${getPlugSizeLabel(id)}-${getPlugDiameterMm(id)}`;
+    // Keep existing links and stored selections valid after the XL Plus rename.
+    return `${getPlugSizeLabel(id).replace("XL Plus", "XL")}-${getPlugDiameterMm(id)}`;
   }
 
   function getCrystalSize(id) {
     if (CLASSIC_MODELS_WITHOUT_HEAD.has(id)) return "";
     const text = String(id || "").toLowerCase();
-    if (text.includes("new-small") || text.includes("new-medium")) return "9 mm";
+    if (text.includes("new-small") || text.includes("new-medium")) return "12 mm";
     if (text.includes("classique-small-18")) return "18 mm";
     if (text.includes("classique-small")) return "16 mm";
     if (text.includes("classique-xl-35") || text.includes("classique-xxl-35")) return "35 mm";
@@ -773,7 +860,30 @@
         || model.family === "NEW MEDIUM";
       if (!supportsCabochon) return false;
     }
-    return !(model.family === "NEW SMALL" && metalFamily === "alu" && ornament === "gem");
+    return !(model.family === "NEW MEDIUM" && metalFamily === "alu" && ["gem", "pressed-glass"].includes(ornament));
+  }
+
+  function enumerateModelConfigurations(model, filters, metals, finishes) {
+    const configurations = [];
+    for (const metal of Object.keys(metals)) {
+      if (filters.metal && filters.metal !== metal) continue;
+      if (!modelSupportsMetalFamily(model, metal)) continue;
+      for (const [metalFinish] of metals[metal]) {
+        if (filters.metalFinish && filters.metalFinish !== metalFinish) continue;
+        if (!modelSupportsMetalFinish(model, metal, metalFinish)) continue;
+        for (const ornament of model.ornaments) {
+          if (filters.ornament && filters.ornament !== ornament) continue;
+          if (!modelSupportsOrnament(model, ornament, metal)) continue;
+          for (const [ornamentFinish] of finishes[ornament] || []) {
+            if (filters.ornamentFinish && filters.ornamentFinish !== ornamentFinish) continue;
+            if (!modelSupportsOrnamentFinish(model, ornament, ornamentFinish)) continue;
+            configurations.push({ family: model.family, head: model.head, plugSize: model.plugSize,
+              crystalSize: model.crystalSize, metal, metalFinish, ornament, ornamentFinish });
+          }
+        }
+      }
+    }
+    return configurations;
   }
 
   function getCrystalFinishRules(model) {

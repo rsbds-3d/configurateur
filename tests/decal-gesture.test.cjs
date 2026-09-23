@@ -30,8 +30,8 @@ const root = path.resolve(__dirname, "..");
     frame: (fn) => { frames.set(++clockId, fn); return clockId; },
     cancelFrame: (id) => frames.delete(id),
   });
-  const event = (type, x = 20, id = 1) => {
-    const e = { type, button: 0, pointerId: id, clientX: x, clientY: 10, prevented: false, stopped: false,
+  const event = (type, x = 20, id = 1, pointerType = "mouse") => {
+    const e = { type, button: 0, pointerId: id, pointerType, clientX: x, clientY: 10, prevented: false, stopped: false,
       preventDefault() { this.prevented = true; }, stopImmediatePropagation() { this.stopped = true; } };
     handlers[type](e); return e;
   };
@@ -41,8 +41,8 @@ const root = path.resolve(__dirname, "..");
   assert.equal(selected, 1); assert.equal(locked, true); assert.equal(began, 0);
   event("pointerup"); hold();
   assert.equal(began, 0); assert.equal(locked, false); assert.equal(finishes.length, 0, "Short click selects only");
-  event("pointerdown"); event("pointermove", 45); hold(); event("pointerup", 45);
-  assert.equal(began, 0, "Motion before hold threshold cancels long press");
+  event("pointerdown", 20, 1, "touch"); event("pointermove", 45, 1, "touch"); hold(); event("pointerup", 45, 1, "touch");
+  assert.equal(began, 0, "Touch motion before hold threshold cancels long press");
   event("pointerdown"); hold();
   assert.equal(began, 1);
   event("pointermove", 40); event("pointermove", 50);
@@ -50,6 +50,13 @@ const root = path.resolve(__dirname, "..");
   event("pointerup", 50);
   assert.equal(moved, 1, "Last motion flushed before saving");
   assert.deepEqual(finishes, [true]); assert.equal(gesture.busy, false); assert.equal(captured, null);
+  event("pointerdown"); event("pointermove", 45);
+  assert.equal(began, 2, "Mouse drag starts immediately after threshold, without long press");
+  assert.equal(locked, true, "Orbit and underlying selection stay blocked during mouse drag");
+  event("pointerup", 45);
+  assert.equal(moved, 2); assert.equal(finishes.at(-1), true);
+  event("pointerdown", 20, 1, "touch"); hold(); event("pointermove", 45, 1, "touch"); event("pointerup", 45, 1, "touch");
+  assert.equal(began, 3, "Touch long press still starts surface dragging");
   for (const reason of ["pointercancel", "lostpointercapture"]) {
     event("pointerdown"); hold(); event(reason);
     assert.equal(finishes.at(-1), false); assert.equal(locked, false);

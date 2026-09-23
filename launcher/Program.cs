@@ -14,15 +14,15 @@ using System.Windows.Forms;
 [assembly: AssemblyCompany("Charles Thierry de Ville d'Avray")]
 [assembly: AssemblyProduct("Configurateur de Bijoux Rosebuds")]
 [assembly: AssemblyCopyright("Copyright (C) 2026 Charles Thierry de Ville d'Avray")]
-[assembly: AssemblyVersion("0.5.0.0")]
-[assembly: AssemblyFileVersion("0.5.0.0")]
+[assembly: AssemblyVersion("0.6.0.0")]
+[assembly: AssemblyFileVersion("0.6.0.0")]
 
 namespace Rosebuds.Configurateur
 {
     internal static class Program
     {
         private const int Port = 8080;
-        private const string CacheToken = "20260914-png-preview-v05";
+        private const string CacheToken = "20260923-catalog-logo-v06";
         private const string MutexName = @"Local\RosebudsConfigurateurBijoux";
         private static readonly string RootDirectory = AppDomain.CurrentDomain.BaseDirectory;
         private static readonly string LaunchUrl = "http://localhost:" + Port + "/?v=" + CacheToken;
@@ -223,7 +223,7 @@ namespace Rosebuds.Configurateur
                 "Content-Type: " + mimeType + "\r\n" +
                 "Content-Length: " + file.Length + "\r\n" +
                 "Cache-Control: no-store\r\n" +
-                "X-Rosebuds-Configurator: v0.5-260914\r\n" +
+                "X-Rosebuds-Configurator: v0.6-260923\r\n" +
                 "Connection: close\r\n\r\n";
             WriteBytes(stream, Encoding.ASCII.GetBytes(headers));
 

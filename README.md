@@ -1,6 +1,6 @@
 # Configurateur de Bijoux Rosebuds
 
-Version actuelle : **v0.5-260914**
+Version actuelle : **v0.6-260923**
 
 Configurateur de plugs Rosebuds avec catalogue guidé, import de modèles Rhino 3DM, matériaux métalliques PBR, pierres transparentes avec shader optique BVH et mode caméra AR.
 
@@ -61,4 +61,4 @@ La barrière d'accès GitHub Pages est exécutée côté navigateur. Elle empêc
 Get-ChildItem tests/*.test.cjs | ForEach-Object { node $_.FullName }
 ```
 
-La version `v0.5-260914` possède 28 tests unitaires et de non-régression.
+La version `v0.6-260923` possède 32 fichiers de tests unitaires et de non-régression.

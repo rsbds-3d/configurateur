@@ -16,7 +16,7 @@ assert(app.includes("smoothMetalMeshesForOptimizedRender"), "Le lissage du méta
 assert(app.includes("showAuxiliaryProgress"), "Le calcul optimisé doit publier sa progression en bas de page.");
 
 assert(html.includes('id="scale-reference-enabled"'), "Le viewer doit permettre d'activer un objet d'échelle.");
-for (const value of ["coin", "bottle-small", "bottle-large", "ruler"]) {
+for (const value of ["coin", "bottle-1l", "ruler"]) {
   assert(html.includes(`value="${value}"`), `L'objet de comparaison ${value} doit être disponible.`);
 }
 assert(app.includes("sceneUnitsPerMillimeter"), "Les objets d'échelle doivent respecter l'échelle physique du modèle.");

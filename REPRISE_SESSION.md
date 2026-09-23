@@ -1,70 +1,78 @@
 # REPRISE DE SESSION
 
+NOM_SESSION_CIBLE : à calculer uniquement lors de la prochaine bascule de session
 CWD_SESSION : C:\Users\charl\Documents\CONFIGURATEUR DE BIJIOUX
 
 ## Projet
-Configurateur de bijoux Rosebuds : application Windows et site autonome.
+Configurateur de bijoux Rosebuds : application Windows et site web autonome.
 
 ## Objectif global
-Terminer, verifier, reinstaller et publier les demandes du catalogue et du viewer.
+Maintenir le catalogue métier et le viewer Three.js, vérifier l'application Windows et publier la même version sur GitHub Pages.
+
+## Répertoire de travail
+Sources et CWD identiques : `C:\Users\charl\Documents\CONFIGURATEUR DE BIJIOUX`.
 
 ## Branche Git
-master, origin https://github.com/rsbds-3d/configurateur.git. Modifications locales preservees.
+`master`, origin `https://github.com/rsbds-3d/configurateur.git`. Aucun worktree.
 
 ## Version actuelle
-v0.5-260914, VERSION = 0.5, cache 20260914-png-preview-v05. Installee et publiee le 15 septembre.
+`v0.6-260923`, VERSION = `0.6`, cache `20260923-catalog-logo-v06`.
 
-## Travail termine
-- Catalogue blanc/noir/fuchsia : modes guide, multifiltre et prompt IA, tailles plug et cristal separees, famille Originale et restrictions metier.
-- Decalcomanie prioritaire sur le maillage, geste long/glisser et persistance par modele.
-- BVH en worker annulable, rendu PBR provisoire, compilation GPU asynchrone differee pendant la manipulation.
-- Bibliotheque de visibilite des materiaux construite sur demande.
-- Objets comparatifs, regle graduee, capture PNG/partage, rendu optimise et super-resolution locale.
-- Resume produit et liens commerciaux, logo ROSEBUDS sur les deux ecrans.
-- EXE et installateur Inno Setup v0.4 generes.
-- 12 septembre : encodage UTF-8 de la construction web corrige, 27 tests passes, accents du HTML genere verifies.
+## État actuel
+Version v0.6 compilée et installée localement. Publication GitHub restant à effectuer au moment de cette mise à jour.
+
+## Travail terminé
+- Catalogue : noms commerciaux anglais, XL 27/35 mm, NEW 12 mm, XL Plus et règles gemme/verre pressé.
+- Résultats déclinés par combinaison exacte de matériaux.
+- Décalcomanie prioritaire sur le maillage, glissement souris immédiat, appui long tactile et persistance par modèle.
+- Exports PNG avec filigranes ROSEBUDS diagonaux répétés.
+- Objet d'échelle `Bouteille_1L_cristal.glb`, hauteur 258,23 mm et chargement différé.
+- Ouverture `file:///` : reprise automatique sur HTTP ou aide si le serveur est arrêté.
+- Viewer XL vérifié visuellement : rendu provisoire visible et progression du lancer de rayons.
+- 32 tests Node réussis.
+- EXE et installateur v0.6 compilés ; installation locale code 0 ; HTTP 200 et version installée vérifiés.
 
 ## Travail en cours
-Publication v0.5 confirmee : commit cc981b585843ae340b50c8e85fc5472b233ef846, GitHub Pages run 34970005153 reussi. Site public HTTP 200, version v0.5, dialogue PNG et auth.js verifies. Release : https://github.com/rsbds-3d/configurateur/releases/tag/v0.5-260914.
-15 septembre : apercu PNG persistant ajoute, ouverture/enregistrement explicites, nettoyage des URL, prevention des doubles clics. 28 tests reussis. Capture reelle 1600 x 900 non vide verifiee dans Codex, affichage mobile 390 x 844 lisible. Telechargement sur disque et partage natif non confirmes.
-Paquet web et installateur v0.5 compiles. Desinstallation v0.4 retourne encore 1 ; mise a jour sur place v0.5 reussie (code 0). EXE source/installe SHA256 4B1139786147CD5C7E7EF4F50D2F1C44D84CE409701DB5342DDF75725CD7D605. Serveur installe HTTP 200, en-tete et interface v0.5 verifies. Installateur SHA256 13A9DD9E7BF4FD90BBA40BE595C8DDF609290355BFBC85FDF841B38CAF7E9FB3.
+- Commit, push GitHub, contrôle GitHub Pages et release v0.6.
 
-Historique v0.4 :
-Mise a niveau Windows v0.4 reussie le 12 septembre, code Inno 0. Desinstallation prealable refusee (code 1, sans journal) : installation sur place, pas de desinstallation complete. EXE installe identique au livrable, HTTP 200, en-tete et interface v0.4 verifies.
-Sources publiees : be8c390b02172175fd5bb68f390737eb3ae9385c. GitHub Pages run 34710847482 reussi. Site public et connexion verifies le 13 septembre : https://rsbds-3d.github.io/configurateur/.
-Release : https://github.com/rsbds-3d/configurateur/releases/tag/v0.4-260911 ; installateur 22441193 octets, SHA256 B408990632EDB39F8BAAFDC517DF60DF96467D1B83AD1AD167DCF92DDC976534, digest distant identique.
-
-## Decisions et problemes connus
-- Conserver le shader BVH des pierres ; grand solide metallique, petit solide gemme.
-- IA en workers, poids telecharges au premier usage puis caches, pas physiquement livres dans le depot.
-- Rendu optimise : PBR et Swin2SR, pas encore de rendu generatif ComfyUI complet.
-- GitHub Pages : identification cote navigateur uniquement, pas de confidentialite serveur des ressources publiques.
-- Ne pas garantir une absence totale de latence GPU sur tous les appareils.
+## Décisions prises
+- Le viewer nécessite HTTP/HTTPS ; `file:///` sert uniquement de point de reprise vers l'application locale.
+- Conserver le shader BVH et un rendu PBR provisoire manipulable pendant les calculs.
+- Les captures des cartes montrent la géométrie ; libellés et pastilles distinguent les matériaux appliqués.
+- Utiliser uniquement la bouteille originale fournie, jamais la variante `visionneuse3D`.
 
 ## Fichiers importants
-app.js, welcome.js, index.html, style.css, welcome.css ; assets/js/diamond/background-bvh.js et bvh-worker.js ; assets/js/decal-gesture.js ; catalog-ai-worker.js ; render-enhance-worker.js ; online/build-online.ps1 ; launcher/Program.cs.
+`welcome.js`, `app.js`, `index.html`, `assets/js/decal-gesture.js`, `assets/js/png-watermark.js`, `assets/js/bottle-reference.js`, `assets/models/references/Bouteille_1L_cristal.glb`, `online/build-online.ps1`, `launcher/Program.cs`.
 
 ## Commandes importantes
-Tests : node sur chaque tests/*.test.cjs.
-Web : powershell -NoProfile -ExecutionPolicy Bypass -File online/build-online.ps1.
-Lanceur : launcher/build-launcher.ps1.
-Inno : C:\Program Files (x86)\Inno Setup 6\ISCC.exe.
+- Tests : exécuter chaque `tests/*.test.cjs` avec Node.
+- Web : `powershell -NoProfile -ExecutionPolicy Bypass -File online/build-online.ps1`.
+- Lanceur : `powershell -NoProfile -ExecutionPolicy Bypass -File launcher/build-launcher.ps1`.
+- Inno : `C:\Program Files (x86)\Inno Setup 6\ISCC.exe`.
 
-## Tests realises
-28 tests Node reussis le 15 septembre. Controles navigateur precedents : catalogue, multifiltre NEW SMALL noir, prompt, Originale XXXL90 avec progression et rendu optique, regle visible. Capture PNG et affichage mobile verifies pour v0.5.
+## Problèmes connus
+- La compilation GPU initiale peut rester longue selon la machine, mais le rendu provisoire reste visible.
+- Les poids du LLM et de Swin2SR sont téléchargés puis mis en cache, pas physiquement inclus.
+- Le rendu génératif ComfyUI complet n'est pas implémenté.
+- L'authentification GitHub Pages côté navigateur ne rend pas les ressources publiques confidentielles.
 
-## Tests restant a faire
-Validation prolongee mobile et AR camera reelle ; partage natif PNG ; resultat complet de super-resolution IA ; geste decalcomanie dans navigateur en complement des tests unitaires.
-13 septembre : export PNG clique dans le navigateur integre, evenement download non recu en 20 secondes, aucun fichier confirme. Ne pas presenter ce controle comme reussi ; distinguer limitation du navigateur et bug applicatif.
-Catalogue public : multifiltre NEW SMALL aluminium propose uniquement noir, cristal/verre presse, deux modeles. Viewer charge visuellement avec corps noir et petite pierre claire, puis retour au catalogue. Onglet conserve comme apercu.
+## Tests réalisés
+- 32 tests réussis le 23 septembre 2026.
+- Viewer XL local et installé contrôlé visuellement sans écran noir.
+- EXE source/installé : SHA-256 `9277490B767F5E90F0151E3D2DD51437482057A162C414BEB01690941DDC9EE1`.
+- Installateur : SHA-256 `0C02571FD6448195B76F0B1FA8E335B51868B53B5160B7B2A6B71C99440BB1F0`.
+
+## Tests restant à faire
+- Téléphone réel : geste tactile, AR caméra et partage natif PNG.
+- Mesures de performance sur plusieurs GPU et téléphones.
 
 ## Prochaines actions prioritaires
-1. Completer les controles reels du viewer et de l'IA mentionnes ci-dessus, notamment fichier PNG enregistre sur disque et glisser-deposer du logo. L'apercu PNG est valide ; ne pas recommencer sa mise en place.
-2. Finaliser le moteur generatif hyperrealiste demande, sans confondre super-resolution et generation.
-3. Clarifier la protection serveur si une confidentialite forte est attendue pour le site.
+1. Commit et push de v0.6.
+2. Vérifier GitHub Pages et la version publique.
+3. Créer la release v0.6 avec l'installateur.
 
 ## Interdictions / points de vigilance
-Aucun reset, nouveau worktree ou changement de branche. Ne pas publier de mot de passe en clair. Auth gh fonctionne hors sandbox (diagnostic sandbox faux negatif reseau). Ne pas annoncer ComfyUI ou une authentification serveur comme termines.
+Aucun reset destructif, nouveau worktree ou changement de branche. Ne pas annoncer ComfyUI, une authentification serveur forte ou les tests mobiles comme terminés.
 
-## Derniere demande utilisateur
-CONTINUE ; nouvelles regles AGENTS globales remplacant les anciennes. Meme cwd et branche.
+## Dernière demande utilisateur
+Corriger l'écran noir du viewer 3D puis continuer la finalisation.

@@ -840,3 +840,32 @@ button {
     transition-duration: 0.01ms !important;
   }
 }
+
+.welcome-variant-material {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.welcome-variant-material i {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  border: 1px solid #999;
+  border-radius: 50%;
+}
+
+.welcome-more-results {
+  grid-column: 1 / -1;
+  justify-self: center;
+  padding: 12px 24px;
+  color: #161616;
+  background: white;
+  border: 1px solid #d60069;
+  border-radius: 4px;
+  font: inherit;
+  cursor: pointer;
+}

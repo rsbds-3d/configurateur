@@ -1,6 +1,6 @@
 #define AppName "Configurateur de Bijoux Rosebuds"
-#define AppVersion "0.5"
-#define AppDisplayVersion "v0.5-260914"
+#define AppVersion "0.6"
+#define AppDisplayVersion "v0.6-260923"
 #define AppPublisher "Charles Thierry de Ville d'Avray"
 #define AppExecutable "Configurateur de Bijoux Rosebuds.exe"
 #define ProjectRoot SourcePath + "..\.."
@@ -15,7 +15,7 @@ DefaultDirName={autopf}\Configurateur de Bijoux Rosebuds
 DefaultGroupName=Configurateur de Bijoux Rosebuds
 DisableProgramGroupPage=yes
 OutputDir=..
-OutputBaseFilename=Configurateur de Bijoux v0.5-260914
+OutputBaseFilename=Configurateur de Bijoux v0.6-260923
 SetupIconFile={#ProjectRoot}\assets\icons\diamond-launcher.ico
 UninstallDisplayIcon={app}\{#AppExecutable}
 Compression=lzma2/ultra64
@@ -26,11 +26,11 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 CloseApplications=force
 RestartApplications=no
-VersionInfoVersion=0.5.0.0
+VersionInfoVersion=0.6.0.0
 VersionInfoCompany={#AppPublisher}
 VersionInfoDescription={#AppName} {#AppDisplayVersion}
 VersionInfoProductName={#AppName}
-VersionInfoProductVersion=0.5.0.0
+VersionInfoProductVersion=0.6.0.0
 VersionInfoCopyright=Copyright (C) 2026 {#AppPublisher}
 
 [Languages]
@@ -53,8 +53,6 @@ Source: "{#ProjectRoot}\Documentation\*"; DestDir: "{app}\Documentation"; Flags:
 Type: files; Name: "{app}\relancer-viewer.bat"
 Type: files; Name: "{app}\Lancer Configurateur Bijoux.bat"
 Type: files; Name: "{app}\.viewer-server.cjs"
-Type: filesandordirs; Name: "{app}\MATERIAUX"
-Type: filesandordirs; Name: "{app}\MODELES 3D"
 
 [Icons]
 Name: "{autoprograms}\Configurateur de Bijoux Rosebuds"; Filename: "{app}\{#AppExecutable}"; WorkingDir: "{app}"; Comment: "Lancer le configurateur de bijoux Rosebuds"

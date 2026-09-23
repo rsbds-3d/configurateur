@@ -1,0 +1,41 @@
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
+const { pathToFileURL } = require("node:url");
+const root = path.resolve(__dirname, "..");
+(async () => {
+  const threeUrl = pathToFileURL(path.join(root, "assets/vendor/three.module.js")).href;
+  const THREE = await import(threeUrl);
+  const source = fs.readFileSync(path.join(root, "assets/js/bottle-reference.js"), "utf8").replace('from "three"', `from "${threeUrl}"`);
+  const { createBottleReference } = await import(`data:text/javascript;base64,${Buffer.from(source).toString("base64")}`);
+  const bytes = fs.readFileSync(path.join(root, "assets/models/references/Bouteille_1L_cristal.glb"));
+  assert.equal(bytes.readUInt32LE(0), 0x46546c67);
+  const gltf = JSON.parse(bytes.toString("utf8", 20, 20 + bytes.readUInt32LE(12)));
+  assert(gltf.nodes.some((n) => n.name === "Bouteille_PET"));
+  assert(gltf.nodes.some((n) => n.name === "Etiquette"));
+  assert(gltf.images.every((i) => i.bufferView !== undefined), "Label texture is embedded, no missing external image");
+  const bounds = gltf.meshes.flatMap((m) => m.primitives.map((p) => gltf.accessors[p.attributes.POSITION]));
+  const heightMeters = Math.max(...bounds.map((a) => a.max[1])) - Math.min(...bounds.map((a) => a.min[1]));
+  assert(Math.abs(heightMeters - 0.258230358) < 0.000001);
+  const original = new THREE.Group();
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(0.076, heightMeters, 0.076), new THREE.MeshPhysicalMaterial({ transmission: 1 }));
+  mesh.position.set(0.1, heightMeters / 2, 0.2);
+  original.add(mesh);
+  for (const unit of [0.01, 0.1, 1]) {
+    const reference = createBottleReference(original, unit, -2);
+    const box = new THREE.Box3().setFromObject(reference);
+    assert(Math.abs(box.min.y + 2) < 1e-7, "Bottle rests on floor");
+    assert(Math.abs(box.getSize(new THREE.Vector3()).y / unit - heightMeters * 1000) < 0.0001);
+    assert(Math.abs(box.getCenter(new THREE.Vector3()).x) < 1e-7);
+    const clonedMesh = reference.children[0].children[0];
+    assert.notEqual(clonedMesh.geometry, mesh.geometry);
+    assert.notEqual(clonedMesh.material, mesh.material);
+    assert.equal(clonedMesh.material.transmission, 1);
+  }
+  assert.equal(original.scale.x, 1, "Cached source is not rescaled");
+  const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
+  assert(app.includes('loadAsync("./assets/models/references/Bouteille_1L_cristal.glb")'));
+  assert(!app.includes("Bouteille_1L_cristal_visionneuse3D"));
+  assert(app.includes("request !== scaleReferenceRequest"), "Late loads cannot override a new choice or disabled state");
+  console.log("Bottle GLB, physical units, source preservation and asynchronous switching OK");
+})().catch((error) => { console.error(error); process.exitCode = 1; });
