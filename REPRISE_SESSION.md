@@ -19,7 +19,7 @@ Sources et CWD identiques : `C:\Users\charl\Documents\CONFIGURATEUR DE BIJIOUX`.
 `v0.6-260923`, VERSION = `0.6`, cache `20260923-catalog-logo-v06`.
 
 ## État actuel
-Version v0.6 compilée et installée localement. Publication GitHub restant à effectuer au moment de cette mise à jour.
+Version v0.6 compilée, installée localement, publiée sur GitHub Pages et disponible dans une release avec son installateur.
 
 ## Travail terminé
 - Catalogue : noms commerciaux anglais, XL 27/35 mm, NEW 12 mm, XL Plus et règles gemme/verre pressé.
@@ -33,7 +33,7 @@ Version v0.6 compilée et installée localement. Publication GitHub restant à e
 - EXE et installateur v0.6 compilés ; installation locale code 0 ; HTTP 200 et version installée vérifiés.
 
 ## Travail en cours
-- Commit, push GitHub, contrôle GitHub Pages et release v0.6.
+- Aucun travail de livraison v0.6 restant.
 
 ## Décisions prises
 - Le viewer nécessite HTTP/HTTPS ; `file:///` sert uniquement de point de reprise vers l'application locale.
@@ -61,15 +61,17 @@ Version v0.6 compilée et installée localement. Publication GitHub restant à e
 - Viewer XL local et installé contrôlé visuellement sans écran noir.
 - EXE source/installé : SHA-256 `9277490B767F5E90F0151E3D2DD51437482057A162C414BEB01690941DDC9EE1`.
 - Installateur : SHA-256 `0C02571FD6448195B76F0B1FA8E335B51868B53B5160B7B2A6B71C99440BB1F0`.
+- GitHub Pages : run `35925710465` réussi, site public HTTP 200 et ressources v0.6 vérifiées.
+- Release : `https://github.com/rsbds-3d/configurateur/releases/tag/v0.6-260923`, empreinte distante identique.
 
 ## Tests restant à faire
 - Téléphone réel : geste tactile, AR caméra et partage natif PNG.
 - Mesures de performance sur plusieurs GPU et téléphones.
 
 ## Prochaines actions prioritaires
-1. Commit et push de v0.6.
-2. Vérifier GitHub Pages et la version publique.
-3. Créer la release v0.6 avec l'installateur.
+1. Recueillir les retours d'usage sur mobile et sur les GPU plus lents.
+2. Mesurer les temps de compilation du lancer de rayons sur plusieurs appareils.
+3. Poursuivre les améliorations fonctionnelles demandées dans une prochaine version.
 
 ## Interdictions / points de vigilance
 Aucun reset destructif, nouveau worktree ou changement de branche. Ne pas annoncer ComfyUI, une authentification serveur forte ou les tests mobiles comme terminés.
