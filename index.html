@@ -8,7 +8,7 @@
       content="Viewer 3D joaillerie luxe pour bague en or, gemme padparadscha et pavage diamant."
     />
     <title>Configurateur de bijoux Rosebuds</title>
-    <link rel="stylesheet" href="./welcome.css?v=20260923-catalog-logo-v06" />
+    <link rel="stylesheet" href="./welcome.css?v=20260928-scale-comparison-v07" />
     <script type="importmap">
       {
         "imports": {
@@ -25,14 +25,14 @@
     <section id="welcome-screen" class="welcome-screen" aria-labelledby="welcome-title">
       <header class="welcome-header">
         <div class="welcome-brand">
-          <img class="welcome-rosebuds-logo" src="./assets/brand/rosebuds-logo.png?v=20260923-catalog-logo-v06" alt="ROSEBUDS" width="284" height="117" />
+          <img class="welcome-rosebuds-logo" src="./assets/brand/rosebuds-logo.png?v=20260928-scale-comparison-v07" alt="ROSEBUDS" width="284" height="117" />
           <div class="welcome-brand-copy">
             <h1 id="welcome-title">Configurateur de bijoux</h1>
           </div>
         </div>
         <div class="welcome-header-meta">
           <p class="welcome-intro">Composez votre plug Rosebuds étape par étape.</p>
-          <span class="app-version" aria-label="Version de l'application">v0.6-260923</span>
+          <span class="app-version" aria-label="Version de l'application">v0.7-260928</span>
         </div>
       </header>
 
@@ -111,7 +111,12 @@
           <option value="coin">Pièce de 1 euro</option>
           <option value="bottle-1l">Bouteille 1 L</option>
           <option value="ruler">Règle graduée 20 cm</option>
+          <option value="compare">Comparer les tailles de plugs</option>
         </select>
+        <label id="scale-comparison-upright-control" class="viewer-scale-toggle" hidden>
+          <input id="scale-comparison-upright" type="checkbox" checked />
+          <span>Plugs verticaux</span>
+        </label>
         <button id="download-view-png" type="button">Télécharger PNG</button>
         <button id="share-view" type="button">Partager</button>
       </section>
@@ -188,7 +193,7 @@
       </section>
 
       <section class="brand-panel" aria-label="Informations produit">
-        <img class="viewer-rosebuds-logo" src="./assets/brand/rosebuds-logo.png?v=20260923-catalog-logo-v06" alt="ROSEBUDS" width="190" height="78" />
+        <img class="viewer-rosebuds-logo" src="./assets/brand/rosebuds-logo.png?v=20260928-scale-comparison-v07" alt="ROSEBUDS" width="190" height="78" />
         <h1 id="viewer-product-summary">Originale - Plug - Métal - Ornement</h1>
         <p id="viewer-product-description">Visualisation 3D photoréaliste de la configuration sélectionnée.</p>
         <a id="viewer-product-link" href="https://rosebuds.net/fr/6-gamme-originale-inox" target="_blank" rel="noopener">Voir la gamme Rosebuds</a>
@@ -199,7 +204,7 @@
           <div>
             <p class="eyebrow">Studio WebGL</p>
             <h2>Direction artistique</h2>
-            <p class="viewer-version">v0.6-260923</p>
+            <p class="viewer-version">v0.7-260928</p>
           </div>
           <button id="toggle-panel" class="icon-button" type="button" aria-label="Ouvrir le panneau" aria-expanded="false">
             <span></span>
@@ -980,7 +985,7 @@
       </section>
     </main>
 
-    <script src="./welcome.js?v=20260923-catalog-logo-v06" defer></script>
+    <script src="./welcome.js?v=20260928-scale-comparison-v07" defer></script>
   </body>
 </html>
 

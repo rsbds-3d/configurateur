@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const VIEWER_VERSION = "20260923-catalog-logo-v06";
+  const VIEWER_VERSION = "20260928-scale-comparison-v07";
   const LOCAL_APPLICATION_URL = "http://localhost:8080/";
   const ALUMINUM_FINISHES_BY_SIZE_CLASS = Object.freeze({
     SMALL: Object.freeze(["aluminum-gray", "aluminum-black", "aluminum-red", "aluminum-violet"]),

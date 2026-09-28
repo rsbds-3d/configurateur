@@ -1,6 +1,13 @@
 # Cahier des charges - Configurateur de bijoux
 
-Version : **v0.6-260923**
+Version : **v0.7-260928**
+
+## Révision du 28 septembre 2026
+
+- La pièce générique de l'objet d'échelle est remplacée par le fichier `Piece_1_euro.glb` fourni, et non par une variante de visionneuse : diamètre 23,25 mm, épaisseur 2,33 mm, texture embarquée et matériaux distincts pour l'avers, le revers et la tranche.
+- La liste des objets d'échelle propose `Comparer les tailles de plugs`. Les variantes compatibles conservent la gamme, la tête, le métal, la finition et l'ornement du modèle courant ; seule la taille varie.
+- La comparaison emploie une unité physique commune, trie les plugs du plus petit au plus grand, centre la taille étudiée entre les tailles inférieures et supérieures et impose un jeu de 20 mm entre les volumes.
+- La position verticale est activée par défaut, ornement vers le haut, avec chaque plug posé sur le sol. Une case permet de revenir à l'orientation couchée.
 
 ## Révision du 23 septembre 2026
 
@@ -51,7 +58,8 @@ Modèles Originale `Avec tête` validés : `LARGE 35`, `MEDIUM`, `SMALL 18`, `SM
 - Mode AR par caméra sur téléphone ou ordinateur, avec flux vidéo intégré comme arrière-plan Three.js et conservation stricte du pipeline PBR du viewer normal.
 - Déplacement visuel de la décalcomanie sur la tige, contrainte à la surface métallique, avec mémorisation distincte par modèle.
 - Rendu optimisé à la demande par capture haute définition et super-résolution open source côté client.
-- Objets 3D de comparaison à dimensions réelles : pièce de monnaie, bouteille détaillée de 1 L issue du fichier fourni et règle graduée 20 cm.
+- Objets 3D de comparaison à dimensions réelles : pièce de 1 euro détaillée issue du fichier fourni, bouteille détaillée de 1 L et règle graduée 20 cm.
+- Comparaison automatique des tailles compatibles, à matériaux constants, avec tri croissant, jeu de 20 mm, pose au sol et orientation verticale optionnelle.
 - Téléchargement PNG et partage de la vue courante.
 - Résumé du produit et lien vers la fiche Rosebuds la plus proche ou le formulaire sur mesure prérempli.
 
@@ -68,7 +76,7 @@ Modèles Originale `Avec tête` validés : `LARGE 35`, `MEDIUM`, `SMALL 18`, `SM
 - Les mêmes règles doivent filtrer les questions d'accueil, la galerie finale, les paramètres d'URL et le menu contextuel du viewer.
 - Un changement de matériau ne change ni forme, ni échelle, ni position.
 - Un changement de forme ou de diamètre conserve le matériau et le point d'ancrage.
-- Les modèles multiples sont disposés parallèlement avec un jeu réglable.
+- Le mode manuel dispose plusieurs modèles parallèlement avec un jeu réglable. Le mode d'échelle `Comparer` applique automatiquement un jeu fixe de 20 mm et conserve les réglages du modèle courant.
 
 ## Contraintes
 
@@ -98,7 +106,7 @@ Modèles Originale `Avec tête` validés : `LARGE 35`, `MEDIUM`, `SMALL 18`, `SM
 - Lanceur Windows : signature PE valide, serveur local fourni par l'EXE et raccourcis ciblant l'exécutable.
 - Version en ligne : paquet autonome, écran d'accès actif, application non chargée avant validation et workflow GitHub Pages présent.
 - Catalogue : trois modes cohérents donnant accès aux mêmes combinaisons compatibles.
-- Viewer : rendu provisoire conservé pendant le BVH, priorité des interactions avant compilation, objets d'échelle et export/partage PNG.
+- Viewer : rendu provisoire conservé pendant le BVH, priorité des interactions avant compilation, objets d'échelle, comparaison physique des tailles et export/partage PNG.
 
 ## À poursuivre
 

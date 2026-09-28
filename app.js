@@ -16,9 +16,10 @@ import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js"
 import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
 import { MeshoptDecoder } from "meshoptimizer";
 import { buildBVHInWorker, compileBeforeSwap, abortError } from "./assets/js/diamond/background-bvh.js";
-import { attachDecalGesture } from "./assets/js/decal-gesture.js?v=20260923-catalog-logo-v06";
+import { attachDecalGesture } from "./assets/js/decal-gesture.js?v=20260928-scale-comparison-v07";
 import { watermarkPngBlob } from "./assets/js/png-watermark.js";
 import { createBottleReference } from "./assets/js/bottle-reference.js";
+import { createCoinReference } from "./assets/js/coin-reference.js";
 import { pointInPlacementFrame, placementInWorld } from "./assets/js/decal-placement.js";
 import { buildViewerProductSummary, resolveRosebudsProductLink } from "./assets/js/rosebuds-product-link.js";
 
@@ -7245,17 +7246,17 @@ function makeScaleReferenceMaterial(options = {}) {
   });
 }
 
-function makeCoinReference(unit) {
-  const group = new THREE.Group();
-  const coin = new THREE.Mesh(new THREE.CylinderGeometry(11.625 * unit, 11.625 * unit, 2.33 * unit, 96), makeScaleReferenceMaterial({ color: "#d7b45a", metalness: 0.92, roughness: 0.22 }));
-  coin.rotation.x = Math.PI / 2;
-  coin.position.y = floor.position.y + 11.625 * unit;
-  group.add(coin);
-  return group;
-}
-
+let coinReferencePromise = null;
 let bottleReferencePromise = null;
 let scaleReferenceRequest = 0;
+let scaleComparisonActive = false;
+
+async function makeCoinReference(unit) {
+  coinReferencePromise ||= new GLTFLoader().loadAsync("./assets/models/references/Piece_1_euro.glb")
+    .then((gltf) => gltf.scene)
+    .catch((error) => { coinReferencePromise = null; throw error; });
+  return createCoinReference(await coinReferencePromise, unit, floor.position.y);
+}
 
 async function makeBottleReference(unit) {
   bottleReferencePromise ||= new GLTFLoader().loadAsync("./assets/models/references/Bouteille_1L_cristal.glb")
@@ -7270,6 +7271,177 @@ function disposeScaleReference(object) {
     const materials = Array.isArray(child.material) ? child.material : [child.material];
     materials.forEach((material) => material?.dispose?.());
   });
+}
+
+function getComparisonPlugDiameterMm(id) {
+  const text = String(id || "").toLowerCase();
+  if (text.includes("new-small") || text.includes("classique-small")) return 25;
+  if (text.includes("new-medium")) return Number(text.match(/-(67|60|55|50|45|35|30)-/)?.[1] || 30);
+  if (text.includes("classique-55-")) return 55;
+  if (text.includes("classique-67-")) return 67;
+  if (text.includes("classique-large")) return 35;
+  if (text.includes("classique-medium")) return 30;
+  if (text.includes("classique-xl-45")) return 45;
+  if (text.includes("classique-xl")) return 40;
+  if (text.includes("classique-xxl")) return 50;
+  if (text.includes("classique-xxxl")) return Number(text.match(/-(100|90|80|70|60)(?:-|$)/)?.[1] || 60);
+  return 0;
+}
+
+function getComparisonCrystalSize(id) {
+  const text = String(id || "").toLowerCase();
+  if (text.includes("sans-tete")) return "";
+  if (text.includes("new-small") || text.includes("new-medium")) return "12 mm";
+  if (text.includes("classique-small-18")) return "18 mm";
+  if (text.includes("classique-small")) return "16 mm";
+  if (text.includes("classique-xl-35") || text.includes("classique-xxl-35")) return "35 mm";
+  if (text.includes("classique-xxxl")) return "50 mm";
+  return "27 mm";
+}
+
+function getAutomaticScaleComparisonModelIds() {
+  const params = new URLSearchParams(window.location.search);
+  const currentId = settings.modelId;
+  const currentMeta = getCatalogModelMeta(currentId, modelDefaults[currentId]?.title || currentId);
+  const ornament = params.get("ornament") || (currentMeta.ornamentFamilies[0] || "none");
+  const metalFamily = params.get("metalFamily") || (settings.metalPreset.startsWith("aluminum-") ? "alu" : "inox");
+  const metalFinish = params.get("metalFinish") || settings.metalPreset;
+  const withoutHead = params.get("classicHead") === "sans-tete" || currentId.includes("sans-tete");
+  const desiredCrystalSize = params.get("crystalSize") || getComparisonCrystalSize(currentId);
+  const candidates = Object.keys(modelDefaults).filter((id) => {
+    if (!id.startsWith("plug-") || id === "plug-decalcomanie") return false;
+    const meta = getCatalogModelMeta(id, modelDefaults[id]?.title || id);
+    if (meta.modelFamily !== currentMeta.modelFamily) return false;
+    if (meta.modelFamily === "Classique" && id.includes("sans-tete") !== withoutHead) return false;
+    if (!catalogModelSupportsMetalFinish(meta, metalFamily, metalFinish)) return false;
+    if (ornament === "none") return !meta.hasStone;
+    if (!catalogModelSupportsOrnament(meta, ornament, metalFamily)) return false;
+    if (["gem", "pressed-glass"].includes(ornament) && meta.modelFamily !== "Classique") {
+      return normalizeCatalogText(modelDefaults[id]?.title).includes("cabochon");
+    }
+    if (ornament === "crystal" && meta.modelFamily !== "Classique") {
+      return normalizeCatalogText(modelDefaults[id]?.title).includes("cristal");
+    }
+    return true;
+  });
+
+  const byDiameter = new Map();
+  candidates.forEach((id) => {
+    const diameter = getComparisonPlugDiameterMm(id);
+    if (!diameter) return;
+    const previous = byDiameter.get(diameter);
+    const sameCrystal = getComparisonCrystalSize(id) === desiredCrystalSize;
+    if (!previous || id === currentId || (sameCrystal && getComparisonCrystalSize(previous) !== desiredCrystalSize)) {
+      byDiameter.set(diameter, id);
+    }
+  });
+  if (currentId && modelDefaults[currentId]) byDiameter.set(getComparisonPlugDiameterMm(currentId), currentId);
+  return [...byDiameter.values()].sort((a, b) => getComparisonPlugDiameterMm(a) - getComparisonPlugDiameterMm(b));
+}
+
+function findModelSceneUnitsPerMillimeter(model, fallback) {
+  let value = Number(model.userData?.sceneUnitsPerMillimeter);
+  model.traverse((child) => {
+    if (!Number.isFinite(value) && Number.isFinite(child.userData?.sceneUnitsPerMillimeter)) {
+      value = child.userData.sceneUnitsPerMillimeter;
+    }
+  });
+  return Number.isFinite(value) && value > 0 ? value : fallback;
+}
+
+function preparePlugForScaleComparison(entry, unit, upright) {
+  const wrapper = new THREE.Group();
+  wrapper.name = entry.defaults?.title || entry.id;
+  wrapper.userData.catalogModelId = entry.id;
+  const model = entry.model;
+  const sourceUnit = findModelSceneUnitsPerMillimeter(model, unit);
+  model.scale.multiplyScalar(unit / sourceUnit);
+  wrapper.add(model);
+  wrapper.updateWorldMatrix(true, true);
+
+  let box = getVisibleMeshBox(wrapper);
+  let center = box.getCenter(new THREE.Vector3());
+  model.position.sub(center);
+  wrapper.updateWorldMatrix(true, true);
+  box = getVisibleMeshBox(wrapper);
+
+  if (upright) {
+    const size = box.getSize(new THREE.Vector3());
+    if (size.x >= size.z && size.x > size.y) wrapper.rotation.z = -Math.PI / 2;
+    else if (size.z > size.y) wrapper.rotation.x = -Math.PI / 2;
+    wrapper.updateWorldMatrix(true, true);
+
+    const gemBox = getModelMeshBox(wrapper, (mesh) => mesh.userData?.classicPlugRole === "gem");
+    box = getVisibleMeshBox(wrapper);
+    if (!isBoxEmpty(gemBox) && gemBox.getCenter(new THREE.Vector3()).y < box.getCenter(new THREE.Vector3()).y) {
+      wrapper.rotation.z += Math.PI;
+      wrapper.updateWorldMatrix(true, true);
+    }
+  }
+
+  box = getVisibleMeshBox(wrapper);
+  center = box.getCenter(new THREE.Vector3());
+  wrapper.position.x -= center.x;
+  wrapper.position.z -= center.z;
+  wrapper.position.y += floor.position.y - box.min.y;
+  wrapper.updateWorldMatrix(true, true);
+  wrapper.userData.plugDiameterMm = getComparisonPlugDiameterMm(entry.id);
+  return wrapper;
+}
+
+function arrangeAutomaticScaleComparison(entries, unit, upright) {
+  const group = new THREE.Group();
+  group.name = "Comparaison automatique des tailles de plugs";
+  const wrappers = entries
+    .map((entry) => preparePlugForScaleComparison(entry, unit, upright))
+    .sort((a, b) => a.userData.plugDiameterMm - b.userData.plugDiameterMm);
+  const gap = 20 * unit;
+  let cursor = 0;
+  let currentCenterX = 0;
+  wrappers.forEach((wrapper) => {
+    const box = getVisibleMeshBox(wrapper);
+    wrapper.position.x += cursor - box.min.x;
+    wrapper.updateWorldMatrix(true, true);
+    const movedBox = getVisibleMeshBox(wrapper);
+    if (wrapper.userData.catalogModelId === settings.modelId) currentCenterX = movedBox.getCenter(new THREE.Vector3()).x;
+    cursor = movedBox.max.x + gap;
+    group.add(wrapper);
+  });
+  group.position.x = -currentCenterX;
+  group.userData.comparisonSpacingMm = 20;
+  group.userData.comparisonUpright = upright;
+  return group;
+}
+
+async function makeAutomaticScaleComparison(unit, upright, request) {
+  const ids = getAutomaticScaleComparisonModelIds();
+  const entries = [];
+  for (let index = 0; index < ids.length; index += 1) {
+    showAuxiliaryProgress(8 + ((index + 1) / Math.max(ids.length, 1)) * 62, `Chargement du plug ${index + 1} sur ${ids.length}`);
+    const loaded = await loadLibraryModelDetached(ids[index]);
+    if (request !== scaleReferenceRequest) {
+      if (loaded?.model) disposeScaleReference(loaded.model);
+      continue;
+    }
+    if (loaded?.model) entries.push({ ...loaded, id: ids[index] });
+  }
+  if (!entries.length) throw new Error("Aucun modèle compatible à comparer");
+  const comparison = arrangeAutomaticScaleComparison(entries, unit, upright);
+  const params = new URLSearchParams(window.location.search);
+  const ornament = params.get("ornament");
+  const ornamentFinish = params.get("ornamentFinish");
+  if (ornament && ornamentFinish && ornament !== "none") {
+    applyCatalogGemPreset(ornament, ornamentFinish, { object: comparison, reason: "comparaison automatique des tailles" });
+  }
+  refreshComparisonGemRendering(comparison, { maxRayTraced: Math.min(2, entries.length) });
+  return comparison;
+}
+
+function syncScaleComparisonControls() {
+  const enabled = document.querySelector("#scale-reference-enabled")?.checked === true;
+  const compare = document.querySelector("#scale-reference-type")?.value === "compare";
+  const control = document.querySelector("#scale-comparison-upright-control");
+  if (control) control.hidden = !(enabled && compare);
 }
 
 function makeRulerTexture() {
@@ -7312,8 +7484,12 @@ function makeRulerReference(unit) {
 }
 
 function frameModelAndScaleReference() {
-  const box = getVisibleMeshBox(root);
-  if (scaleReferenceGroup.visible) box.union(new THREE.Box3().setFromObject(scaleReferenceGroup));
+  const box = scaleComparisonActive
+    ? getVisibleMeshBox(scaleReferenceGroup)
+    : getVisibleMeshBox(root);
+  if (!scaleComparisonActive && scaleReferenceGroup.visible) {
+    box.union(new THREE.Box3().setFromObject(scaleReferenceGroup));
+  }
   if (isBoxEmpty(box)) return;
   const size = box.getSize(new THREE.Vector3());
   const center = box.getCenter(new THREE.Vector3());
@@ -7328,6 +7504,8 @@ function frameModelAndScaleReference() {
 
 async function refreshScaleReference() {
   const request = ++scaleReferenceRequest;
+  root.visible = true;
+  scaleComparisonActive = false;
   clearScaleReference();
   const enabled = document.querySelector("#scale-reference-enabled")?.checked === true;
   const select = document.querySelector("#scale-reference-type");
@@ -7340,22 +7518,42 @@ async function refreshScaleReference() {
   }
   const unit = getSceneUnitsPerMillimeter();
   const type = select?.value || "coin";
+  syncScaleComparisonControls();
   let object;
   try {
+    if (type === "coin") showAuxiliaryProgress(5, "Chargement de la pièce de 1 euro");
     if (type === "bottle-1l") showAuxiliaryProgress(5, "Chargement de la bouteille 1 L");
-    object = type === "coin" ? makeCoinReference(unit)
-      : type === "bottle-1l" ? await makeBottleReference(unit) : makeRulerReference(unit);
+    if (type === "compare") showAuxiliaryProgress(5, "Préparation de la comparaison des tailles");
+    object = type === "coin" ? await makeCoinReference(unit)
+      : type === "bottle-1l" ? await makeBottleReference(unit)
+        : type === "compare" ? await makeAutomaticScaleComparison(
+          unit,
+          document.querySelector("#scale-comparison-upright")?.checked !== false,
+          request,
+        ) : makeRulerReference(unit);
   } catch (error) {
     if (request !== scaleReferenceRequest) return;
     scaleReferenceGroup.visible = false;
     document.querySelector("#scale-reference-enabled").checked = false;
     if (select) select.disabled = true;
-    finishAuxiliaryProgress("Bouteille indisponible");
-    showNotice("Le chargement de la bouteille a échoué. Vous pouvez réessayer.");
+    const referenceLabel = type === "coin" ? "Pièce de 1 euro"
+      : type === "compare" ? "Comparaison des tailles" : "Bouteille 1 L";
+    finishAuxiliaryProgress(`${referenceLabel} indisponible`);
+    showNotice(`Le chargement de l’objet « ${referenceLabel} » a échoué. Vous pouvez réessayer.`);
     logDebug("scale-reference", "Chargement impossible", { message: error.message });
     return;
   }
   if (request !== scaleReferenceRequest) { disposeScaleReference(object); return; }
+  if (type === "compare") {
+    root.visible = false;
+    scaleComparisonActive = true;
+    scaleReferenceGroup.add(object);
+    scaleReferenceGroup.updateWorldMatrix(true, true);
+    updateSoftStudioShadow(object, true);
+    frameModelAndScaleReference();
+    finishAuxiliaryProgress("Comparaison prête · jeu de 20 mm");
+    return;
+  }
   const modelBox = getVisibleMeshBox(root);
   const objectBox = new THREE.Box3().setFromObject(object);
   const margin = Math.max(unit * 12, 0.08);
@@ -7608,8 +7806,15 @@ function wireInterface() {
   document.querySelector("#decal-edit-mode")?.addEventListener("change", syncStemDecalEditMode);
   document.querySelector("#decal-reset-position")?.addEventListener("click", resetCurrentStemDecalPosition);
   document.querySelector("#toggle-ar")?.addEventListener("click", toggleCameraAR);
-  document.querySelector("#scale-reference-enabled")?.addEventListener("change", refreshScaleReference);
-  document.querySelector("#scale-reference-type")?.addEventListener("change", refreshScaleReference);
+  document.querySelector("#scale-reference-enabled")?.addEventListener("change", () => {
+    syncScaleComparisonControls();
+    refreshScaleReference();
+  });
+  document.querySelector("#scale-reference-type")?.addEventListener("change", () => {
+    syncScaleComparisonControls();
+    refreshScaleReference();
+  });
+  document.querySelector("#scale-comparison-upright")?.addEventListener("change", refreshScaleReference);
   document.querySelector("#download-view-png")?.addEventListener("click", downloadCurrentView);
   document.querySelector("#png-export-close")?.addEventListener("click", () => document.querySelector("#png-export-dialog")?.close());
   document.querySelector("#png-export-dialog")?.addEventListener("close", clearPngExport);

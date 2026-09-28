@@ -1,80 +1,87 @@
 # REPRISE DE SESSION
 
-NOM_SESSION_CIBLE : à calculer uniquement lors de la prochaine bascule de session
+NOM_SESSION_CIBLE : a calculer uniquement lors de la prochaine bascule de session
 CWD_SESSION : C:\Users\charl\Documents\CONFIGURATEUR DE BIJIOUX
 
 ## Projet
 Configurateur de bijoux Rosebuds : application Windows et site web autonome.
 
 ## Objectif global
-Maintenir le catalogue métier et le viewer Three.js, vérifier l'application Windows et publier la même version sur GitHub Pages.
+Maintenir le catalogue metier et le viewer Three.js, verifier l'application Windows et publier la meme version sur GitHub Pages.
 
-## Répertoire de travail
+## Repertoire de travail
 Sources et CWD identiques : `C:\Users\charl\Documents\CONFIGURATEUR DE BIJIOUX`.
 
 ## Branche Git
 `master`, origin `https://github.com/rsbds-3d/configurateur.git`. Aucun worktree.
 
 ## Version actuelle
-`v0.6-260923`, VERSION = `0.6`, cache `20260923-catalog-logo-v06`.
+`v0.7-260928`, VERSION = `0.7`, cache `20260928-scale-comparison-v07`.
 
-## État actuel
-Version v0.6 compilée, installée localement, publiée sur GitHub Pages et disponible dans une release avec son installateur.
+## Etat actuel
+Version v0.7 compilee, testee et reinstallee localement. Publication GitHub Pages et release v0.7 a terminer dans cette session.
 
-## Travail terminé
-- Catalogue : noms commerciaux anglais, XL 27/35 mm, NEW 12 mm, XL Plus et règles gemme/verre pressé.
-- Résultats déclinés par combinaison exacte de matériaux.
-- Décalcomanie prioritaire sur le maillage, glissement souris immédiat, appui long tactile et persistance par modèle.
-- Exports PNG avec filigranes ROSEBUDS diagonaux répétés.
-- Objet d'échelle `Bouteille_1L_cristal.glb`, hauteur 258,23 mm et chargement différé.
-- Ouverture `file:///` : reprise automatique sur HTTP ou aide si le serveur est arrêté.
-- Viewer XL vérifié visuellement : rendu provisoire visible et progression du lancer de rayons.
-- 32 tests Node réussis.
-- EXE et installateur v0.6 compilés ; installation locale code 0 ; HTTP 200 et version installée vérifiés.
+## Travail termine
+- Remplacement de l'objet d'echelle simplifie par le fichier exact `Piece_1_euro.glb`, texture et trois materiaux embarques conserves.
+- Dimensions physiques de la piece respectees : 23,25 mm de diametre et 2,33 mm d'epaisseur.
+- Ajout du mode `Comparer les tailles de plugs` dans la liste des objets d'echelle.
+- Comparaison limitee aux modeles compatibles avec la gamme, la tete, le metal, la finition et l'ornement courants ; seule la taille varie.
+- Tri de gauche a droite du plus petit au plus grand, taille courante entre les tailles inferieures et superieures, jeu physique de 20 mm.
+- Position verticale activee par defaut, ornement vers le haut et plugs poses au sol ; option desactivable.
+- Cadrage dedie de la rangee comparative et conservation d'une echelle physique commune entre modeles Rhino.
+- Version visible `v0.7-260928` dans les interfaces web et version PE `0.7.0.0` dans le lanceur Windows.
+- 33 tests Node reussis.
+- EXE et installateur v0.7 compiles ; v0.6 desinstallee, v0.7 installee, serveur local HTTP 200 et version installee verifies.
 
 ## Travail en cours
-- Aucun travail de livraison v0.6 restant.
+- Publier les sources et le site v0.7 sur GitHub.
+- Creer la release `v0.7-260928` avec l'installateur et verifier le deploiement distant.
 
-## Décisions prises
-- Le viewer nécessite HTTP/HTTPS ; `file:///` sert uniquement de point de reprise vers l'application locale.
+## Decisions prises
+- Utiliser exclusivement le GLB de piece fourni, jamais un substitut procedural ou une variante de visionneuse.
+- Reutiliser les memes reglages de materiaux et d'ornement pour les plugs compares, en ne variant que la taille.
+- Corriger la normalisation propre a chaque fichier Rhino afin de conserver les rapports d'echelle physiques entre plugs.
+- Le viewer necessite HTTP/HTTPS ; `file:///` sert uniquement de point de reprise vers l'application locale.
 - Conserver le shader BVH et un rendu PBR provisoire manipulable pendant les calculs.
-- Les captures des cartes montrent la géométrie ; libellés et pastilles distinguent les matériaux appliqués.
-- Utiliser uniquement la bouteille originale fournie, jamais la variante `visionneuse3D`.
 
 ## Fichiers importants
-`welcome.js`, `app.js`, `index.html`, `assets/js/decal-gesture.js`, `assets/js/png-watermark.js`, `assets/js/bottle-reference.js`, `assets/models/references/Bouteille_1L_cristal.glb`, `online/build-online.ps1`, `launcher/Program.cs`.
+`app.js`, `index.html`, `assets/js/coin-reference.js`, `assets/models/references/Piece_1_euro.glb`, `tests/coin-reference.test.cjs`, `tests/viewer-tools.test.cjs`, `online/build-online.ps1`, `launcher/Program.cs`.
 
 ## Commandes importantes
-- Tests : exécuter chaque `tests/*.test.cjs` avec Node.
+- Tests : executer chaque `tests/*.test.cjs` avec Node et controler `$LASTEXITCODE` apres chaque fichier.
 - Web : `powershell -NoProfile -ExecutionPolicy Bypass -File online/build-online.ps1`.
 - Lanceur : `powershell -NoProfile -ExecutionPolicy Bypass -File launcher/build-launcher.ps1`.
 - Inno : `C:\Program Files (x86)\Inno Setup 6\ISCC.exe`.
 
-## Problèmes connus
+## Problemes connus
 - La compilation GPU initiale peut rester longue selon la machine, mais le rendu provisoire reste visible.
-- Les poids du LLM et de Swin2SR sont téléchargés puis mis en cache, pas physiquement inclus.
-- Le rendu génératif ComfyUI complet n'est pas implémenté.
-- L'authentification GitHub Pages côté navigateur ne rend pas les ressources publiques confidentielles.
+- Une erreur shader ancienne liee a la decalcomanie et a `transmissionAlpha` peut encore apparaitre dans la console sans bloquer le rendu.
+- Les poids du LLM et de Swin2SR sont telecharges puis mis en cache, pas physiquement inclus.
+- Le rendu generatif ComfyUI complet n'est pas implemente.
+- L'authentification GitHub Pages cote navigateur ne rend pas les ressources publiques confidentielles.
 
-## Tests réalisés
-- 32 tests réussis le 23 septembre 2026.
-- Viewer XL local et installé contrôlé visuellement sans écran noir.
-- EXE source/installé : SHA-256 `9277490B767F5E90F0151E3D2DD51437482057A162C414BEB01690941DDC9EE1`.
-- Installateur : SHA-256 `0C02571FD6448195B76F0B1FA8E335B51868B53B5160B7B2A6B71C99440BB1F0`.
-- GitHub Pages : run `35925710465` réussi, site public HTTP 200 et ressources v0.6 vérifiées.
-- Release : `https://github.com/rsbds-3d/configurateur/releases/tag/v0.6-260923`, empreinte distante identique.
+## Tests realises
+- 33 tests Node reussis le 28 septembre 2026.
+- Piece GLB et rangee comparative controlees visuellement dans le viewer local.
+- EXE : SHA-256 `BAAD9CCCF453A290E258ECD2CED407659F8F3DD8C15B561FC2DD4B2D22D231FD`.
+- Installateur : SHA-256 `6600E8644EE37BA528C3A29E0ACEE1E16FACDC951FAFB33A67110840FD5B2F94`.
+- Piece GLB source, paquet web et installation : SHA-256 `2A84249F3D7C504B6B694AE28FC8F475294E67E831EF66E44769F2F00219A6B7`.
+- Installation locale : code 0, HTTP 200, en-tete `v0.7-260928`, VERSION `0.7`, controles `Comparer` et `Plugs verticaux` presents.
 
-## Tests restant à faire
-- Téléphone réel : geste tactile, AR caméra et partage natif PNG.
-- Mesures de performance sur plusieurs GPU et téléphones.
+## Tests restant a faire
+- Verifier le workflow GitHub Actions et le site public v0.7 apres publication.
+- Verifier l'empreinte de l'installateur telecharge depuis la release.
+- Telephone reel : geste tactile, AR camera et partage natif PNG.
+- Mesures de performance sur plusieurs GPU et telephones.
 
 ## Prochaines actions prioritaires
-1. Recueillir les retours d'usage sur mobile et sur les GPU plus lents.
-2. Mesurer les temps de compilation du lancer de rayons sur plusieurs appareils.
-3. Poursuivre les améliorations fonctionnelles demandées dans une prochaine version.
+1. Examiner le diff, commiter et pousser la v0.7 sur `master`.
+2. Attendre le succes du deploiement GitHub Pages et verifier les ressources publiques.
+3. Creer la release `v0.7-260928` avec l'installateur puis verifier son empreinte distante.
+4. Completer ce fichier et le journal avec les identifiants de publication.
 
 ## Interdictions / points de vigilance
-Aucun reset destructif, nouveau worktree ou changement de branche. Ne pas annoncer ComfyUI, une authentification serveur forte ou les tests mobiles comme terminés.
+Aucun reset destructif, nouveau worktree ou changement de branche. Ne pas annoncer ComfyUI, une authentification serveur forte ou les tests mobiles comme termines.
 
-## Dernière demande utilisateur
-Corriger l'écran noir du viewer 3D puis continuer la finalisation.
+## Derniere demande utilisateur
+Ajouter la comparaison des plugs par taille avec orientation verticale et 20 mm de jeu, puis continuer jusqu'a la livraison complete.

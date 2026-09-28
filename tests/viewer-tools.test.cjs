@@ -16,10 +16,16 @@ assert(app.includes("smoothMetalMeshesForOptimizedRender"), "Le lissage du méta
 assert(app.includes("showAuxiliaryProgress"), "Le calcul optimisé doit publier sa progression en bas de page.");
 
 assert(html.includes('id="scale-reference-enabled"'), "Le viewer doit permettre d'activer un objet d'échelle.");
-for (const value of ["coin", "bottle-1l", "ruler"]) {
+for (const value of ["coin", "bottle-1l", "ruler", "compare"]) {
   assert(html.includes(`value="${value}"`), `L'objet de comparaison ${value} doit être disponible.`);
 }
 assert(app.includes("sceneUnitsPerMillimeter"), "Les objets d'échelle doivent respecter l'échelle physique du modèle.");
+assert(app.includes('loadAsync("./assets/models/references/Piece_1_euro.glb")'), "La pièce d'échelle doit utiliser le GLB détaillé fourni.");
+assert(app.includes("createCoinReference"), "La pièce GLB doit être préparée dans un module testable dédié.");
+assert(html.includes('id="scale-comparison-upright"'), "La comparaison doit proposer la position verticale des plugs.");
+assert(app.includes("comparisonSpacingMm = 20"), "La comparaison automatique doit conserver un jeu physique de 20 mm.");
+assert(app.includes("getAutomaticScaleComparisonModelIds"), "Les tailles compatibles doivent être sélectionnées automatiquement.");
+assert(app.includes("root.visible = false"), "Le plug isolé doit être remplacé par la rangée comparative.");
 assert(app.includes("makeRulerReference"), "Une règle graduée de 20 cm doit être générée.");
 
 assert(html.includes('id="download-view-png"'), "Le téléchargement PNG doit être proposé.");
