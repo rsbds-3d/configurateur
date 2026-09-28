@@ -19,7 +19,7 @@ Sources et CWD identiques : `C:\Users\charl\Documents\CONFIGURATEUR DE BIJIOUX`.
 `v0.7-260928`, VERSION = `0.7`, cache `20260928-scale-comparison-v07`.
 
 ## Etat actuel
-Version v0.7 compilee, testee et reinstallee localement. Publication GitHub Pages et release v0.7 a terminer dans cette session.
+Version v0.7 compilee, testee, reinstallee localement et publiee sur GitHub Pages avec une release contenant son installateur.
 
 ## Travail termine
 - Remplacement de l'objet d'echelle simplifie par le fichier exact `Piece_1_euro.glb`, texture et trois materiaux embarques conserves.
@@ -32,10 +32,10 @@ Version v0.7 compilee, testee et reinstallee localement. Publication GitHub Page
 - Version visible `v0.7-260928` dans les interfaces web et version PE `0.7.0.0` dans le lanceur Windows.
 - 33 tests Node reussis.
 - EXE et installateur v0.7 compiles ; v0.6 desinstallee, v0.7 installee, serveur local HTTP 200 et version installee verifies.
+- Sources poussees dans le commit `5cff576`, deploiement GitHub Pages `36482122738` reussi et release `v0.7-260928` publiee.
 
 ## Travail en cours
-- Publier les sources et le site v0.7 sur GitHub.
-- Creer la release `v0.7-260928` avec l'installateur et verifier le deploiement distant.
+- Aucun travail de livraison v0.7 restant.
 
 ## Decisions prises
 - Utiliser exclusivement le GLB de piece fourni, jamais un substitut procedural ou une variante de visionneuse.
@@ -67,18 +67,17 @@ Version v0.7 compilee, testee et reinstallee localement. Publication GitHub Page
 - Installateur : SHA-256 `6600E8644EE37BA528C3A29E0ACEE1E16FACDC951FAFB33A67110840FD5B2F94`.
 - Piece GLB source, paquet web et installation : SHA-256 `2A84249F3D7C504B6B694AE28FC8F475294E67E831EF66E44769F2F00219A6B7`.
 - Installation locale : code 0, HTTP 200, en-tete `v0.7-260928`, VERSION `0.7`, controles `Comparer` et `Plugs verticaux` presents.
+- GitHub Pages : run `36482122738` reussi, site public HTTP 200 et ressources v0.7 verifiees.
+- Release : `https://github.com/rsbds-3d/configurateur/releases/tag/v0.7-260928`, digest distant de l'installateur identique.
 
 ## Tests restant a faire
-- Verifier le workflow GitHub Actions et le site public v0.7 apres publication.
-- Verifier l'empreinte de l'installateur telecharge depuis la release.
 - Telephone reel : geste tactile, AR camera et partage natif PNG.
 - Mesures de performance sur plusieurs GPU et telephones.
 
 ## Prochaines actions prioritaires
-1. Examiner le diff, commiter et pousser la v0.7 sur `master`.
-2. Attendre le succes du deploiement GitHub Pages et verifier les ressources publiques.
-3. Creer la release `v0.7-260928` avec l'installateur puis verifier son empreinte distante.
-4. Completer ce fichier et le journal avec les identifiants de publication.
+1. Recueillir les retours d'usage sur la comparaison des tailles et les objets d'echelle.
+2. Tester sur telephone reel le tactile, l'AR et le partage natif PNG.
+3. Mesurer les performances sur plusieurs GPU et telephones.
 
 ## Interdictions / points de vigilance
 Aucun reset destructif, nouveau worktree ou changement de branche. Ne pas annoncer ComfyUI, une authentification serveur forte ou les tests mobiles comme termines.
