@@ -4,7 +4,7 @@ Version : **v0.10-260929**
 
 | Date | Travail | État | Durée |
 |---|---|---|---|
-| 2026-09-29 | v0.10 : remplacement contrôlé des 37 modèles 3DM optimisés, audit de tessellation, cache-buster et extension du glissement du logo à toute la surface | 35 tests, paquet web, EXE, installateur et réinstallation locale validés ; publication en cours | Non mesurée |
+| 2026-09-29 | v0.10 : remplacement contrôlé des 37 modèles 3DM optimisés, audit de tessellation, cache-buster et extension du glissement du logo à toute la surface | 35 tests, paquet web, EXE, installateur, réinstallation et publication GitHub validés | Non mesurée |
 | 2026-09-29 | Règle GLB parallèle au plug ; bouteille par défaut ; comparaison verticale inversée, arc réglable, centrage et halo du plug courant | Code, tests et contrôle visuel effectués ; livraison en cours | Non mesurée |
 | 2026-09-28 | Pièce de 1 euro GLB détaillée ; comparaison automatique des tailles à échelle commune, jeu 20 mm, pose au sol et orientation verticale | Code, 33 tests et contrôle visuel effectués | Non mesurée |
 | 2026-09-22 | Catalogue : règles, noms, XL Plus, 12 mm, variantes ; exports filigranés ; correction glisser logo | Code et tests effectués | Non mesurée |

@@ -19,7 +19,7 @@ Sources et CWD identiques : `C:\Users\charl\Documents\CONFIGURATEUR DE BIJIOUX`.
 `v0.10-260929`, VERSION = `0.10`, cache interface `20260929-optimized-3dm-decal-v10`, cache geometrie `20260929-optimized-3dm-v10`.
 
 ## Etat actuel
-Les 37 nouveaux modeles 3DM sont integres, controles et installes. Les tests, le paquet web, l'EXE et l'installateur sont valides. Publication GitHub en cours au moment de cette mise a jour.
+La v0.10 est integree, testee, reinstallee et publiee. Les 37 nouveaux modeles 3DM et la course complete du logo sont disponibles localement et sur GitHub Pages.
 
 ## Travail termine
 - Association explicite des 37 sources aux 37 identifiants et cibles du catalogue.
@@ -32,9 +32,12 @@ Les 37 nouveaux modeles 3DM sont integres, controles et installes. Les tests, le
 - 35 tests Node reussis.
 - Paquet web autonome, lanceur PE 0.10.0.0 et installateur v0.10 generes.
 - v0.9 desinstallee puis v0.10 installee : HTTP 200, version visible, en-tete v0.10 et 37 empreintes installees conformes.
+- Commit `937f301` pousse sur master ; workflow GitHub Pages `36589354021` reussi.
+- Site public v0.10 controle : HTML courant et trois modeles representatifs strictement conformes.
+- Release `v0.10-260929` publiee avec installateur de 25 457 401 octets et digest conforme.
 
 ## Travail en cours
-- Commit, push, deploiement GitHub Pages et release Windows v0.10.
+Aucun travail requis pour la livraison v0.10. Les essais physiques sur telephone restent un controle materiel ulterieur.
 
 ## Decisions prises
 - Conserver la topologie fonctionnelle des fichiers Rhino et utiliser leurs nouveaux maillages de rendu plus denses sans subdivision Three.js supplementaire par defaut.
@@ -67,14 +70,16 @@ Les 37 nouveaux modeles 3DM sont integres, controles et installes. Les tests, le
 - Lanceur SHA-256 : `B638F6D49EDB5E6386F9289DEAD4C3DB99D21A2F3E2700E0C56843F303155887`.
 - Installateur SHA-256 : `C7A7BF464F4B1A61C43453E97BA4352FAAF9554B308100E354E1CC804CFE0451`.
 - Installation locale : PE 0.10.0.0, VERSION 0.10, HTTP 200, en-tete v0.10 et 37 modeles conformes.
+- GitHub Pages : workflow `36589354021` reussi ; Originale XL Plus sans tete, NEW MEDIUM 35 cristal et NEW SMALL cristal verifies par SHA-256 depuis le site public.
+- Release : `https://github.com/rsbds-3d/configurateur/releases/tag/v0.10-260929`, digest distant conforme.
 
 ## Tests restant a faire
 - Telephone reel : geste tactile, AR camera et partage natif PNG.
 
 ## Prochaines actions prioritaires
-1. Terminer la publication GitHub Pages et la release v0.10.
-2. Tester sur un telephone reel les gestes tactiles, l'AR camera et le partage PNG.
-3. Profiler la charge GPU des maillages 3DM plus denses sur appareils modestes.
+1. Tester sur un telephone reel les gestes tactiles, l'AR camera et le partage PNG.
+2. Profiler la charge GPU des maillages 3DM plus denses sur appareils modestes.
+3. Recueillir le retour utilisateur sur les silhouettes et reflets des nouveaux maillages.
 
 ## Interdictions / points de vigilance
 Aucun reset destructif, nouveau worktree ou changement de branche. Ne pas melanger les fichiers portant des noms proches. Ne pas annoncer les tests mobiles comme termines.
