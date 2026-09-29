@@ -16,10 +16,10 @@ Sources et CWD identiques : `C:\Users\charl\Documents\CONFIGURATEUR DE BIJIOUX`.
 `master`, origin `https://github.com/rsbds-3d/configurateur.git`. Aucun worktree.
 
 ## Version actuelle
-`v0.8-260929`, VERSION = `0.8`, cache `20260929-ruler-reference-v08`.
+`v0.9-260929`, VERSION = `0.9`, cache `20260929-scale-orientation-v09`.
 
 ## Etat actuel
-Version v0.8 compilee, testee, reinstallee localement et publiee. Le site GitHub Pages et la release Windows ont ete verifies.
+Version v0.9 compilee, testee et reinstallee localement. La publication GitHub Pages et la release Windows restent a verifier.
 
 ## Travail termine
 - Remplacement de la regle procedurale par le fichier original `Regle_20cm_ROSEBUDS.glb` fourni.
@@ -32,14 +32,24 @@ Version v0.8 compilee, testee, reinstallee localement et publiee. Le site GitHub
 - Commit source `6994dfb` pousse sur `master` ; workflow GitHub Pages `36525144113` termine avec succes.
 - Site public v0.8 controle : HTTP 200, version visible correcte et GLB public strictement identique a la source.
 - Release `v0.8-260929` publiee avec l'installateur et digest distant verifie.
+- Bouteille 1 L definie comme objet d'echelle par defaut et regle placee parallelement au plug.
+- Sens vertical corrige : tete/pierre en bas, ogive en haut, plugs poses sur le sol.
+- Comparaison en arc activee par defaut, rayon reglable de 250 a 2 000 mm, ligne droite disponible.
+- Plug courant centre comme pivot de l'orbite et distingue par un halo fuchsia ; panoramique verrouille pendant la comparaison.
+- Controle visuel local du tri, de l'arc, de l'orientation, du centrage et du halo.
+- 34 tests reussis ; paquet web, lanceur et installateur v0.9 compiles.
+- v0.8 desinstallee puis v0.9 installee : EXE 0.9.0.0, VERSION 0.9, HTTP 200 et en-tete v0.9 verifies.
 
 ## Travail en cours
-Aucun travail requis pour la livraison v0.8. Les essais physiques sur telephone restent un controle materiel ulterieur.
+Publier la v0.9 sur GitHub Pages et creer la release Windows. Les essais physiques sur telephone restent un controle materiel ulterieur.
 
 ## Decisions prises
 - Utiliser exclusivement la regle GLB originale fournie, jamais une geometrie procedurale simplifiee.
 - Conserver la longueur exterieure reelle de 210 mm ; la graduation utile mesure 200 mm.
 - Les objets d'echelle sont charges uniquement a la demande et conservent leur propre materiau.
+- La bouteille est le choix par defaut ; la regle suit l'axe principal horizontal du plug.
+- En comparaison, la tete et la pierre restent en bas, l'ogive en haut ; l'arc de 600 mm est active par defaut.
+- La camera pivote autour du plug courant, qui reste centre et signale par un halo.
 - Le viewer necessite HTTP/HTTPS ; `file:///` sert uniquement de point de reprise vers l'application locale.
 
 ## Fichiers importants
@@ -60,6 +70,10 @@ Aucun travail requis pour la livraison v0.8. Les essais physiques sur telephone 
 
 ## Tests realises
 - 34 tests Node reussis le 29 septembre 2026.
+- Controle visuel local du comparatif en arc : orientation, sol, centrage et halo conformes.
+- Lanceur v0.9 : SHA-256 `21A1AB700D89C18BFE7210F45CED003C52D03C6819F7935E507A8113B0CD3413`.
+- Installateur v0.9 : SHA-256 `043AA5F52FE56D5278B8B09F8923AB16E31F70CD38800FE99D8FEAAA11CA0E37`.
+- Installation locale v0.9 : codes 0, EXE 0.9.0.0, VERSION 0.9, HTTP 200, en-tete v0.9.
 - Regle GLB controlee visuellement dans le viewer local, avec graduations et marquage visibles.
 - EXE : SHA-256 `F480645E998157D05871229EE1C54B79A96A750C212F7B40EBCEDB15F0ED0443`.
 - Installateur : SHA-256 `4F6F32D56D8B4654729A7A9C70415D6325AFF67A32FC0026DAB5E8EF38BA3822`.
@@ -73,12 +87,12 @@ Aucun travail requis pour la livraison v0.8. Les essais physiques sur telephone 
 - Telephone reel : geste tactile, AR camera et partage natif PNG.
 
 ## Prochaines actions prioritaires
-1. Recueillir le retour utilisateur sur la taille et la position de la regle dans le viewer.
-2. Tester sur un telephone reel les gestes tactiles, l'AR camera et le partage PNG.
-3. Traiter separement les optimisations GPU et l'ancienne erreur shader de decalcomanie.
+1. Executer les 34 tests, compiler le web, le lanceur et l'installateur v0.9.
+2. Reinstaller localement puis publier GitHub Pages et la release v0.9.
+3. Tester sur un telephone reel les gestes tactiles, l'AR camera et le partage PNG.
 
 ## Interdictions / points de vigilance
 Aucun reset destructif, nouveau worktree ou changement de branche. Ne pas annoncer ComfyUI, une authentification serveur forte ou les tests mobiles comme termines.
 
 ## Derniere demande utilisateur
-Remplacer la regle simpliste de l'objet d'echelle par le fichier `Regle_20cm_ROSEBUDS.glb` fourni, puis continuer jusqu'a la livraison complete.
+Dans le comparatif, mettre le plug courant en surbrillance, centrer la camera et l'orbite sur lui, puis proposer par defaut une disposition en arc avec rayon reglable.

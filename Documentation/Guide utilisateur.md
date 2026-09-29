@@ -1,6 +1,6 @@
 # Guide utilisateur - Configurateur de bijoux
 
-Version : **v0.8-260929**
+Version : **v0.9-260929**
 
 ## Objectif
 
@@ -59,9 +59,10 @@ Les noms de couleurs de cristal conservent leur appellation commerciale d'origin
 - `Voir en AR` : active la caméra et place le plug devant le flux vidéo. Le rendu métallique conserve les mêmes matériaux PBR, l'environnement et l'exposition que le viewer normal.
 - Glisser directement à la souris sur le logo ROSEBUDS : déplace la décalcomanie sur la tige sans sélectionner le métal ni faire tourner le plug. Sur écran tactile, maintenir un appui long avant de glisser. Sa position est mémorisée séparément pour chaque modèle dans ce navigateur et sur cette adresse du site. Échap annule le déplacement en cours.
 - `Rendu optimisé` : lisse temporairement les métaux, capture la vue en haute définition et applique, lorsqu'il est disponible, le modèle open source Swin2SR dans un worker local.
-- `Objet d'échelle` : affiche la pièce de 1 euro détaillée fournie, une bouteille détaillée de 1 L ou la règle ROSEBUDS graduée à la même échelle que le plug. La pièce conserve ses faces, sa tranche et sa texture ; elle mesure 23,25 mm de diamètre sur 2,33 mm d'épaisseur. La bouteille mesure environ 258,23 mm de haut. La règle conserve son corps translucide, ses graduations et sa semelle marquée ROSEBUDS ; sa longueur extérieure est de 210 mm pour 200 mm gradués, avec une largeur de 32 mm. Ces modèles se chargent uniquement à la demande.
-- `Comparer les tailles de plugs` : remplace temporairement le plug isolé par toutes les tailles compatibles avec la gamme, la tête, le métal, la finition et l'ornement courants. La rangée va du plus petit au plus grand, le modèle étudié reste entre ses tailles inférieures et supérieures, et les volumes sont séparés par un jeu physique de 20 mm.
-- `Plugs verticaux` : place par défaut les plugs de la comparaison sur le sol, avec le côté ornement vers le haut. Décochez la case pour conserver leur orientation couchée.
+- `Objet d'échelle` : affiche par défaut la bouteille détaillée de 1 L, ou permet de choisir la pièce de 1 euro détaillée et la règle ROSEBUDS graduée. La pièce conserve ses faces, sa tranche et sa texture ; elle mesure 23,25 mm de diamètre sur 2,33 mm d'épaisseur. La bouteille mesure environ 258,23 mm de haut. La règle conserve son corps translucide, ses graduations et sa semelle marquée ROSEBUDS ; sa longueur extérieure est de 210 mm pour 200 mm gradués, avec une largeur de 32 mm. Elle est automatiquement placée parallèlement à l'axe du plug. Ces modèles se chargent uniquement à la demande.
+- `Comparer les tailles de plugs` : remplace temporairement le plug isolé par toutes les tailles compatibles avec la gamme, la tête, le métal, la finition et l'ornement courants. Les tailles vont du plus petit au plus grand avec un jeu physique de 20 mm. Le modèle étudié reste au centre, sert de pivot à la rotation de vue et reçoit un halo fuchsia.
+- `Ogive en haut, tête en bas` : pose par défaut tous les plugs verticalement sur leur tête ou leur pierre, avec l'ogive dirigée vers le haut. Décochez la case pour conserver leur orientation couchée.
+- `Disposition en arc` : activée par défaut pendant la comparaison. Le curseur `Rayon` règle la courbure de l'arc de 250 à 2 000 mm. Décochez l'option pour revenir à une rangée droite.
 
 ### Dépannage du viewer noir
 

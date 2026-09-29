@@ -13,7 +13,7 @@ function assert(condition, message) {
   }
 }
 
-assert(logicalVersion === "0.8", "La version logique attendue est 0.8.");
+assert(logicalVersion === "0.9", "La version logique attendue est 0.9.");
 assert((html.match(new RegExp(displayVersion.replaceAll(".", "\\."), "g")) || []).length >= 2, "La version doit être visible sur l'accueil et dans le viewer.");
 
 console.log("Version display regression test OK");

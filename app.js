@@ -16,7 +16,7 @@ import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js"
 import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
 import { MeshoptDecoder } from "meshoptimizer";
 import { buildBVHInWorker, compileBeforeSwap, abortError } from "./assets/js/diamond/background-bvh.js";
-import { attachDecalGesture } from "./assets/js/decal-gesture.js?v=20260929-ruler-reference-v08";
+import { attachDecalGesture } from "./assets/js/decal-gesture.js?v=20260929-scale-orientation-v09";
 import { watermarkPngBlob } from "./assets/js/png-watermark.js";
 import { createBottleReference } from "./assets/js/bottle-reference.js";
 import { createCoinReference } from "./assets/js/coin-reference.js";
@@ -7227,6 +7227,7 @@ function getSceneUnitsPerMillimeter() {
 
 function clearScaleReference() {
   scaleReferenceGroup.traverse((child) => {
+    child.userData?.ownedTexture?.dispose?.();
     child.geometry?.dispose?.();
     if (Array.isArray(child.material)) child.material.forEach((material) => material?.dispose?.());
     else child.material?.dispose?.();
@@ -7363,16 +7364,18 @@ function preparePlugForScaleComparison(entry, unit, upright) {
 
   if (upright) {
     const size = box.getSize(new THREE.Vector3());
-    if (size.x >= size.z && size.x > size.y) wrapper.rotation.z = -Math.PI / 2;
+    if (size.x >= size.z && size.x > size.y) wrapper.rotation.z = Math.PI / 2;
     else if (size.z > size.y) wrapper.rotation.x = -Math.PI / 2;
     wrapper.updateWorldMatrix(true, true);
 
     const gemBox = getModelMeshBox(wrapper, (mesh) => mesh.userData?.classicPlugRole === "gem");
     box = getVisibleMeshBox(wrapper);
-    if (!isBoxEmpty(gemBox) && gemBox.getCenter(new THREE.Vector3()).y < box.getCenter(new THREE.Vector3()).y) {
+    // La pierre appartient au cote tete : elle doit rester sous l'ogive en position verticale.
+    if (!isBoxEmpty(gemBox) && gemBox.getCenter(new THREE.Vector3()).y > box.getCenter(new THREE.Vector3()).y) {
       wrapper.rotation.z += Math.PI;
       wrapper.updateWorldMatrix(true, true);
     }
+    wrapper.userData.verticalPose = "ogive-up-head-down";
   }
 
   box = getVisibleMeshBox(wrapper);
@@ -7385,31 +7388,115 @@ function preparePlugForScaleComparison(entry, unit, upright) {
   return wrapper;
 }
 
-function arrangeAutomaticScaleComparison(entries, unit, upright) {
+function addCurrentPlugHighlight(group, wrapper, unit) {
+  wrapper.userData.currentComparisonPlug = true;
+  const box = getVisibleMeshBox(wrapper);
+  const center = box.getCenter(new THREE.Vector3());
+  const localCenter = group.worldToLocal(center.clone());
+  const size = box.getSize(new THREE.Vector3());
+  const haloRadius = Math.max(size.x, size.z, 26 * unit) * 1.18;
+  const halo = new THREE.Mesh(
+    new THREE.RingGeometry(haloRadius * 0.68, haloRadius, 64),
+    new THREE.MeshBasicMaterial({
+      color: "#ff2d86",
+      transparent: true,
+      opacity: 0.62,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    }),
+  );
+  halo.name = "Halo du plug courant";
+  halo.rotation.x = -Math.PI / 2;
+  halo.position.set(localCenter.x, floor.position.y + Math.max(0.012, unit * 0.8), localCenter.z);
+  halo.userData.nonMaterialEditable = true;
+
+  const glowCanvas = document.createElement("canvas");
+  glowCanvas.width = 128;
+  glowCanvas.height = 128;
+  const glowContext = glowCanvas.getContext("2d");
+  const glowGradient = glowContext.createRadialGradient(64, 64, 10, 64, 64, 64);
+  glowGradient.addColorStop(0, "rgba(255, 45, 134, 0.62)");
+  glowGradient.addColorStop(0.46, "rgba(255, 45, 134, 0.24)");
+  glowGradient.addColorStop(1, "rgba(255, 45, 134, 0)");
+  glowContext.fillStyle = glowGradient;
+  glowContext.fillRect(0, 0, 128, 128);
+  const glowTexture = new THREE.CanvasTexture(glowCanvas);
+  glowTexture.colorSpace = THREE.SRGBColorSpace;
+  const glow = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: glowTexture,
+    color: "#ff5b9f",
+    transparent: true,
+    opacity: 0.82,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    depthTest: true,
+  }));
+  const glowSize = Math.max(size.x, size.y, size.z, unit * 45) * 1.55;
+  glow.name = "Halo lumineux du plug courant";
+  glow.position.copy(localCenter);
+  glow.scale.set(glowSize, glowSize, 1);
+  glow.userData.nonMaterialEditable = true;
+  glow.userData.ownedTexture = glowTexture;
+
+  const light = new THREE.PointLight("#ff6bad", 12, Math.max(size.length() * 3.2, unit * 240), 2);
+  light.name = "Lumière du plug courant";
+  light.position.set(localCenter.x, localCenter.y + size.y * 0.12, localCenter.z);
+  group.add(halo, glow, light);
+  group.userData.currentPlug = wrapper;
+  group.userData.currentPlugCenter = center.clone();
+}
+
+function arrangeAutomaticScaleComparison(entries, unit, upright, arcEnabled, arcRadiusMm) {
   const group = new THREE.Group();
   group.name = "Comparaison automatique des tailles de plugs";
   const wrappers = entries
     .map((entry) => preparePlugForScaleComparison(entry, unit, upright))
     .sort((a, b) => a.userData.plugDiameterMm - b.userData.plugDiameterMm);
   const gap = 20 * unit;
-  let cursor = 0;
-  let currentCenterX = 0;
-  wrappers.forEach((wrapper) => {
-    const box = getVisibleMeshBox(wrapper);
-    wrapper.position.x += cursor - box.min.x;
-    wrapper.updateWorldMatrix(true, true);
-    const movedBox = getVisibleMeshBox(wrapper);
-    if (wrapper.userData.catalogModelId === settings.modelId) currentCenterX = movedBox.getCenter(new THREE.Vector3()).x;
-    cursor = movedBox.max.x + gap;
-    group.add(wrapper);
-  });
-  group.position.x = -currentCenterX;
+  const currentIndex = Math.max(0, wrappers.findIndex((wrapper) => wrapper.userData.catalogModelId === settings.modelId));
+  const widths = wrappers.map((wrapper) => getVisibleMeshBox(wrapper).getSize(new THREE.Vector3()).x);
+  if (arcEnabled) {
+    const radius = Math.max(Number(arcRadiusMm) || 600, 250) * unit;
+    const angles = new Array(wrappers.length).fill(0);
+    for (let index = currentIndex + 1; index < wrappers.length; index += 1) {
+      angles[index] = angles[index - 1] + (widths[index - 1] * 0.5 + gap + widths[index] * 0.5) / radius;
+    }
+    for (let index = currentIndex - 1; index >= 0; index -= 1) {
+      angles[index] = angles[index + 1] - (widths[index + 1] * 0.5 + gap + widths[index] * 0.5) / radius;
+    }
+    wrappers.forEach((wrapper, index) => {
+      const angle = angles[index];
+      wrapper.position.x += radius * Math.sin(angle);
+      wrapper.position.z += radius * (1 - Math.cos(angle));
+      wrapper.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), -angle);
+      wrapper.updateWorldMatrix(true, true);
+      group.add(wrapper);
+    });
+    group.userData.comparisonArcRadiusMm = Number(arcRadiusMm) || 600;
+  } else {
+    let cursor = 0;
+    let currentCenterX = 0;
+    wrappers.forEach((wrapper) => {
+      const box = getVisibleMeshBox(wrapper);
+      wrapper.position.x += cursor - box.min.x;
+      wrapper.updateWorldMatrix(true, true);
+      const movedBox = getVisibleMeshBox(wrapper);
+      if (wrapper.userData.catalogModelId === settings.modelId) currentCenterX = movedBox.getCenter(new THREE.Vector3()).x;
+      cursor = movedBox.max.x + gap;
+      group.add(wrapper);
+    });
+    group.position.x = -currentCenterX;
+  }
+  group.updateWorldMatrix(true, true);
+  addCurrentPlugHighlight(group, wrappers[currentIndex], unit);
   group.userData.comparisonSpacingMm = 20;
   group.userData.comparisonUpright = upright;
+  group.userData.comparisonArc = arcEnabled;
   return group;
 }
 
-async function makeAutomaticScaleComparison(unit, upright, request) {
+async function makeAutomaticScaleComparison(unit, upright, arcEnabled, arcRadiusMm, request) {
   const ids = getAutomaticScaleComparisonModelIds();
   const entries = [];
   for (let index = 0; index < ids.length; index += 1) {
@@ -7422,7 +7509,7 @@ async function makeAutomaticScaleComparison(unit, upright, request) {
     if (loaded?.model) entries.push({ ...loaded, id: ids[index] });
   }
   if (!entries.length) throw new Error("Aucun modèle compatible à comparer");
-  const comparison = arrangeAutomaticScaleComparison(entries, unit, upright);
+  const comparison = arrangeAutomaticScaleComparison(entries, unit, upright, arcEnabled, arcRadiusMm);
   const params = new URLSearchParams(window.location.search);
   const ornament = params.get("ornament");
   const ornamentFinish = params.get("ornamentFinish");
@@ -7436,8 +7523,43 @@ async function makeAutomaticScaleComparison(unit, upright, request) {
 function syncScaleComparisonControls() {
   const enabled = document.querySelector("#scale-reference-enabled")?.checked === true;
   const compare = document.querySelector("#scale-reference-type")?.value === "compare";
-  const control = document.querySelector("#scale-comparison-upright-control");
-  if (control) control.hidden = !(enabled && compare);
+  const active = enabled && compare;
+  const uprightControl = document.querySelector("#scale-comparison-upright-control");
+  const arcControl = document.querySelector("#scale-comparison-arc-control");
+  const radiusControl = document.querySelector("#scale-comparison-radius-control");
+  if (uprightControl) uprightControl.hidden = !active;
+  if (arcControl) arcControl.hidden = !active;
+  if (radiusControl) radiusControl.hidden = !(active && document.querySelector("#scale-comparison-arc")?.checked !== false);
+}
+
+function getHorizontalPrincipalAxisAngle(object) {
+  object.updateWorldMatrix(true, true);
+  let count = 0;
+  let meanX = 0;
+  let meanZ = 0;
+  let covarianceXX = 0;
+  let covarianceXZ = 0;
+  let covarianceZZ = 0;
+  const point = new THREE.Vector3();
+  object.traverse((child) => {
+    if (!child.isMesh || !child.visible) return;
+    const position = child.geometry?.attributes?.position;
+    if (!position?.count) return;
+    const stride = Math.max(1, Math.ceil(position.count / 1024));
+    for (let index = 0; index < position.count; index += stride) {
+      point.fromBufferAttribute(position, index).applyMatrix4(child.matrixWorld);
+      count += 1;
+      const deltaX = point.x - meanX;
+      const deltaZ = point.z - meanZ;
+      meanX += deltaX / count;
+      meanZ += deltaZ / count;
+      covarianceXX += deltaX * (point.x - meanX);
+      covarianceXZ += deltaX * (point.z - meanZ);
+      covarianceZZ += deltaZ * (point.z - meanZ);
+    }
+  });
+  if (count < 2) return 0;
+  return 0.5 * Math.atan2(2 * covarianceXZ, covarianceXX - covarianceZZ);
 }
 
 function frameModelAndScaleReference() {
@@ -7449,7 +7571,16 @@ function frameModelAndScaleReference() {
   }
   if (isBoxEmpty(box)) return;
   const size = box.getSize(new THREE.Vector3());
-  const center = box.getCenter(new THREE.Vector3());
+  let currentPlug = null;
+  if (scaleComparisonActive) {
+    scaleReferenceGroup.traverse((child) => {
+      if (!currentPlug && child.userData?.currentComparisonPlug) currentPlug = child;
+    });
+  }
+  const currentBox = currentPlug ? getVisibleMeshBox(currentPlug) : null;
+  const center = currentBox && !isBoxEmpty(currentBox)
+    ? currentBox.getCenter(new THREE.Vector3())
+    : box.getCenter(new THREE.Vector3());
   const radius = Math.max(size.x, size.y, size.z, 0.8);
   controls.target.copy(center);
   camera.position.set(center.x + radius * 1.5, center.y + radius * 0.75, center.z + radius * 1.85);
@@ -7463,6 +7594,7 @@ async function refreshScaleReference() {
   const request = ++scaleReferenceRequest;
   root.visible = true;
   scaleComparisonActive = false;
+  controls.enablePan = true;
   clearScaleReference();
   const enabled = document.querySelector("#scale-reference-enabled")?.checked === true;
   const select = document.querySelector("#scale-reference-type");
@@ -7474,7 +7606,7 @@ async function refreshScaleReference() {
     return;
   }
   const unit = getSceneUnitsPerMillimeter();
-  const type = select?.value || "coin";
+  const type = select?.value || "bottle-1l";
   syncScaleComparisonControls();
   let object;
   try {
@@ -7488,6 +7620,8 @@ async function refreshScaleReference() {
           : await makeAutomaticScaleComparison(
             unit,
             document.querySelector("#scale-comparison-upright")?.checked !== false,
+            document.querySelector("#scale-comparison-arc")?.checked !== false,
+            Number(document.querySelector("#scale-comparison-radius")?.value || 600),
             request,
           );
   } catch (error) {
@@ -7507,12 +7641,21 @@ async function refreshScaleReference() {
   if (type === "compare") {
     root.visible = false;
     scaleComparisonActive = true;
+    controls.enablePan = false;
     scaleReferenceGroup.add(object);
     scaleReferenceGroup.updateWorldMatrix(true, true);
     updateSoftStudioShadow(object, true);
     frameModelAndScaleReference();
-    finishAuxiliaryProgress("Comparaison prête · jeu de 20 mm");
+    finishAuxiliaryProgress(object.userData.comparisonArc
+      ? `Comparaison en arc prête · rayon ${object.userData.comparisonArcRadiusMm} mm`
+      : "Comparaison en ligne prête · jeu de 20 mm");
     return;
+  }
+  if (type === "ruler") {
+    const plugAxisAngle = getHorizontalPrincipalAxisAngle(root);
+    object.rotation.y = -plugAxisAngle;
+    object.userData.parallelToPlug = true;
+    object.updateWorldMatrix(true, true);
   }
   const modelBox = getVisibleMeshBox(root);
   const objectBox = new THREE.Box3().setFromObject(object);
@@ -7775,6 +7918,15 @@ function wireInterface() {
     refreshScaleReference();
   });
   document.querySelector("#scale-comparison-upright")?.addEventListener("change", refreshScaleReference);
+  document.querySelector("#scale-comparison-arc")?.addEventListener("change", () => {
+    syncScaleComparisonControls();
+    refreshScaleReference();
+  });
+  document.querySelector("#scale-comparison-radius")?.addEventListener("input", (event) => {
+    const value = document.querySelector("#scale-comparison-radius-value");
+    if (value) value.textContent = String(Math.round(Number(event.target.value) || 600));
+  });
+  document.querySelector("#scale-comparison-radius")?.addEventListener("change", refreshScaleReference);
   document.querySelector("#download-view-png")?.addEventListener("click", downloadCurrentView);
   document.querySelector("#png-export-close")?.addEventListener("click", () => document.querySelector("#png-export-dialog")?.close());
   document.querySelector("#png-export-dialog")?.addEventListener("close", clearPngExport);

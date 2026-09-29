@@ -19,12 +19,24 @@ assert(html.includes('id="scale-reference-enabled"'), "Le viewer doit permettre 
 for (const value of ["coin", "bottle-1l", "ruler", "compare"]) {
   assert(html.includes(`value="${value}"`), `L'objet de comparaison ${value} doit être disponible.`);
 }
+assert(html.includes('value="bottle-1l" selected'), "La bouteille 1 L doit être l'objet d'échelle sélectionné par défaut.");
+assert(app.includes('select?.value || "bottle-1l"'), "Le repli JavaScript de l'objet d'échelle doit utiliser la bouteille.");
 assert(app.includes("sceneUnitsPerMillimeter"), "Les objets d'échelle doivent respecter l'échelle physique du modèle.");
 assert(app.includes('loadAsync("./assets/models/references/Piece_1_euro.glb")'), "La pièce d'échelle doit utiliser le GLB détaillé fourni.");
 assert(app.includes("createCoinReference"), "La pièce GLB doit être préparée dans un module testable dédié.");
 assert(app.includes('loadAsync("./assets/models/references/Regle_20cm_ROSEBUDS.glb")'), "La règle d'échelle doit utiliser le GLB ROSEBUDS fourni.");
 assert(app.includes("createRulerReference"), "La règle GLB doit être préparée dans un module testable dédié.");
+assert(app.includes("getHorizontalPrincipalAxisAngle(root)"), "La règle doit suivre l'axe principal horizontal du plug.");
+assert(app.includes("parallelToPlug = true"), "La règle affichée doit être marquée comme parallèle au plug.");
 assert(html.includes('id="scale-comparison-upright"'), "La comparaison doit proposer la position verticale des plugs.");
+assert(html.includes("Ogive en haut, tête en bas"), "Le sens de la position verticale doit être explicite.");
+assert(app.includes('verticalPose = "ogive-up-head-down"'), "La pose verticale doit conserver l'ogive en haut et la tête en bas.");
+assert(app.includes("gemBox.getCenter(new THREE.Vector3()).y > box.getCenter(new THREE.Vector3()).y"), "La pierre doit servir de contrôle pour maintenir la tête en bas.");
+assert(html.includes('id="scale-comparison-arc"'), "La comparaison doit proposer une disposition en arc.");
+assert(html.includes('id="scale-comparison-radius"'), "Le rayon de l'arc doit être réglable.");
+assert(app.includes("comparisonArcRadiusMm"), "Le rayon physique de l'arc doit être conservé dans le groupe comparatif.");
+assert(app.includes("Halo du plug courant"), "Le plug courant doit être signalé par un halo lumineux.");
+assert(app.includes("controls.enablePan = false"), "La caméra comparative doit rester centrée sur le plug courant.");
 assert(app.includes("comparisonSpacingMm = 20"), "La comparaison automatique doit conserver un jeu physique de 20 mm.");
 assert(app.includes("getAutomaticScaleComparisonModelIds"), "Les tailles compatibles doivent être sélectionnées automatiquement.");
 assert(app.includes("root.visible = false"), "Le plug isolé doit être remplacé par la rangée comparative.");

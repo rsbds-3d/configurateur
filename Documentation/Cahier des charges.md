@@ -1,19 +1,23 @@
 # Cahier des charges - Configurateur de bijoux
 
-Version : **v0.8-260929**
+Version : **v0.9-260929**
 
 ## Révision du 29 septembre 2026
 
 - La règle procédurale est remplacée par le fichier original `Regle_20cm_ROSEBUDS.glb` fourni.
 - Le modèle conserve les objets `Regle_corps`, `Graduations_gauche`, `Graduations_droite` et `Semelle`, ainsi que les matériaux `Plastique translucide`, `Graduations` et `Semelle ROSEBUDS`.
 - Les deux textures PNG restent embarquées. La règle est chargée uniquement à la demande, posée sur le sol et affichée à ses dimensions physiques : 210 × 32 × 5 mm, pour 200 mm gradués.
+- La bouteille 1 L devient l'objet d'échelle sélectionné par défaut et la règle est alignée parallèlement à l'axe principal du plug.
+- La comparaison verticale place la tête et la pierre en bas et l'ogive en haut, tous les volumes reposant sur le sol.
+- La comparaison suit par défaut un arc de rayon réglable de 250 à 2 000 mm, avec conservation du jeu physique de 20 mm ; la disposition droite reste disponible.
+- Le plug courant reste au centre de la caméra et de l'orbite, le panoramique est verrouillé pendant la comparaison et un halo fuchsia lumineux le distingue.
 
 ## Révision du 28 septembre 2026
 
 - La pièce générique de l'objet d'échelle est remplacée par le fichier `Piece_1_euro.glb` fourni, et non par une variante de visionneuse : diamètre 23,25 mm, épaisseur 2,33 mm, texture embarquée et matériaux distincts pour l'avers, le revers et la tranche.
 - La liste des objets d'échelle propose `Comparer les tailles de plugs`. Les variantes compatibles conservent la gamme, la tête, le métal, la finition et l'ornement du modèle courant ; seule la taille varie.
 - La comparaison emploie une unité physique commune, trie les plugs du plus petit au plus grand, centre la taille étudiée entre les tailles inférieures et supérieures et impose un jeu de 20 mm entre les volumes.
-- La position verticale est activée par défaut, ornement vers le haut, avec chaque plug posé sur le sol. Une case permet de revenir à l'orientation couchée.
+- La position verticale est activée par défaut, tête et pierre en bas, ogive en haut, avec chaque plug posé sur le sol. Une case permet de revenir à l'orientation couchée.
 
 ## Révision du 23 septembre 2026
 
@@ -65,7 +69,7 @@ Modèles Originale `Avec tête` validés : `LARGE 35`, `MEDIUM`, `SMALL 18`, `SM
 - Déplacement visuel de la décalcomanie sur la tige, contrainte à la surface métallique, avec mémorisation distincte par modèle.
 - Rendu optimisé à la demande par capture haute définition et super-résolution open source côté client.
 - Objets 3D de comparaison à dimensions réelles : pièce de 1 euro détaillée, bouteille 1 L et règle ROSEBUDS originale de 210 mm avec 200 mm gradués, issus des fichiers fournis.
-- Comparaison automatique des tailles compatibles, à matériaux constants, avec tri croissant, jeu de 20 mm, pose au sol et orientation verticale optionnelle.
+- Comparaison automatique des tailles compatibles, à matériaux constants, avec tri croissant, jeu de 20 mm, pose au sol, orientation verticale optionnelle, arc réglable et surbrillance du modèle courant.
 - Téléchargement PNG et partage de la vue courante.
 - Résumé du produit et lien vers la fiche Rosebuds la plus proche ou le formulaire sur mesure prérempli.
 
@@ -82,7 +86,7 @@ Modèles Originale `Avec tête` validés : `LARGE 35`, `MEDIUM`, `SMALL 18`, `SM
 - Les mêmes règles doivent filtrer les questions d'accueil, la galerie finale, les paramètres d'URL et le menu contextuel du viewer.
 - Un changement de matériau ne change ni forme, ni échelle, ni position.
 - Un changement de forme ou de diamètre conserve le matériau et le point d'ancrage.
-- Le mode manuel dispose plusieurs modèles parallèlement avec un jeu réglable. Le mode d'échelle `Comparer` applique automatiquement un jeu fixe de 20 mm et conserve les réglages du modèle courant.
+- Le mode manuel dispose plusieurs modèles parallèlement avec un jeu réglable. Le mode d'échelle `Comparer` applique automatiquement un jeu fixe de 20 mm, conserve les réglages du modèle courant, le centre comme pivot de l'orbite et propose un arc de rayon réglable.
 
 ## Contraintes
 

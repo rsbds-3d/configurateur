@@ -1,6 +1,6 @@
 # Configurateur de Bijoux Rosebuds
 
-Version actuelle : **v0.8-260929**
+Version actuelle : **v0.9-260929**
 
 Configurateur de plugs Rosebuds avec catalogue guidé, import de modèles Rhino 3DM, matériaux métalliques PBR, pierres transparentes avec shader optique BVH et mode caméra AR.
 
@@ -52,8 +52,9 @@ La barrière d'accès GitHub Pages est exécutée côté navigateur. Elle empêc
 - Rendu optimisé à la demande avec lissage PBR et super-résolution Swin2SR locale.
 - Déplacement prioritaire de la décalcomanie par appui long et mémorisation par modèle.
 - Mode AR par caméra avec conservation du rendu Three.js.
-- Objets d'échelle réels fournis : pièce de 1 euro, bouteille 1 L et règle ROSEBUDS graduée sur 20 cm, avec export PNG et partage natif de la vue.
-- Comparaison automatique des tailles compatibles, à l'échelle physique, espacées de 20 mm et orientables verticalement.
+- Objets d'échelle réels fournis : bouteille 1 L sélectionnée par défaut, pièce de 1 euro et règle ROSEBUDS graduée sur 20 cm automatiquement parallèle au plug, avec export PNG et partage natif de la vue.
+- Comparaison automatique des tailles compatibles posées au sol, ogive en haut et tête en bas, espacées de 20 mm et disposées par défaut sur un arc de rayon réglable.
+- Plug courant centré, utilisé comme pivot de rotation et mis en évidence par un halo lumineux fuchsia pendant la comparaison.
 - Affichage parallèle de plusieurs plugs.
 
 ## Tests
@@ -62,4 +63,4 @@ La barrière d'accès GitHub Pages est exécutée côté navigateur. Elle empêc
 Get-ChildItem tests/*.test.cjs | ForEach-Object { node $_.FullName }
 ```
 
-La version `v0.8-260929` possède 34 fichiers de tests unitaires et de non-régression.
+La version `v0.9-260929` possède 34 fichiers de tests unitaires et de non-régression.

@@ -2287,6 +2287,7 @@ body:has(.controls.is-collapsed) .viewer-actions {
 .viewer-actions button,
 .viewer-actions select,
 .viewer-scale-toggle,
+.viewer-scale-range,
 .viewer-back,
 .ar-toggle {
   min-height: 42px;
@@ -2339,6 +2340,21 @@ body:has(.controls.is-collapsed) .viewer-actions {
 .viewer-scale-toggle input {
   width: 17px;
   height: 17px;
+  accent-color: #ed2b86;
+}
+
+.viewer-scale-range {
+  display: grid;
+  grid-template-columns: auto 104px;
+  align-items: center;
+  gap: 9px;
+  min-height: 42px;
+  padding: 0 12px;
+  font-size: 0.74rem;
+}
+
+.viewer-scale-range input {
+  width: 104px;
   accent-color: #ed2b86;
 }
 
@@ -2541,7 +2557,8 @@ body:has(.controls.is-collapsed) .viewer-actions {
 
   .viewer-actions button,
   .viewer-actions select,
-  .viewer-scale-toggle {
+  .viewer-scale-toggle,
+  .viewer-scale-range {
     min-height: 38px;
     box-shadow: none;
   }
