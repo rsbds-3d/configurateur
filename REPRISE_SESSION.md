@@ -19,7 +19,7 @@ Sources et CWD identiques : `C:\Users\charl\Documents\CONFIGURATEUR DE BIJIOUX`.
 `v0.8-260929`, VERSION = `0.8`, cache `20260929-ruler-reference-v08`.
 
 ## Etat actuel
-Version v0.8 compilee, testee et reinstallee localement. Publication GitHub Pages et release v0.8 a terminer dans cette session.
+Version v0.8 compilee, testee, reinstallee localement et publiee. Le site GitHub Pages et la release Windows ont ete verifies.
 
 ## Travail termine
 - Remplacement de la regle procedurale par le fichier original `Regle_20cm_ROSEBUDS.glb` fourni.
@@ -29,10 +29,12 @@ Version v0.8 compilee, testee et reinstallee localement. Publication GitHub Page
 - Version visible `v0.8-260929` et version PE `0.8.0.0`.
 - 34 tests Node reussis et controle visuel local dans le viewer.
 - EXE et installateur v0.8 compiles ; v0.7 desinstallee, v0.8 installee, serveur local HTTP 200 et regle installee verifies.
+- Commit source `6994dfb` pousse sur `master` ; workflow GitHub Pages `36525144113` termine avec succes.
+- Site public v0.8 controle : HTTP 200, version visible correcte et GLB public strictement identique a la source.
+- Release `v0.8-260929` publiee avec l'installateur et digest distant verifie.
 
 ## Travail en cours
-- Publier les sources et le site v0.8 sur GitHub.
-- Creer la release `v0.8-260929` avec l'installateur et verifier le deploiement distant.
+Aucun travail requis pour la livraison v0.8. Les essais physiques sur telephone restent un controle materiel ulterieur.
 
 ## Decisions prises
 - Utiliser exclusivement la regle GLB originale fournie, jamais une geometrie procedurale simplifiee.
@@ -63,17 +65,17 @@ Version v0.8 compilee, testee et reinstallee localement. Publication GitHub Page
 - Installateur : SHA-256 `4F6F32D56D8B4654729A7A9C70415D6325AFF67A32FC0026DAB5E8EF38BA3822`.
 - Regle GLB source, paquet web et installation : SHA-256 `F73035E5EFEB812DDFB4B4EFBCB737757589A4A2A4A46082414C1F084654FC70`.
 - Installation locale : codes 0, HTTP 200, en-tete `v0.8-260929`, VERSION `0.8`.
+- GitHub Pages : workflow `36525144113` reussi pour le commit `6994dfb`.
+- Site public : HTTP 200, interface `v0.8-260929`, GLB 87 900 octets et empreinte conforme.
+- Release : `https://github.com/rsbds-3d/configurateur/releases/tag/v0.8-260929`, digest distant conforme a l'installateur local.
 
 ## Tests restant a faire
-- Verifier le workflow GitHub Actions et le site public v0.8 apres publication.
-- Verifier le digest de l'installateur dans la release.
 - Telephone reel : geste tactile, AR camera et partage natif PNG.
 
 ## Prochaines actions prioritaires
-1. Examiner le diff, commiter et pousser la v0.8 sur `master`.
-2. Attendre le succes du deploiement GitHub Pages et verifier le GLB public.
-3. Creer la release `v0.8-260929` avec l'installateur puis verifier son digest.
-4. Completer ce fichier et le journal avec les identifiants de publication.
+1. Recueillir le retour utilisateur sur la taille et la position de la regle dans le viewer.
+2. Tester sur un telephone reel les gestes tactiles, l'AR camera et le partage PNG.
+3. Traiter separement les optimisations GPU et l'ancienne erreur shader de decalcomanie.
 
 ## Interdictions / points de vigilance
 Aucun reset destructif, nouveau worktree ou changement de branche. Ne pas annoncer ComfyUI, une authentification serveur forte ou les tests mobiles comme termines.
