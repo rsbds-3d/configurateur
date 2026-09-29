@@ -16,10 +16,11 @@ import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js"
 import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
 import { MeshoptDecoder } from "meshoptimizer";
 import { buildBVHInWorker, compileBeforeSwap, abortError } from "./assets/js/diamond/background-bvh.js";
-import { attachDecalGesture } from "./assets/js/decal-gesture.js?v=20260928-scale-comparison-v07";
+import { attachDecalGesture } from "./assets/js/decal-gesture.js?v=20260929-ruler-reference-v08";
 import { watermarkPngBlob } from "./assets/js/png-watermark.js";
 import { createBottleReference } from "./assets/js/bottle-reference.js";
 import { createCoinReference } from "./assets/js/coin-reference.js";
+import { createRulerReference } from "./assets/js/ruler-reference.js";
 import { pointInPlacementFrame, placementInWorld } from "./assets/js/decal-placement.js";
 import { buildViewerProductSummary, resolveRosebudsProductLink } from "./assets/js/rosebuds-product-link.js";
 
@@ -7233,21 +7234,9 @@ function clearScaleReference() {
   scaleReferenceGroup.clear();
 }
 
-function makeScaleReferenceMaterial(options = {}) {
-  return new THREE.MeshPhysicalMaterial({
-    color: options.color || "#b8bdc2",
-    metalness: options.metalness ?? 0.05,
-    roughness: options.roughness ?? 0.32,
-    transmission: options.transmission ?? 0,
-    thickness: options.thickness ?? 0,
-    transparent: (options.transmission || 0) > 0,
-    opacity: options.opacity ?? 1,
-    envMapIntensity: 1.2,
-  });
-}
-
 let coinReferencePromise = null;
 let bottleReferencePromise = null;
+let rulerReferencePromise = null;
 let scaleReferenceRequest = 0;
 let scaleComparisonActive = false;
 
@@ -7263,6 +7252,13 @@ async function makeBottleReference(unit) {
     .then((gltf) => gltf.scene)
     .catch((error) => { bottleReferencePromise = null; throw error; });
   return createBottleReference(await bottleReferencePromise, unit, floor.position.y);
+}
+
+async function makeRulerReference(unit) {
+  rulerReferencePromise ||= new GLTFLoader().loadAsync("./assets/models/references/Regle_20cm_ROSEBUDS.glb")
+    .then((gltf) => gltf.scene)
+    .catch((error) => { rulerReferencePromise = null; throw error; });
+  return createRulerReference(await rulerReferencePromise, unit, floor.position.y);
 }
 
 function disposeScaleReference(object) {
@@ -7444,45 +7440,6 @@ function syncScaleComparisonControls() {
   if (control) control.hidden = !(enabled && compare);
 }
 
-function makeRulerTexture() {
-  const surface = document.createElement("canvas");
-  surface.width = 1600;
-  surface.height = 220;
-  const context = surface.getContext("2d");
-  context.fillStyle = "#f7e7a9";
-  context.fillRect(0, 0, surface.width, surface.height);
-  context.fillStyle = "#171717";
-  context.font = "42px Arial";
-  context.textAlign = "center";
-  for (let millimeter = 0; millimeter <= 200; millimeter += 1) {
-    const x = 18 + (surface.width - 36) * (millimeter / 200);
-    const length = millimeter % 10 === 0 ? 86 : millimeter % 5 === 0 ? 58 : 34;
-    context.fillRect(x, 0, 2, length);
-    if (millimeter % 10 === 0 && millimeter < 200) context.fillText(String(millimeter / 10), x + 12, 145);
-  }
-  const texture = new THREE.CanvasTexture(surface);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-  return texture;
-}
-
-function makeRulerReference(unit) {
-  const group = new THREE.Group();
-  const ruler = new THREE.Mesh(
-    new THREE.BoxGeometry(200 * unit, 2.4 * unit, 28 * unit),
-    makeScaleReferenceMaterial({ color: "#fff2ba", roughness: 0.5 }),
-  );
-  ruler.position.y = floor.position.y + 1.2 * unit;
-  const markings = new THREE.Mesh(
-    new THREE.PlaneGeometry(200 * unit, 28 * unit),
-    new THREE.MeshBasicMaterial({ map: makeRulerTexture(), toneMapped: false, side: THREE.DoubleSide }),
-  );
-  markings.rotation.x = -Math.PI / 2;
-  markings.position.y = floor.position.y + 2.43 * unit;
-  group.add(ruler, markings);
-  return group;
-}
-
 function frameModelAndScaleReference() {
   const box = scaleComparisonActive
     ? getVisibleMeshBox(scaleReferenceGroup)
@@ -7523,21 +7480,24 @@ async function refreshScaleReference() {
   try {
     if (type === "coin") showAuxiliaryProgress(5, "Chargement de la pièce de 1 euro");
     if (type === "bottle-1l") showAuxiliaryProgress(5, "Chargement de la bouteille 1 L");
+    if (type === "ruler") showAuxiliaryProgress(5, "Chargement de la règle 20 cm ROSEBUDS");
     if (type === "compare") showAuxiliaryProgress(5, "Préparation de la comparaison des tailles");
     object = type === "coin" ? await makeCoinReference(unit)
       : type === "bottle-1l" ? await makeBottleReference(unit)
-        : type === "compare" ? await makeAutomaticScaleComparison(
-          unit,
-          document.querySelector("#scale-comparison-upright")?.checked !== false,
-          request,
-        ) : makeRulerReference(unit);
+        : type === "ruler" ? await makeRulerReference(unit)
+          : await makeAutomaticScaleComparison(
+            unit,
+            document.querySelector("#scale-comparison-upright")?.checked !== false,
+            request,
+          );
   } catch (error) {
     if (request !== scaleReferenceRequest) return;
     scaleReferenceGroup.visible = false;
     document.querySelector("#scale-reference-enabled").checked = false;
     if (select) select.disabled = true;
     const referenceLabel = type === "coin" ? "Pièce de 1 euro"
-      : type === "compare" ? "Comparaison des tailles" : "Bouteille 1 L";
+      : type === "bottle-1l" ? "Bouteille 1 L"
+        : type === "ruler" ? "Règle 20 cm ROSEBUDS" : "Comparaison des tailles";
     finishAuxiliaryProgress(`${referenceLabel} indisponible`);
     showNotice(`Le chargement de l’objet « ${referenceLabel} » a échoué. Vous pouvez réessayer.`);
     logDebug("scale-reference", "Chargement impossible", { message: error.message });

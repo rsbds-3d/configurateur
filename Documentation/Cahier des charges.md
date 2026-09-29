@@ -1,6 +1,12 @@
 # Cahier des charges - Configurateur de bijoux
 
-Version : **v0.7-260928**
+Version : **v0.8-260929**
+
+## Révision du 29 septembre 2026
+
+- La règle procédurale est remplacée par le fichier original `Regle_20cm_ROSEBUDS.glb` fourni.
+- Le modèle conserve les objets `Regle_corps`, `Graduations_gauche`, `Graduations_droite` et `Semelle`, ainsi que les matériaux `Plastique translucide`, `Graduations` et `Semelle ROSEBUDS`.
+- Les deux textures PNG restent embarquées. La règle est chargée uniquement à la demande, posée sur le sol et affichée à ses dimensions physiques : 210 × 32 × 5 mm, pour 200 mm gradués.
 
 ## Révision du 28 septembre 2026
 
@@ -58,7 +64,7 @@ Modèles Originale `Avec tête` validés : `LARGE 35`, `MEDIUM`, `SMALL 18`, `SM
 - Mode AR par caméra sur téléphone ou ordinateur, avec flux vidéo intégré comme arrière-plan Three.js et conservation stricte du pipeline PBR du viewer normal.
 - Déplacement visuel de la décalcomanie sur la tige, contrainte à la surface métallique, avec mémorisation distincte par modèle.
 - Rendu optimisé à la demande par capture haute définition et super-résolution open source côté client.
-- Objets 3D de comparaison à dimensions réelles : pièce de 1 euro détaillée issue du fichier fourni, bouteille détaillée de 1 L et règle graduée 20 cm.
+- Objets 3D de comparaison à dimensions réelles : pièce de 1 euro détaillée, bouteille 1 L et règle ROSEBUDS originale de 210 mm avec 200 mm gradués, issus des fichiers fournis.
 - Comparaison automatique des tailles compatibles, à matériaux constants, avec tri croissant, jeu de 20 mm, pose au sol et orientation verticale optionnelle.
 - Téléchargement PNG et partage de la vue courante.
 - Résumé du produit et lien vers la fiche Rosebuds la plus proche ou le formulaire sur mesure prérempli.

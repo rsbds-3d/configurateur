@@ -1,9 +1,10 @@
 # Planning et suivi
 
-Version : **v0.7-260928**
+Version : **v0.8-260929**
 
 | Date | Travail | État | Durée |
 |---|---|---|---|
+| 2026-09-29 | Remplacement de la règle simplifiée par le GLB ROSEBUDS texturé, à dimensions physiques | Code et tests effectués ; livraison en cours | Non mesurée |
 | 2026-09-28 | Pièce de 1 euro GLB détaillée ; comparaison automatique des tailles à échelle commune, jeu 20 mm, pose au sol et orientation verticale | Code, 33 tests et contrôle visuel effectués | Non mesurée |
 | 2026-09-22 | Catalogue : règles, noms, XL Plus, 12 mm, variantes ; exports filigranés ; correction glisser logo | Code et tests effectués | Non mesurée |
 | 2026-09-23 | Bouteille GLB 1 L fournie, échelle physique, chargement différé ; préparation v0.6 | Validation et livraison en cours | Non mesurée |
@@ -43,6 +44,7 @@ Version : **v0.7-260928**
 - 2026-09-15 : 28 tests réussis, capture PNG 1600 × 900 vérifiée dans le navigateur intégré ; paquet et publication en cours. Durée non mesurée.
 - 2026-09-23 : v0.6 validée par 32 tests ; création des livrables et publication en cours. Durée non mesurée.
 - 2026-09-28 : v0.7 validée par 33 tests ; EXE, installateur et publication en préparation. Durée non mesurée.
+- 2026-09-29 : v0.8, règle ROSEBUDS GLB réelle et 34 tests en préparation de validation. Durée non mesurée.
 
 1. Profiler sur plusieurs téléphones la compilation GPU finale des modèles les plus lourds.
 2. Compléter les miniatures réelles au fil des nouveaux modèles importés.

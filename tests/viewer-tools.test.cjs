@@ -22,11 +22,13 @@ for (const value of ["coin", "bottle-1l", "ruler", "compare"]) {
 assert(app.includes("sceneUnitsPerMillimeter"), "Les objets d'échelle doivent respecter l'échelle physique du modèle.");
 assert(app.includes('loadAsync("./assets/models/references/Piece_1_euro.glb")'), "La pièce d'échelle doit utiliser le GLB détaillé fourni.");
 assert(app.includes("createCoinReference"), "La pièce GLB doit être préparée dans un module testable dédié.");
+assert(app.includes('loadAsync("./assets/models/references/Regle_20cm_ROSEBUDS.glb")'), "La règle d'échelle doit utiliser le GLB ROSEBUDS fourni.");
+assert(app.includes("createRulerReference"), "La règle GLB doit être préparée dans un module testable dédié.");
 assert(html.includes('id="scale-comparison-upright"'), "La comparaison doit proposer la position verticale des plugs.");
 assert(app.includes("comparisonSpacingMm = 20"), "La comparaison automatique doit conserver un jeu physique de 20 mm.");
 assert(app.includes("getAutomaticScaleComparisonModelIds"), "Les tailles compatibles doivent être sélectionnées automatiquement.");
 assert(app.includes("root.visible = false"), "Le plug isolé doit être remplacé par la rangée comparative.");
-assert(app.includes("makeRulerReference"), "Une règle graduée de 20 cm doit être générée.");
+assert(!app.includes("BoxGeometry(200 * unit"), "L'ancienne règle simplifiée ne doit plus être générée.");
 
 assert(html.includes('id="download-view-png"'), "Le téléchargement PNG doit être proposé.");
 assert(html.includes('id="share-view"'), "Le partage natif doit être proposé.");
