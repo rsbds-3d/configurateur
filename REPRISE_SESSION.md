@@ -19,7 +19,7 @@ Sources et CWD identiques : `C:\Users\charl\Documents\CONFIGURATEUR DE BIJIOUX`.
 `v0.9-260929`, VERSION = `0.9`, cache `20260929-scale-orientation-v09`.
 
 ## Etat actuel
-Version v0.9 compilee, testee et reinstallee localement. La publication GitHub Pages et la release Windows restent a verifier.
+Version v0.9 compilee, testee, reinstallee localement et publiee. GitHub Pages et la release Windows ont ete verifies.
 
 ## Travail termine
 - Remplacement de la regle procedurale par le fichier original `Regle_20cm_ROSEBUDS.glb` fourni.
@@ -39,9 +39,12 @@ Version v0.9 compilee, testee et reinstallee localement. La publication GitHub P
 - Controle visuel local du tri, de l'arc, de l'orientation, du centrage et du halo.
 - 34 tests reussis ; paquet web, lanceur et installateur v0.9 compiles.
 - v0.8 desinstallee puis v0.9 installee : EXE 0.9.0.0, VERSION 0.9, HTTP 200 et en-tete v0.9 verifies.
+- Commit `f92c7fc` pousse sur master ; workflow Pages `36568136865` reussi.
+- Site public v0.9 controle en HTTP 200 avec arc, rayon, halo et orientation corriges.
+- Release `v0.9-260929` publiee ; digest distant de l'installateur conforme au fichier local.
 
 ## Travail en cours
-Publier la v0.9 sur GitHub Pages et creer la release Windows. Les essais physiques sur telephone restent un controle materiel ulterieur.
+Aucun travail requis pour la livraison v0.9. Les essais physiques sur telephone restent un controle materiel ulterieur.
 
 ## Decisions prises
 - Utiliser exclusivement la regle GLB originale fournie, jamais une geometrie procedurale simplifiee.
@@ -82,14 +85,16 @@ Publier la v0.9 sur GitHub Pages et creer la release Windows. Les essais physiqu
 - GitHub Pages : workflow `36525144113` reussi pour le commit `6994dfb`.
 - Site public : HTTP 200, interface `v0.8-260929`, GLB 87 900 octets et empreinte conforme.
 - Release : `https://github.com/rsbds-3d/configurateur/releases/tag/v0.8-260929`, digest distant conforme a l'installateur local.
+- GitHub Pages v0.9 : workflow `36568136865` reussi pour `f92c7fc`, HTTP 200 et fonctions de comparaison presentes.
+- Release v0.9 : `https://github.com/rsbds-3d/configurateur/releases/tag/v0.9-260929`, taille 23 583 986 octets et digest `043AA5F52FE56D5278B8B09F8923AB16E31F70CD38800FE99D8FEAAA11CA0E37`.
 
 ## Tests restant a faire
 - Telephone reel : geste tactile, AR camera et partage natif PNG.
 
 ## Prochaines actions prioritaires
-1. Executer les 34 tests, compiler le web, le lanceur et l'installateur v0.9.
-2. Reinstaller localement puis publier GitHub Pages et la release v0.9.
-3. Tester sur un telephone reel les gestes tactiles, l'AR camera et le partage PNG.
+1. Tester sur un telephone reel les gestes tactiles, l'AR camera et le partage PNG.
+2. Recueillir le retour utilisateur sur le rayon d'arc par defaut de 600 mm et le halo fuchsia.
+3. Traiter separement les optimisations GPU et l'ancienne erreur shader de decalcomanie.
 
 ## Interdictions / points de vigilance
 Aucun reset destructif, nouveau worktree ou changement de branche. Ne pas annoncer ComfyUI, une authentification serveur forte ou les tests mobiles comme termines.
