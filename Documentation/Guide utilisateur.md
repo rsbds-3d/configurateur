@@ -1,6 +1,6 @@
 # Guide utilisateur - Configurateur de bijoux
 
-Version : **v0.9-260929**
+Version : **v0.10-260929**
 
 ## Objectif
 
@@ -57,7 +57,7 @@ Les noms de couleurs de cristal conservent leur appellation commerciale d'origin
 - Bouton en haut à droite : ouvrir ou réduire le panneau de réglages.
 - Le logo officiel ROSEBUDS reste visible dans l'en-tête du viewer 3D et adapte son contraste au fond de la scène.
 - `Voir en AR` : active la caméra et place le plug devant le flux vidéo. Le rendu métallique conserve les mêmes matériaux PBR, l'environnement et l'exposition que le viewer normal.
-- Glisser directement à la souris sur le logo ROSEBUDS : déplace la décalcomanie sur la tige sans sélectionner le métal ni faire tourner le plug. Sur écran tactile, maintenir un appui long avant de glisser. Sa position est mémorisée séparément pour chaque modèle dans ce navigateur et sur cette adresse du site. Échap annule le déplacement en cours.
+- Glisser directement à la souris sur le logo ROSEBUDS : déplace la décalcomanie sur toute la longueur de la surface du plug, y compris jusqu'aux extrémités, sans sélectionner le métal ni faire tourner le plug. La projection suit automatiquement le diamètre local. Sur écran tactile, maintenir un appui long avant de glisser. Sa position est mémorisée séparément pour chaque modèle dans ce navigateur et sur cette adresse du site. Échap annule le déplacement en cours.
 - `Rendu optimisé` : lisse temporairement les métaux, capture la vue en haute définition et applique, lorsqu'il est disponible, le modèle open source Swin2SR dans un worker local.
 - `Objet d'échelle` : affiche par défaut la bouteille détaillée de 1 L, ou permet de choisir la pièce de 1 euro détaillée et la règle ROSEBUDS graduée. La pièce conserve ses faces, sa tranche et sa texture ; elle mesure 23,25 mm de diamètre sur 2,33 mm d'épaisseur. La bouteille mesure environ 258,23 mm de haut. La règle conserve son corps translucide, ses graduations et sa semelle marquée ROSEBUDS ; sa longueur extérieure est de 210 mm pour 200 mm gradués, avec une largeur de 32 mm. Elle est automatiquement placée parallèlement à l'axe du plug. Ces modèles se chargent uniquement à la demande.
 - `Comparer les tailles de plugs` : remplace temporairement le plug isolé par toutes les tailles compatibles avec la gamme, la tête, le métal, la finition et l'ornement courants. Les tailles vont du plus petit au plus grand avec un jeu physique de 20 mm. Le modèle étudié reste au centre, sert de pivot à la rotation de vue et reçoit un halo fuchsia.
@@ -81,6 +81,8 @@ Le mode AR demande l'autorisation d'utiliser la caméra. Il fonctionne sur `loca
 ## Import 3DM
 
 Les BREP et polysurfaces Rhino sont convertis en maillages d'affichage par `Rhino3dmLoader`. Les lignes, cotations et annotations sont ignorées. Le panneau d'import permet de régler le lissage et la finesse, mais la qualité de silhouette dépend aussi du maillage de rendu contenu dans le fichier Rhino.
+
+La v0.10 intègre les 37 modèles 3DM optimisés fournis le 29 septembre 2026. Leur maillage de rendu est en moyenne 2,75 fois plus dense en sommets que la version précédente. L'intégrité de chaque fichier est contrôlée par manifeste et empreinte SHA-256 ; le navigateur reçoit un identifiant de version dans l'URL du modèle afin de ne pas conserver une ancienne géométrie en cache.
 
 ## Dépannage
 

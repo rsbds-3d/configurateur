@@ -1,0 +1,228 @@
+{
+  "schemaVersion": 1,
+  "generatedFor": "v0.10-260929",
+  "models": [
+    {
+      "modelId": "plug-classique-large-35",
+      "target": "classiques/large-35.3dm",
+      "bytes": 1679846,
+      "sha256": "C2AC753966B08349391E87BB1C45893D3DC530C4E861858159D044707BA130EC"
+    },
+    {
+      "modelId": "plug-classique-medium",
+      "target": "classiques/medium.3dm",
+      "bytes": 1677866,
+      "sha256": "DE02095C7D046E421F1EE38196B8F57046594A0516DCA388F3030E9A13CB094D"
+    },
+    {
+      "modelId": "plug-classique-small-18",
+      "target": "classiques/small-18.3dm",
+      "bytes": 1595079,
+      "sha256": "EC075814B9094085A4F40C15AB0145F191DB3F3920B2312B83B4A7BC8D77E189"
+    },
+    {
+      "modelId": "plug-classique-small",
+      "target": "classiques/small.3dm",
+      "bytes": 1540240,
+      "sha256": "E711B6FE911CFC36F1B1F4B4475282B10070C4E0298F5E43229D88AC9E1AAEE6"
+    },
+    {
+      "modelId": "plug-classique-xl-35",
+      "target": "classiques/xl-35.3dm",
+      "bytes": 1702711,
+      "sha256": "FA0209F3E03698F2CA998AF43AF8321A2102FC8007534C2C1CE7578CD9F6FB07"
+    },
+    {
+      "modelId": "plug-classique-xl-45-avec-assiette",
+      "target": "classiques/xl-45-avec-assiette.3dm",
+      "bytes": 2032114,
+      "sha256": "0E29DD72C1C2C4FEF3EC245E2D2AFA07E81414A063DF9C01582329258F33456C"
+    },
+    {
+      "modelId": "plug-classique-xl",
+      "target": "classiques/xl.3dm",
+      "bytes": 1701665,
+      "sha256": "B3F94288049AEC7C6AA374B337B7856627664BAD3C21B60D7C48B068177B774E"
+    },
+    {
+      "modelId": "plug-classique-xxl-35",
+      "target": "classiques/xxl-35.3dm",
+      "bytes": 1812665,
+      "sha256": "87CCEA39AF86A2E9E2F1579E83FE73DEE1E3D8BD14ADA9438593811663B24C46"
+    },
+    {
+      "modelId": "plug-classique-xxl",
+      "target": "classiques/xxl.3dm",
+      "bytes": 1809269,
+      "sha256": "D825A1E0E7433555373C7F7FB31BF9361824CDECBF69F9CD0BCA006B2C4D88B3"
+    },
+    {
+      "modelId": "plug-classique-xxxl-60",
+      "target": "classiques/xxxl-60.3dm",
+      "bytes": 1924454,
+      "sha256": "E3AD24E26BC9F5AE4DE18E353EAF7131135FE6C4A7B86E0C37619AAED83C46EF"
+    },
+    {
+      "modelId": "plug-classique-xxxl-70",
+      "target": "classiques/xxxl-70.3dm",
+      "bytes": 2334447,
+      "sha256": "2AFB17C675171B34031836EDEA1ACB7C2E800F28883FEAC361DEFBAFF29F88FC"
+    },
+    {
+      "modelId": "plug-classique-xxxl-80",
+      "target": "classiques/xxxl-80.3dm",
+      "bytes": 2472581,
+      "sha256": "D8EA81CF04CB0AF697B33B9B1276C5D32B7C153E45167A1AF9CE06CD93797DA4"
+    },
+    {
+      "modelId": "plug-classique-xxxl-90",
+      "target": "classiques/xxxl-90.3dm",
+      "bytes": 2513353,
+      "sha256": "918843D1BF37001D05AED32A070538EEBA072A9598777BDDCCB4F5B9CFB71DBB"
+    },
+    {
+      "modelId": "plug-classique-xxxl-100",
+      "target": "classiques/xxxl-100.3dm",
+      "bytes": 2576173,
+      "sha256": "AA45531B7953D602955B649C0477921F9CD57AF9F70C1F45CB5C5BF12F8A2798"
+    },
+    {
+      "modelId": "plug-classique-55-sans-tete",
+      "target": "classiques/55-sans-tete.3dm",
+      "bytes": 1506490,
+      "sha256": "A8A20F57523C7E8C0CFA2E38816D5DDEDC59A95294764FB15790A59D60F35179"
+    },
+    {
+      "modelId": "plug-classique-67-sans-tete",
+      "target": "classiques/67-sans-tete.3dm",
+      "bytes": 1649042,
+      "sha256": "6755E9103AC211409FDFF1C5CB9D33D4E286C488F3175506D834C5BD0DD2825C"
+    },
+    {
+      "modelId": "plug-classique-large-35-sans-tete",
+      "target": "classiques/large-35-sans-tete.3dm",
+      "bytes": 1360798,
+      "sha256": "EC3770EE0CF9DD71B5F9430FFF30DCCA372FC80DA8A91D95C52CBC6834DBD1F5"
+    },
+    {
+      "modelId": "plug-classique-medium-30-sans-tete",
+      "target": "classiques/medium-30-sans-tete.3dm",
+      "bytes": 1324999,
+      "sha256": "F205FA349EFC72DF865E9F79EB6987DEC5FEDE65465EBEC14184C368FAA09FD0"
+    },
+    {
+      "modelId": "plug-classique-xl-45-sans-tete",
+      "target": "classiques/xl-45-sans-tete.3dm",
+      "bytes": 1446002,
+      "sha256": "11EDAB93E95750382C3A596898530BE0DC963C80943F001C9E5DBC0DF8D9233C"
+    },
+    {
+      "modelId": "plug-classique-xxl-50-sans-tete",
+      "target": "classiques/xxl-50-sans-tete.3dm",
+      "bytes": 1482314,
+      "sha256": "5EB64AB48191ED52A59DC895884E71AC0C5FDFAB41F238EAC1CFB45C4190C0A7"
+    },
+    {
+      "modelId": "plug-classique-xxxl-60-sans-tete",
+      "target": "classiques/xxxl-60-sans-tete.3dm",
+      "bytes": 1528711,
+      "sha256": "21E22EFCBE56A5DD3F5543E643EC72285E1C92CB6F16FA7D3C8D245FA4CED559"
+    },
+    {
+      "modelId": "plug-new-medium-30-sans-tete-cabochon-lisse",
+      "target": "new-medium/new-medium-30-sans-tete-cabochon-lisse.3dm",
+      "bytes": 1584360,
+      "sha256": "E09DCA1104988F0BEDB915B8C5D5B7B1AB5DB15F1A6B8A52B080747E53F5345F"
+    },
+    {
+      "modelId": "plug-new-medium-30-sans-tete-cristal",
+      "target": "new-medium/new-medium-30-sans-tete-cristal.3dm",
+      "bytes": 1721694,
+      "sha256": "0D70235082058FE6CEE867474D60D89D62A10CE8354F6290182C428296C19EBD"
+    },
+    {
+      "modelId": "plug-new-medium-35-sans-tete-cabochon-lisse",
+      "target": "new-medium/new-medium-35-sans-tete-cabochon-lisse.3dm",
+      "bytes": 1568022,
+      "sha256": "D084C71261CEC95C1CE64AC42D7E49A9C2A85259A85FD34F74741CA56ADFE079"
+    },
+    {
+      "modelId": "plug-new-medium-35-sans-tete-cristal",
+      "target": "new-medium/new-medium-35-sans-tete-cristal.3dm",
+      "bytes": 1765985,
+      "sha256": "59682D78870D51CB89BCED9A846608A40FF958D3A89B9E65D51970E03EFFC450"
+    },
+    {
+      "modelId": "plug-new-medium-55-sans-tete-cabochon-lisse",
+      "target": "new-medium/new-medium-55-sans-tete-cabochon-lisse.3dm",
+      "bytes": 1728154,
+      "sha256": "F08D9A5B5C837DAA14A517C76BDC68D9BAD706CE41194B769AE2F756086416B1"
+    },
+    {
+      "modelId": "plug-new-medium-55-sans-tete-cristal",
+      "target": "new-medium/new-medium-55-sans-tete-cristal.3dm",
+      "bytes": 1925726,
+      "sha256": "71474E5CD08BE14B5436761103B0E9750C31A54A1AA7480BA812F38E70AC402A"
+    },
+    {
+      "modelId": "plug-new-medium-67-sans-tete-cabochon-lisse",
+      "target": "new-medium/new-medium-67-sans-tete-cabochon-lisse.3dm",
+      "bytes": 1871957,
+      "sha256": "43975844E69B72D45566B9CDC9435D460EA9912342ECBCDA305DD2C7CFAE9736"
+    },
+    {
+      "modelId": "plug-new-medium-67-sans-tete-cristal",
+      "target": "new-medium/new-medium-67-sans-tete-cristal.3dm",
+      "bytes": 2069541,
+      "sha256": "54C5B2B5B4A7A96493781F290866D9CB3D6060FE95D85BABE0254EAADA53D365"
+    },
+    {
+      "modelId": "plug-new-medium-xl-45-sans-tete-cabochon-lisse",
+      "target": "new-medium/new-medium-xl-45-sans-tete-cabochon-lisse.3dm",
+      "bytes": 1652334,
+      "sha256": "5F47419AB3CFEB5E76FDBC2F877345EB2B7C3F51CDED37016E004078A4B96467"
+    },
+    {
+      "modelId": "plug-new-medium-xl-45-sans-tete-cristal",
+      "target": "new-medium/new-medium-xl-45-sans-tete-cristal.3dm",
+      "bytes": 1849940,
+      "sha256": "5C6ABF5406DEC02CA6BBB077EF4A5598C54F3395589B3F9D0E205CBC84ABAB48"
+    },
+    {
+      "modelId": "plug-new-medium-xxl-50-sans-tete-cabochon-lisse",
+      "target": "new-medium/new-medium-xxl-50-sans-tete-cabochon-lisse.3dm",
+      "bytes": 1691615,
+      "sha256": "3AE0F4C00CAA1666F23E6661BAA30EE46B67130D5BD1C5C8634B500B851F8649"
+    },
+    {
+      "modelId": "plug-new-medium-xxl-50-sans-tete-cristal",
+      "target": "new-medium/new-medium-xxl-50-sans-tete-cristal.3dm",
+      "bytes": 1889315,
+      "sha256": "8609E568FF2EA4D1BAF0C44DB28E8556BC94CFDC68ED55A882479FAFBF523DCE"
+    },
+    {
+      "modelId": "plug-new-medium-xxxl-60-sans-tete-cabochon-lisse",
+      "target": "new-medium/new-medium-xxxl-60-sans-tete-cabochon-lisse.3dm",
+      "bytes": 1723090,
+      "sha256": "7D51A9FEB71ED5B24CD2943E3576D8C5F2F9D84CAD250EAE518A5F3934652C72"
+    },
+    {
+      "modelId": "plug-new-medium-xxxl-60-sans-tete-cristal",
+      "target": "new-medium/new-medium-xxxl-60-sans-tete-cristal.3dm",
+      "bytes": 1918773,
+      "sha256": "DD8C3C48FC9187626A38CD5D6864EA1395FE067B74467255B98C5B88A730838B"
+    },
+    {
+      "modelId": "plug-new-small-cabochon-lisse",
+      "target": "new-small/new-small-cabochon-lisse.3dm",
+      "bytes": 1640188,
+      "sha256": "BCE994579CB7FE53A61C4EB7002AD3396ED863BDFFB0676518D23E08DBBAA3A6"
+    },
+    {
+      "modelId": "plug-new-small-cristal",
+      "target": "new-small/new-small-cristal.3dm",
+      "bytes": 1830639,
+      "sha256": "306DC8B40BEB9D4F17C59322B369E8A50B486C2C527B6C15764914CF48E592E6"
+    }
+  ]
+}

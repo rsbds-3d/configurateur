@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const VIEWER_VERSION = "20260929-scale-orientation-v09";
+  const VIEWER_VERSION = "20260929-optimized-3dm-decal-v10";
   const LOCAL_APPLICATION_URL = "http://localhost:8080/";
   const ALUMINUM_FINISHES_BY_SIZE_CLASS = Object.freeze({
     SMALL: Object.freeze(["aluminum-gray", "aluminum-black", "aluminum-red", "aluminum-violet"]),

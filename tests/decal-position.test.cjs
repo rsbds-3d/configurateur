@@ -5,6 +5,7 @@ const root = path.resolve(__dirname, "..");
 const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const css = fs.readFileSync(path.join(root, "style.css"), "utf8");
+const placementModule = fs.readFileSync(path.join(root, "assets", "js", "decal-placement.js"), "utf8");
 
 function assert(condition, message) {
   if (!condition) {
@@ -27,7 +28,12 @@ assert(app.includes('stemDecalFrameWorld = model.matrixWorld.clone()'), "Chaque 
 assert(app.includes('"#library-add", "#decal-edit-mode", "#material-visibility-library"'), "Les commandes de logo doivent rester dans la bibliothèque visible.");
 assert(app.includes("raycaster.intersectObject(target, false)"), "Le déplacement doit rester projeté sur le métal ciblé.");
 assert(app.includes("rebuildStemDecalGeometry(decal)"), "La projection doit être recalculée pendant le déplacement.");
-assert(/\? \(safeMinT \+ safeMaxT\) \* 0\.5/.test(app), "La position initiale doit être centrée sur la tige utile.");
+assert(/\? \(initialMinT \+ initialMaxT\) \* 0\.5/.test(app), "La position initiale doit être centrée sur la tige utile.");
+assert(app.includes("const safeMinT = profileMinT + edgeInset"), "La course du logo doit commencer au bord du profil complet du plug.");
+assert(app.includes("const safeMaxT = profileMaxT - edgeInset"), "La course du logo doit finir au bord du profil complet du plug.");
+assert(app.includes("axialProfile,"), "Le profil axial complet doit être conservé avec la décalcomanie.");
+assert(app.includes("sampleAxialProfileRadius(placement.axialProfile"), "La distance du logo à l'axe doit suivre le diamètre local du plug.");
+assert(placementModule.includes("export function sampleAxialProfileRadius"), "L'interpolation du profil axial doit rester isolée et testable.");
 assert(css.includes("canvas.is-decal-editing"), "Le canvas doit signaler visuellement le mode de déplacement.");
 assert(css.includes("canvas.is-decal-dragging"), "Le canvas doit signaler visuellement le glisser en cours.");
 

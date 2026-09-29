@@ -16,12 +16,14 @@ import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js"
 import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
 import { MeshoptDecoder } from "meshoptimizer";
 import { buildBVHInWorker, compileBeforeSwap, abortError } from "./assets/js/diamond/background-bvh.js";
-import { attachDecalGesture } from "./assets/js/decal-gesture.js?v=20260929-scale-orientation-v09";
+import { attachDecalGesture } from "./assets/js/decal-gesture.js?v=20260929-optimized-3dm-v10";
+
+const MODEL_ASSET_VERSION = "20260929-optimized-3dm-v10";
 import { watermarkPngBlob } from "./assets/js/png-watermark.js";
 import { createBottleReference } from "./assets/js/bottle-reference.js";
 import { createCoinReference } from "./assets/js/coin-reference.js";
 import { createRulerReference } from "./assets/js/ruler-reference.js";
-import { pointInPlacementFrame, placementInWorld } from "./assets/js/decal-placement.js";
+import { pointInPlacementFrame, placementInWorld, sampleAxialProfileRadius } from "./assets/js/decal-placement.js?v=20260929-optimized-3dm-decal-v10";
 import { buildViewerProductSummary, resolveRosebudsProductLink } from "./assets/js/rosebuds-product-link.js";
 
 const canvas = document.querySelector("#jewel-canvas");
@@ -3952,6 +3954,12 @@ function loadWithTimeout(promise, timeoutMs, label) {
   ]);
 }
 
+function withCurrentModelVersion(url) {
+  if (typeof url !== "string" || /^(blob:|data:)/i.test(url)) return url;
+  const separator = url.includes("?") ? "&" : "?";
+  return `${url}${separator}meshVersion=${MODEL_ASSET_VERSION}`;
+}
+
 function createPlugFallbackPart(geometry, name, position, rotation = [0, 0, Math.PI / 2]) {
   const mesh = new THREE.Mesh(geometry, makeRhinoPolishedMetalMaterial(name));
   mesh.name = name;
@@ -4642,7 +4650,7 @@ function loadRhinoModelDetached(url, meshOptions = {}) {
 
   return new Promise((resolve, reject) => {
     loader.load(
-      url,
+      withCurrentModelVersion(url),
       (object) => {
         object.name = "Imported Rhino 3DM jewelry model";
         applyRhinoCoordinateFrame(object, effectiveMeshOptions);
@@ -10590,7 +10598,7 @@ function loadRhinoModel(url, meshOptions = {}) {
 
   return new Promise((resolve, reject) => {
     loader.load(
-      url,
+      withCurrentModelVersion(url),
       (object) => {
         setLoadingProgress(64, "Décodage du document Rhino 3DM");
         clearRhinoMeshPreview();
@@ -10950,11 +10958,19 @@ function findThinStemDecalPlacement(entry, referenceBox, gemCenter = null) {
   const segmentMinT = tMin + (scored.group.start / binCount) * span;
   const segmentMaxT = tMin + ((scored.group.end + 1) / binCount) * span;
   const halfProjectorWidth = widthWorld * 0.5;
-  const safeMinT = segmentMinT + halfProjectorWidth;
-  const safeMaxT = segmentMaxT - halfProjectorWidth;
+  const initialMinT = segmentMinT + halfProjectorWidth;
+  const initialMaxT = segmentMaxT - halfProjectorWidth;
+  const axialProfile = valid
+    .map((item) => ({ t: item.center.dot(axis), radius: item.radius }))
+    .sort((a, b) => a.t - b.t);
+  const profileMinT = axialProfile[0].t;
+  const profileMaxT = axialProfile[axialProfile.length - 1].t;
+  const edgeInset = Math.min(widthWorld * 0.03, Math.max((profileMaxT - profileMinT) * 0.005, 0));
+  const safeMinT = profileMinT + edgeInset;
+  const safeMaxT = profileMaxT - edgeInset;
   const centerT = centerBin.center.dot(axis);
-  const shiftedT = safeMinT <= safeMaxT
-    ? (safeMinT + safeMaxT) * 0.5
+  const shiftedT = initialMinT <= initialMaxT
+    ? (initialMinT + initialMaxT) * 0.5
     : (segmentMinT + segmentMaxT) * 0.5;
   const decalShiftWorld = shiftedT - centerT;
   const decalShiftMillimeters = Math.abs(decalShiftWorld) / Math.max(worldUnitsPerMillimeter, 1e-8);
@@ -10980,6 +10996,7 @@ function findThinStemDecalPlacement(entry, referenceBox, gemCenter = null) {
     halfTextShiftWorld,
     safeMinT,
     safeMaxT,
+    axialProfile,
     worldUnitsPerMillimeter,
     binRange: [scored.group.start, scored.group.end],
   };
@@ -11077,6 +11094,7 @@ function setStemDecalPlacementCoordinates(placement, axialRatio, angle) {
   const normalizedRatio = THREE.MathUtils.clamp(Number.isFinite(Number(axialRatio)) ? Number(axialRatio) : 0.5, 0, 1);
   const normalizedAngle = Number.isFinite(Number(angle)) ? Number(angle) : 0;
   const axialT = THREE.MathUtils.lerp(minT, maxT, normalizedRatio);
+  const surfaceRadius = sampleAxialProfileRadius(placement.axialProfile, axialT, placement.stemRadius);
   const normal = placement.stemUAxis.clone().multiplyScalar(Math.cos(normalizedAngle))
     .addScaledVector(placement.stemVAxis, Math.sin(normalizedAngle)).normalize();
   const stemCenter = placement.axisOrigin.clone().addScaledVector(placement.stemAxis, axialT);
@@ -11085,7 +11103,8 @@ function setStemDecalPlacementCoordinates(placement, axialRatio, angle) {
   placement.heightAxis.crossVectors(normal, placement.axis).normalize();
   if (placement.heightAxis.lengthSq() < 0.000001) placement.heightAxis.copy(placement.stemVAxis);
   placement.center.copy(stemCenter)
-    .addScaledVector(normal, placement.stemRadius * 0.98 + placement.size.z * 0.18);
+    .addScaledVector(normal, surfaceRadius * 0.98 + placement.size.z * 0.18);
+  placement.currentSurfaceRadius = surfaceRadius;
   placement.axialRatio = normalizedRatio;
   placement.angle = normalizedAngle;
 }

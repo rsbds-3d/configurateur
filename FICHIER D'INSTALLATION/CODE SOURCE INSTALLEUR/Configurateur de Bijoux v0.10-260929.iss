@@ -1,6 +1,6 @@
 #define AppName "Configurateur de Bijoux Rosebuds"
-#define AppVersion "0.9"
-#define AppDisplayVersion "v0.9-260929"
+#define AppVersion "0.10"
+#define AppDisplayVersion "v0.10-260929"
 #define AppPublisher "Charles Thierry de Ville d'Avray"
 #define AppExecutable "Configurateur de Bijoux Rosebuds.exe"
 #define ProjectRoot SourcePath + "..\.."
@@ -15,7 +15,7 @@ DefaultDirName={autopf}\Configurateur de Bijoux Rosebuds
 DefaultGroupName=Configurateur de Bijoux Rosebuds
 DisableProgramGroupPage=yes
 OutputDir=..
-OutputBaseFilename=Configurateur de Bijoux v0.9-260929
+OutputBaseFilename=Configurateur de Bijoux v0.10-260929
 SetupIconFile={#ProjectRoot}\assets\icons\diamond-launcher.ico
 UninstallDisplayIcon={app}\{#AppExecutable}
 Compression=lzma2/ultra64
@@ -26,11 +26,11 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 CloseApplications=force
 RestartApplications=no
-VersionInfoVersion=0.9.0.0
+VersionInfoVersion=0.10.0.0
 VersionInfoCompany={#AppPublisher}
 VersionInfoDescription={#AppName} {#AppDisplayVersion}
 VersionInfoProductName={#AppName}
-VersionInfoProductVersion=0.9.0.0
+VersionInfoProductVersion=0.10.0.0
 VersionInfoCopyright=Copyright (C) 2026 {#AppPublisher}
 
 [Languages]

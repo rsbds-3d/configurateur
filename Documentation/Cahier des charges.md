@@ -1,6 +1,6 @@
 # Cahier des charges - Configurateur de bijoux
 
-Version : **v0.9-260929**
+Version : **v0.10-260929**
 
 ## Révision du 29 septembre 2026
 
@@ -112,7 +112,8 @@ Modèles Originale `Avec tête` validés : `LARGE 35`, `MEDIUM`, `SMALL 18`, `SM
 - Contrôle des textes mal encodés.
 - Affichage cohérent de la version.
 - Mode AR : bouton disponible, demande caméra différée au clic, libération de la caméra à la sortie et conservation des matériaux PBR via `VideoTexture`.
-- Déplacements de décalcomanie persistants, bornés à la tige et isolés par identifiant de modèle.
+- Déplacements de décalcomanie persistants, isolés par identifiant de modèle et autorisés sur toute la longueur du solide jusqu'aux extrémités, avec adaptation au rayon local.
+- Intégrité des 37 modèles 3DM du catalogue : correspondance source/cible explicite, empreinte SHA-256 et cache-buster de géométrie.
 - Lanceur Windows : signature PE valide, serveur local fourni par l'EXE et raccourcis ciblant l'exécutable.
 - Version en ligne : paquet autonome, écran d'accès actif, application non chargée avant validation et workflow GitHub Pages présent.
 - Catalogue : trois modes cohérents donnant accès aux mêmes combinaisons compatibles.
