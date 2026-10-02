@@ -1,6 +1,6 @@
 # Guide utilisateur - Configurateur de bijoux
 
-Version : **v0.10-260929**
+Version : **v0.11-260930**
 
 ## Objectif
 
@@ -100,6 +100,13 @@ Le rendu optimisé emploie une super-résolution Swin2SR, pas encore un moteur d
 
 ## Version en ligne
 
-La version publiée à l'adresse https://rsbds-3d.github.io/configurateur/ est indépendante de l'installation Windows mais fournit le même catalogue, les mêmes modèles, matériaux, fonctions 3D et fonctions AR. Elle demande un identifiant et un mot de passe avant de charger l'application. L'autorisation est mémorisée uniquement pendant la session de l'onglet.
+La version publiée à l'adresse https://rsbds-3d.github.io/configurateur/ est indépendante de l'installation Windows mais fournit le même catalogue, les mêmes modèles, matériaux, fonctions 3D et fonctions AR. Son adresse d'entrée affiche uniquement une page de connexion : le catalogue et le viewer ne sont ni visibles ni chargés derrière le formulaire. Après validation, le navigateur ouvre la page protégée `configurateur.html`. Une adresse directe vers un modèle conserve tous ses paramètres pendant ce passage par la connexion. L'autorisation est mémorisée uniquement pendant la session de l'onglet.
 
 GitHub Pages étant statique, cette barrière protège l'accès normal à l'interface mais pas les fichiers contre une personne capable d'inspecter directement le dépôt ou les URL. Une authentification côté serveur reste nécessaire pour une confidentialité forte.
+# Complements v0.11
+
+Dans Originale, choisir Bronzes puis Keyring et sa finition Gold, Silver, Shiny ou Patine. Les corps sont ceux des modeles avec tete. Le bronze suit le diametre de l'ornement principal remplace.
+
+Le cache optique local reutilise le BVH d'une pierre deja preparee. La compilation GPU peut encore demander du temps selon le navigateur. Revenir au catalogue annule le calcul en cours.
+
+Le logo de tige est blanc sur aluminium et marron dore sur inox. Le lanceur Windows utilise Chrome en mode application sans onglets si Chrome est installe.

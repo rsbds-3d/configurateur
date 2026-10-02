@@ -24,15 +24,15 @@ assert(selector.includes("entries.slice(1)"), "Le plus grand solide doit etre ex
 assert(selector.includes("gemCandidates[gemCandidates.length - 1]"), "Le plus petit volume doit seulement rester un fallback.");
 
 const assigner = getFunctionBody("assignClassicPlugMaterialsByVolume");
-assert(assigner.includes("selectClassicPlugGemEntry(entries, meshOptions)"), "L'attribution plug doit utiliser la selection robuste de pierre.");
+assert(assigner.includes("selectClassicPlugGemEntry(entries, meshOptions, new Set(bronzeEntry ? [bronzeEntry] : []))"), "L'attribution plug doit utiliser la sélection robuste de pierre sans confondre le bronze.");
 assert(assigner.includes("gemScore"), "Le journal d'import doit exposer le score de detection pour deboguer les cas Rhino.");
 
 const rootGemMeshes = getFunctionBody("getRootGemMeshes");
-assert(rootGemMeshes.includes('if (explicitRole === "metal") return'), "Un solide explicitement metallique ne doit jamais recevoir un materiau de pierre.");
-assert(rootGemMeshes.indexOf('if (explicitRole === "metal") return') < rootGemMeshes.indexOf("isLikelyGemMaterial"), "Le veto metal doit preceder toute heuristique de couleur ou transparence.");
+assert(rootGemMeshes.includes('if (explicitRole === "metal" || explicitRole === "bronze") return'), "Un solide explicitement métallique ou bronze ne doit jamais recevoir un matériau de pierre.");
+assert(rootGemMeshes.indexOf('if (explicitRole === "metal" || explicitRole === "bronze") return') < rootGemMeshes.indexOf("isLikelyGemMaterial"), "Le veto métal/bronze doit précéder toute heuristique de couleur ou transparence.");
 
 const cacheRestore = getFunctionBody("restoreCachedImportedModelState");
-assert(cacheRestore.includes('explicitRole !== "metal"'), "La restauration du cache ne doit pas reclasser un metal clair comme pierre.");
+assert(cacheRestore.includes("!['metal', 'bronze'].includes(explicitRole)"), "La restauration du cache ne doit pas reclasser un métal ou un bronze clair comme pierre.");
 
 const optical = getFunctionBody("getGemOpticalQualityProfile");
 assert(optical.includes("isCabochon ? THREE.MathUtils.clamp(transmission, 0.22, 0.46)"), "Les cabochons doivent rester colores et ne pas devenir trop transparents.");

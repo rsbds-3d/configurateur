@@ -42,6 +42,18 @@ async function main() {
   const bvh = MeshBVH.deserialize(serialized, geometry);
   assert(bvh.raycastFirst(new THREE.Ray(new THREE.Vector3(0, 0, 3), new THREE.Vector3(0, 0, -1)), THREE.DoubleSide));
 
+  const values = new Map();
+  const cache = { get: async (key) => values.get(key), set: async (key, value) => values.set(key, value) };
+  await buildBVHInWorker(new THREE.BoxGeometry(), { createWorker: nodeWorkerFactory, cacheKey: "box-v1", cache });
+  let cacheHit = false;
+  const cached = await buildBVHInWorker(new THREE.BoxGeometry(), {
+    cacheKey: "box-v1",
+    cache,
+    onCacheHit: () => { cacheHit = true; },
+    createWorker: () => { throw new Error("Le worker ne doit pas être relancé après mise en cache"); },
+  });
+  assert(cacheHit && cached?.roots?.length, "Une géométrie déjà calculée doit être restaurée depuis le cache persistant.");
+
   let terminated = 0;
   const controller = new AbortController();
   const pending = buildBVHInWorker(new THREE.BoxGeometry(), {
@@ -100,6 +112,7 @@ async function main() {
   assert.match(app, /await waitForViewerIdle\(controller.signal/, "La compilation GPU doit attendre la fin des interactions");
   assert.match(app, /Rendu rapide interactif : finalisation en attente/, "La progression doit expliquer l'attente de la haute qualité");
   assert.match(app, /await ensureDiamondGpuBVHMaterial/);
+  assert.match(app, /retour immédiat au catalogue/, "Le bouton Catalogue doit annuler le calcul haute qualité dès l'appui.");
   assert.match(app, /\.finally\(\(\) => finishLoading\(\)\)/, "Le chargement initial ne doit pas masquer la progression optique");
   console.log("Background BVH worker, responsiveness, compilation and cancellation tests OK");
 }

@@ -7,7 +7,7 @@ const launcherPath = path.join(root, "Configurateur de Bijoux Rosebuds.exe");
 const launcherSource = fs.readFileSync(path.join(root, "launcher", "Program.cs"), "utf8");
 const shortcutScript = fs.readFileSync(path.join(root, "install-configurateur.ps1"), "utf8");
 const installerSource = fs.readFileSync(
-  path.join(root, "FICHIER D'INSTALLATION", "CODE SOURCE INSTALLEUR", "Configurateur de Bijoux v0.10-260929.iss"),
+  path.join(root, "FICHIER D'INSTALLATION", "CODE SOURCE INSTALLEUR", "Configurateur de Bijoux v0.11-260930.iss"),
   "utf8"
 );
 
@@ -21,5 +21,9 @@ assert(shortcutScript.includes("$targetExe"), "Les raccourcis réparés doivent 
 assert(!shortcutScript.includes("$targetBat"), "Les raccourcis ne doivent plus cibler un BAT.");
 assert(installerSource.includes("{#AppExecutable}"), "L'installateur doit embarquer le véritable EXE.");
 assert(!installerSource.includes('Filename: "{app}\\relancer-viewer.bat"'), "L'installateur ne doit pas lancer le BAT.");
+assert(launcherSource.includes('--app=\\"'), "Chrome doit être lancé en mode application sans onglets.");
+assert(launcherSource.includes("FindChromePath"), "Le lanceur doit rechercher explicitement Google Chrome.");
+assert(installerSource.includes("rosebuds-launcher.ico"), "L'installateur doit utiliser l'icône ROSEBUDS.");
+assert(fs.existsSync(path.join(root, "assets", "icons", "rosebuds-launcher.ico")), "L'icône ROSEBUDS du lanceur doit exister.");
 
 console.log("Windows EXE launcher regression test OK");

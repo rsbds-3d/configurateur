@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const VIEWER_VERSION = "20260929-optimized-3dm-decal-v10";
+  const VIEWER_VERSION = "20260930-login-page-v11";
   const LOCAL_APPLICATION_URL = "http://localhost:8080/";
   const ALUMINUM_FINISHES_BY_SIZE_CLASS = Object.freeze({
     SMALL: Object.freeze(["aluminum-gray", "aluminum-black", "aluminum-red", "aluminum-violet"]),
@@ -53,6 +53,22 @@
     "plug-classique-xl-45-sans-tete",
     "plug-classique-xxl-50-sans-tete",
     "plug-classique-xxxl-60-sans-tete",
+  ]);
+  const CLASSIC_BRONZE_MODELS = new Set([
+    "plug-classique-large-35-keyring",
+    "plug-classique-medium-keyring",
+    "plug-classique-small-18-keyring",
+    "plug-classique-small-keyring",
+    "plug-classique-xl-35-keyring",
+    "plug-classique-xl-45-avec-assiette-keyring",
+    "plug-classique-xl-keyring",
+    "plug-classique-xxl-35-keyring",
+    "plug-classique-xxl-keyring",
+    "plug-classique-xxxl-60-keyring",
+    "plug-classique-xxxl-70-keyring",
+    "plug-classique-xxxl-80-keyring",
+    "plug-classique-xxxl-90-keyring",
+    "plug-classique-xxxl-100-keyring",
   ]);
   const params = new URLSearchParams(window.location.search);
 
@@ -177,6 +193,7 @@
     const state = {
       family: "",
       head: "",
+      bronzeType: "",
       plugSize: "",
       crystalSize: "",
       metal: "",
@@ -217,10 +234,18 @@
         visual: "profile-with-head",
       },
       {
-        id: "sans-tete",
-        label: "Sans tête",
-        description: "Le corps du plug reste nu, sans tête ni logement d'ornement.",
-        visual: "profile-without-head",
+        id: "bronze",
+        label: "Bronzes",
+        description: "La pierre principale est remplacée par un ornement en bronze, qui peut intégrer ses propres cristaux.",
+        visual: "ornament-bronze",
+      },
+    ];
+    const bronzeTypes = [
+      {
+        id: "keyring",
+        label: "Keyring",
+        description: "Bronze Keyring de référence Ø 26,8 mm, mis à l’échelle comme la pierre principale pour chaque taille de plug.",
+        visual: "ornament-bronze",
       },
     ];
     const metalFinishes = {
@@ -268,7 +293,8 @@
         ["Aquamarine cabochon", "Aquamarine", "#68c9dc"],
       ],
       bronze: [
-        ["Bronze poli", "Bronze poli", "#bd7d3f"], ["Bronze patiné", "Bronze patiné", "#507e70"], ["Bronze doré", "Bronze doré", "#cc9d45"],
+        ["Gold", "Gold (or)", "#c99b45"], ["Silver", "Silver (argent)", "#d8dbdc"],
+        ["Shiny", "Shiny (brillant)", "#b77842"], ["Patine", "Patine (noir)", "#171716"],
       ],
       none: [["none", "Sans finition", "#5f5d58"]],
     };
@@ -283,11 +309,19 @@
       },
       {
         key: "head",
-        eyebrow: "Tête du plug",
-        title: "Votre modèle Originale doit-il avoir une tête ?",
-        description: "Ce choix distingue les modèles complets avec logement d'ornement des corps de plug sans tête.",
+        eyebrow: "Catégorie",
+        title: "Quelle catégorie Originale recherchez-vous ?",
+        description: "Choisissez une tête avec pierre principale ou la catégorie Bronzes.",
         visible: () => state.family === "Classique",
         options: () => classicHeadOptions,
+      },
+      {
+        key: "bronzeType",
+        eyebrow: "Type de bronze",
+        title: "Quel type de bronze recherchez-vous ?",
+        description: "Chaque type correspond à une géométrie bronze réelle. D'autres collections pourront être ajoutées ici.",
+        visible: () => state.family === "Classique" && state.head === "bronze",
+        options: () => bronzeTypes.filter((type) => models.some((model) => model.head === "bronze" && model.bronzeType === type.id)),
       },
       {
         key: "plugSize",
@@ -301,10 +335,11 @@
         eyebrow: "03 · Taille du cristal",
         title: "Quelle taille de cristal recherchez-vous ?",
         description: "Une même taille de plug peut accepter plusieurs diamètres de cristal. Seules les dimensions présentes dans les modèles Rhino sont proposées.",
-        visible: () => state.family !== "Classique" || state.head !== "sans-tete",
+        visible: () => getCandidateModels(models, state).some((model) => Boolean(model.crystalSize)),
         options: () => sortPhysicalSizes(unique(models
           .filter((model) => model.family === state.family
             && matchesClassicHead(model, state.family, state.head)
+            && (!state.bronzeType || model.bronzeType === state.bronzeType)
             && model.plugSize === state.plugSize)
           .map((model) => model.crystalSize))).map((size) => ({
           id: size, label: size, description: describeSize(size), visual: `size-${size.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
@@ -348,10 +383,16 @@
       if (!button) return;
       const key = button.dataset.key;
       const value = button.dataset.value;
-      const definitionIndex = questionDefinitions.findIndex((question) => question.key === key);
+      const activeQuestions = getActiveQuestions();
+      const definitionIndex = activeQuestions.findIndex((question) => question.key === key);
       if (definitionIndex < 0) return;
       state[key] = value;
-      questionDefinitions.slice(definitionIndex + 1).forEach((question) => { state[question.key] = ""; });
+      activeQuestions.slice(definitionIndex + 1).forEach((question) => { state[question.key] = ""; });
+      if (key === "family" || key === "head") {
+        state.bronzeType = "";
+        state.ornament = "";
+        state.ornamentFinish = "";
+      }
       render();
       requestAnimationFrame(() => {
         const activeIndex = getActiveQuestions().findIndex((question) => question.key === key);
@@ -456,8 +497,8 @@
         return `<section class="welcome-step${state[question.key] ? " is-answered" : ""}" data-step-index="${index}">
           <div class="welcome-step-copy">
             <p class="welcome-kicker">${escapeHtml(formatQuestionEyebrow(question, index))}</p>
-            <h2>${escapeHtml(question.title)}</h2>
-            <p>${escapeHtml(question.description)}</p>
+            <h2>${escapeHtml(resolveQuestionText(question.title))}</h2>
+            <p>${escapeHtml(resolveQuestionText(question.description))}</p>
           </div>
           <div class="welcome-options welcome-options--${escapeHtml(question.key)}">
             ${options.map((option) => renderChoice(question.key, option, state[question.key] === option.id)).join("")}
@@ -534,6 +575,7 @@
       url.searchParams.set("catalogModel", modelId);
       url.searchParams.set("modelFamily", resolved.family);
       url.searchParams.set("classicHead", resolved.head);
+      if (resolved.bronzeType) url.searchParams.set("bronzeType", resolved.bronzeType);
       url.searchParams.set("plugSize", resolved.plugSize);
       url.searchParams.set("crystalSize", resolved.crystalSize);
       url.searchParams.set("metalFamily", resolved.metal);
@@ -547,7 +589,8 @@
       if (!multifilterFields) return;
       const fields = [
         ["family", "Gamme"],
-        ["head", "Tête (Originale)"],
+        ["head", "Catégorie (Originale)"],
+        ["bronzeType", "Type de bronze"],
         ["plugSize", "Taille du plug"],
         ["crystalSize", "Taille du cristal"],
         ["metal", "Métal"],
@@ -557,7 +600,8 @@
       ];
       multifilterFields.innerHTML = fields.map(([key, label]) => {
         const options = getFacetOptions(key);
-        const disabled = key === "head" && state.family && state.family !== "Classique";
+        const disabled = (key === "head" && state.family && state.family !== "Classique")
+          || (key === "bronzeType" && state.head !== "bronze");
         return `<label>
           <span>${escapeHtml(label)}</span>
           <select data-catalog-filter="${escapeHtml(key)}"${disabled ? " disabled" : ""}>
@@ -577,6 +621,7 @@
     function getAllFilterOptions(key) {
       if (key === "family") return modelFamilies;
       if (key === "head") return classicHeadOptions;
+      if (key === "bronzeType") return bronzeTypes;
       if (key === "metal") return metalFamilies;
       if (key === "ornament") return Object.entries(ornaments).map(([id, option]) => ({ id, ...option }));
       if (key === "plugSize") {
@@ -603,6 +648,7 @@
     function modelMatchesFilters(model, filters) {
       if (filters.family && model.family !== filters.family) return false;
       if (filters.head && (model.family !== "Classique" || model.head !== filters.head)) return false;
+      if (filters.bronzeType && model.bronzeType !== filters.bronzeType) return false;
       if (filters.plugSize && model.plugSize !== filters.plugSize) return false;
       if (filters.crystalSize && model.crystalSize !== filters.crystalSize) return false;
 
@@ -629,8 +675,9 @@
 
     function keepOnlyPossibleSelections(changedKey) {
       if (state.family !== "Classique") state.head = "";
+      if (state.head !== "bronze") state.bronzeType = "";
       if (models.some((model) => modelMatchesFilters(model, state))) return;
-      const keys = ["ornamentFinish", "ornament", "metalFinish", "metal", "crystalSize", "plugSize", "head", "family"];
+      const keys = ["ornamentFinish", "ornament", "metalFinish", "metal", "crystalSize", "plugSize", "bronzeType", "head", "family"];
       for (const key of keys) {
         if (key === changedKey || !state[key]) continue;
         state[key] = "";
@@ -643,6 +690,7 @@
       const resolved = {
         family: model.family,
         head: model.head,
+        bronzeType: model.bronzeType,
         plugSize: model.plugSize,
         crystalSize: model.crystalSize,
         metal: filters.metal,
@@ -674,6 +722,7 @@
         let score = 0;
         if (filters.family && model.family === filters.family) score += 8;
         if (filters.head && model.head === filters.head) score += 4;
+        if (filters.bronzeType && model.bronzeType === filters.bronzeType) score += 6;
         if (filters.plugSize && model.plugSize === filters.plugSize) score += 8;
         if (filters.crystalSize && model.crystalSize === filters.crystalSize) score += 5;
         if (filters.metal && modelSupportsMetalFamily(model, filters.metal)) score += 3;
@@ -686,7 +735,7 @@
     }
 
     function buildAiSchema() {
-      return Object.fromEntries(["family", "head", "plugSize", "crystalSize", "metal", "metalFinish", "ornament", "ornamentFinish"]
+      return Object.fromEntries(["family", "head", "bronzeType", "plugSize", "crystalSize", "metal", "metalFinish", "ornament", "ornamentFinish"]
         .map((key) => [key, getAllFilterOptions(key).map((option) => ({ id: option.id, label: option.label, diameter: option.diameter }))]));
     }
 
@@ -703,7 +752,25 @@
     }
 
     function getActiveQuestions() {
-      return questionDefinitions.filter((question) => !question.visible || question.visible());
+      const active = questionDefinitions.filter((question) => !question.visible || question.visible());
+      if (state.family !== "Classique" || state.head !== "bronze") return active;
+      state.ornament = "bronze";
+      const finish = active.find((question) => question.key === "ornamentFinish");
+      const ordered = active.filter((question) => !["ornament", "ornamentFinish"].includes(question.key));
+      const bronzeTypeIndex = ordered.findIndex((question) => question.key === "bronzeType");
+      if (finish && bronzeTypeIndex >= 0) ordered.splice(bronzeTypeIndex + 1, 0, finish);
+      return ordered;
+    }
+
+    function resolveQuestionText(value) {
+      if (typeof value === "function") return value();
+      if (state.head === "bronze" && value === "Quelle finition d'ornement vous convient ?") {
+        return "Quel matériau souhaitez-vous pour le bronze ?";
+      }
+      if (state.head === "bronze" && value === "La teinte sera transmise au rendu optique du cristal, de la gemme ou du décor.") {
+        return "Choisissez Gold, Silver, Shiny ou Patine pour le bronze Keyring.";
+      }
+      return value;
     }
 
     function formatQuestionEyebrow(question, index) {
@@ -731,6 +798,7 @@
           label,
           family: getModelFamily(label),
           head: getModelHead(option.value),
+          bronzeType: getBronzeType(option.value),
           plugSize: getPlugSize(option.value),
           plugSizeLabel: getPlugSizeLabel(option.value),
           plugDiameterMm: getPlugDiameterMm(option.value),
@@ -775,7 +843,7 @@
   }
 
   function getCrystalSize(id) {
-    if (CLASSIC_MODELS_WITHOUT_HEAD.has(id)) return "";
+    if (CLASSIC_MODELS_WITHOUT_HEAD.has(id) || String(id || "").includes("-keyring")) return "";
     const text = String(id || "").toLowerCase();
     if (text.includes("new-small") || text.includes("new-medium")) return "12 mm";
     if (text.includes("classique-small-18")) return "18 mm";
@@ -794,8 +862,13 @@
 
   function getModelHead(id) {
     if (CLASSIC_MODELS_WITH_HEAD.has(id)) return "avec-tete";
+    if (CLASSIC_BRONZE_MODELS.has(id)) return "bronze";
     if (CLASSIC_MODELS_WITHOUT_HEAD.has(id)) return "sans-tete";
     return "";
+  }
+
+  function getBronzeType(id) {
+    return String(id || "").includes("keyring") ? "keyring" : "";
   }
 
   function matchesClassicHead(model, family, head) {
@@ -815,6 +888,7 @@
   function getCandidateModels(models, state) {
     return models.filter((model) => model.family === state.family
       && matchesClassicHead(model, state.family, state.head)
+      && (!state.bronzeType || model.bronzeType === state.bronzeType)
       && (!state.plugSize || model.plugSize === state.plugSize)
       && (!state.crystalSize || model.crystalSize === state.crystalSize));
   }
@@ -877,7 +951,7 @@
           for (const [ornamentFinish] of finishes[ornament] || []) {
             if (filters.ornamentFinish && filters.ornamentFinish !== ornamentFinish) continue;
             if (!modelSupportsOrnamentFinish(model, ornament, ornamentFinish)) continue;
-            configurations.push({ family: model.family, head: model.head, plugSize: model.plugSize,
+            configurations.push({ family: model.family, head: model.head, bronzeType: model.bronzeType, plugSize: model.plugSize,
               crystalSize: model.crystalSize, metal, metalFinish, ornament, ornamentFinish });
           }
         }
@@ -925,6 +999,7 @@
     const options = new Map();
     models
       .filter((model) => model.family === state.family && matchesClassicHead(model, state.family, state.head))
+      .filter((model) => !state.bronzeType || model.bronzeType === state.bronzeType)
       .forEach((model) => {
         if (options.has(model.plugSize)) return;
         options.set(model.plugSize, {

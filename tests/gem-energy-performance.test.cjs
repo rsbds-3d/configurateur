@@ -29,8 +29,8 @@ assert(
   "La BVH doit etre reutilisee tant que la geometrie de la pierre ne change pas."
 );
 assert(
-  app.includes("await buildBVHInWorker(geometry, { signal, onProgress })"),
-  "La construction BVH doit utiliser un worker avec progression et annulation."
+  app.includes("cacheKey: getDiamondBvhCacheKey(mesh, geometry)"),
+  "La construction BVH doit utiliser un worker avec progression, annulation et cache persistant."
 );
 assert(
   app.includes("await compileBeforeSwap({") && !app.includes("function traceDiamondChannel"),

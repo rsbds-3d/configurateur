@@ -1,6 +1,14 @@
 # Cahier des charges - Configurateur de bijoux
 
-Version : **v0.10-260929**
+Version : **v0.11-260930**
+
+## Révision du 30 septembre 2026
+
+- La version GitHub Pages sépare physiquement la page de connexion `index.html` de l'application `configurateur.html`.
+- Aucun script du catalogue ou du viewer n'est chargé avant l'authentification.
+- Un garde synchrone placé en tête de la page applicative bloque son affichage direct sans session autorisée.
+- Les paramètres de recherche et l'ancre sont conservés lors du passage par la connexion afin de rouvrir le modèle demandé.
+- L'application Windows reste indépendante et continue d'ouvrir directement son catalogue local.
 
 ## Révision du 29 septembre 2026
 
@@ -98,7 +106,7 @@ Modèles Originale `Avec tête` validés : `LARGE 35`, `MEDIUM`, `SMALL 18`, `SM
 - Pas d'éléments non-plugs dans la bibliothèque produit.
 - Application Windows lancée par un véritable EXE autonome, sans appel à un BAT ni dépendance à Node.js.
 - Version web générée et publiée indépendamment de l'application Windows, avec parité fonctionnelle.
-- Écran d'identification chargé avant le catalogue et le viewer sur la version en ligne uniquement.
+- Page d'identification autonome chargée avant le catalogue et le viewer sur la version en ligne uniquement ; aucune partie de l'application ne doit être visible derrière le formulaire.
 - Les modèles IA fonctionnent côté client, sans API payante; un repli déterministe doit maintenir la recherche si le modèle n'est pas disponible.
 
 ## Tests exigés
@@ -115,7 +123,7 @@ Modèles Originale `Avec tête` validés : `LARGE 35`, `MEDIUM`, `SMALL 18`, `SM
 - Déplacements de décalcomanie persistants, isolés par identifiant de modèle et autorisés sur toute la longueur du solide jusqu'aux extrémités, avec adaptation au rayon local.
 - Intégrité des 37 modèles 3DM du catalogue : correspondance source/cible explicite, empreinte SHA-256 et cache-buster de géométrie.
 - Lanceur Windows : signature PE valide, serveur local fourni par l'EXE et raccourcis ciblant l'exécutable.
-- Version en ligne : paquet autonome, écran d'accès actif, application non chargée avant validation et workflow GitHub Pages présent.
+- Version en ligne : paquet autonome, page d'accès distincte, application non chargée avant validation, garde contre l'accès direct, conservation de l'URL demandée et workflow GitHub Pages présent.
 - Catalogue : trois modes cohérents donnant accès aux mêmes combinaisons compatibles.
 - Viewer : rendu provisoire conservé pendant le BVH, priorité des interactions avant compilation, objets d'échelle, comparaison physique des tailles et export/partage PNG.
 

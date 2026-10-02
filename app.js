@@ -12,6 +12,7 @@ import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { DecalGeometry } from "three/addons/geometries/DecalGeometry.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
 import { MeshoptDecoder } from "meshoptimizer";
@@ -23,7 +24,7 @@ import { watermarkPngBlob } from "./assets/js/png-watermark.js";
 import { createBottleReference } from "./assets/js/bottle-reference.js";
 import { createCoinReference } from "./assets/js/coin-reference.js";
 import { createRulerReference } from "./assets/js/ruler-reference.js";
-import { pointInPlacementFrame, placementInWorld, sampleAxialProfileRadius } from "./assets/js/decal-placement.js?v=20260929-optimized-3dm-decal-v10";
+import { pointInPlacementFrame, placementInWorld, sampleAxialProfileRadius } from "./assets/js/decal-placement.js?v=20260930-login-page-v11";
 import { buildViewerProductSummary, resolveRosebudsProductLink } from "./assets/js/rosebuds-product-link.js";
 
 const canvas = document.querySelector("#jewel-canvas");
@@ -247,7 +248,7 @@ const settings = {
   metalPreset: "silver",
   metalIntensity: 1.38,
   metalRoughness: 0.06,
-  facetTextureEnabled: true,
+  facetTextureEnabled: false,
   facetTextureMode: "jewelry",
   facetTextureIntensity: 0.18,
   facetTextureRoughness: 0.14,
@@ -292,13 +293,13 @@ const defaultRhinoMeshOptions = {
   chordTolerance: meshQualityPresets.luxury.chord,
   angleTolerance: meshQualityPresets.luxury.angle,
   maxEdgeLength: meshQualityPresets.luxury.maxEdge,
-  weldTolerance: 0,
-  smoothAngle: 68,
+  weldTolerance: 0.0002,
+  smoothAngle: 86,
   visualSubdivisions: meshQualityPresets.luxury.visualSubdivisions,
   surfaceRelaxation: meshQualityPresets.luxury.surfaceRelaxation,
   relaxationStrength: meshQualityPresets.luxury.relaxationStrength,
   preserveAngle: meshQualityPresets.luxury.preserveAngle,
-  weightedNormals: false,
+  weightedNormals: true,
   recomputeNormals: true,
   creaseNormals: true,
   doubleSided: true,
@@ -450,6 +451,7 @@ const composer = new EffectComposer(renderer);
 composer.addPass(renderPass);
 composer.addPass(bloomPass);
 composer.addPass(bokehPass);
+composer.addPass(new OutputPass());
 
 const root = new THREE.Group();
 root.name = "Luxury ring root";
@@ -538,7 +540,7 @@ async function readPersistentModelRecords() {
 
 const facetTextureBestDefault = {
   name: "Joaillerie luxe - subtil",
-  enabled: true,
+  enabled: false,
   mode: "jewelry",
   intensity: 0.18,
   roughness: 0.14,
@@ -605,6 +607,7 @@ const environmentVisuals = {
     background: "radial-gradient(circle at 70% 20%, #d8b15f 0 7%, transparent 8% 20%), linear-gradient(135deg, #030304 0%, #18070e 48%, #3a0d1c 100%)",
   },
 };
+
 const modelDefaults = {
   "plug-decalcomanie": {
     title: "Plug avec decalcomanie",
@@ -988,6 +991,44 @@ const modelDefaults = {
   },
 
 };
+
+const CLASSIC_BRONZE_KEYRING_SOURCE = "./assets/models/plugs/bronzes/keyring-reference-26-8.3dm?v=20260930-bronze-keyring-v11";
+const classicBronzeKeyringVariants = [
+  ["plug-classique-large-35-keyring", "plug-classique-large-35", "LARGE 35", 27],
+  ["plug-classique-medium-keyring", "plug-classique-medium", "MEDIUM 30", 27],
+  ["plug-classique-small-18-keyring", "plug-classique-small-18", "SMALL 18", 18],
+  ["plug-classique-small-keyring", "plug-classique-small", "SMALL", 16],
+  ["plug-classique-xl-35-keyring", "plug-classique-xl-35", "XL 35", 35],
+  ["plug-classique-xl-45-avec-assiette-keyring", "plug-classique-xl-45-avec-assiette", "XL Plus 45", 27],
+  ["plug-classique-xl-keyring", "plug-classique-xl", "XL", 27],
+  ["plug-classique-xxl-35-keyring", "plug-classique-xxl-35", "XXL 35", 35],
+  ["plug-classique-xxl-keyring", "plug-classique-xxl", "XXL", 27],
+  ["plug-classique-xxxl-60-keyring", "plug-classique-xxxl-60", "XXXL 60", 50],
+  ["plug-classique-xxxl-70-keyring", "plug-classique-xxxl-70", "XXXL 70", 50],
+  ["plug-classique-xxxl-80-keyring", "plug-classique-xxxl-80", "XXXL 80", 50],
+  ["plug-classique-xxxl-90-keyring", "plug-classique-xxxl-90", "XXXL 90", 50],
+  ["plug-classique-xxxl-100-keyring", "plug-classique-xxxl-100", "XXXL 100", 50],
+];
+
+classicBronzeKeyringVariants.forEach(([id, baseId, sizeLabel, targetDiameterMm]) => {
+  const base = modelDefaults[baseId];
+  modelDefaults[id] = {
+    ...base,
+    title: `Plug Originale ${sizeLabel} bronze Keyring`,
+    eyebrow: "Collection Bronzes Originale",
+    copy: `Plug Originale ${sizeLabel} avec tête et bronze Keyring à la place de la pierre principale.`,
+    gemColor: "#bd7d3f",
+    meshOptions: {
+      ...(base.meshOptions || defaultRhinoMeshOptions),
+      classicPlugVolumeMaterials: true,
+      classicPlugGem: false,
+      classicPlugBronze: true,
+      bronzeUrl: CLASSIC_BRONZE_KEYRING_SOURCE,
+      bronzeReferenceDiameterMm: 26.8,
+      bronzeTargetDiameterMm: targetDiameterMm,
+    },
+  };
+});
 
 const gemPresets = {
   padparadscha: {
@@ -3627,9 +3668,7 @@ vec3 polishedFacetNormal(vec3 faceNormal) {
         "#include <normal_fragment_maps>",
         `#include <normal_fragment_maps>
 if (uOpticalPolishEnabled > 0.5) {
-  vec3 faceNormalForPolish = normalize(cross(dFdx(vViewPosition), dFdy(vViewPosition)));
-  vec3 smoothNormalForPolish = polishedFacetNormal(faceNormalForPolish);
-  normal = normalize(mix(normal, smoothNormalForPolish, clamp(uOpticalPolishStrength * 0.42, 0.0, 0.72)));
+  normal = normalize(normal);
 }`
       )
       .replace(
@@ -3651,7 +3690,7 @@ if (uFacetTextureEnabled > 0.5) {
 }`
       );
   };
-  material.customProgramCacheKey = () => "ctva-facet-texture-optical-polish-v2";
+  material.customProgramCacheKey = () => "ctva-smooth-rhino-polish-v3";
   return material;
 }
 
@@ -3854,6 +3893,15 @@ const supportTextureLoader = new THREE.TextureLoader();
 const gemTextureCache = new Map();
 const gemTextureLoader = new THREE.TextureLoader();
 const stemDecalTexture = supportTextureLoader.load("./assets/decals/logo-gravure-alu.png", (texture) => {
+  const mask = document.createElement("canvas");
+  mask.width = texture.image.width;
+  mask.height = texture.image.height;
+  const context = mask.getContext("2d");
+  context.drawImage(texture.image, 0, 0);
+  context.globalCompositeOperation = "source-in";
+  context.fillStyle = "#ffffff";
+  context.fillRect(0, 0, mask.width, mask.height);
+  texture.image = mask;
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.center.set(0.5, 0.5);
   texture.rotation = Math.PI / 2;
@@ -4088,7 +4136,7 @@ const catalogOrnamentFamilies = {
   },
   bronze: {
     label: "Ornement bronze",
-    finishes: ["Bronze poli", "Bronze patiné", "Bronze doré"],
+    finishes: ["Gold", "Silver", "Shiny", "Patine"],
   },
 };
 
@@ -4215,6 +4263,7 @@ function getCatalogModelMeta(id, label = "") {
   const hasCrystal = normalized.includes("cristal") || normalized.includes("crystal");
   const hasCabochon = normalized.includes("cabochon");
   const hasStone = hasCrystal || hasCabochon || normalized.includes("avec pierre") || normalized.includes("pierre precieuse");
+  const isBronze = normalized.includes("bronze") || normalized.includes("keyring");
   const isSansTete = normalized.includes("sans tete") && !hasCrystal && !hasCabochon;
   const ornamentFamilies = [];
   if (hasCrystal) ornamentFamilies.push("crystal");
@@ -4226,7 +4275,7 @@ function getCatalogModelMeta(id, label = "") {
     ornamentFamilies.push("crystal");
     if (metalSizeClass === "SMALL") ornamentFamilies.push("gem", "pressed-glass");
   }
-  if (normalized.includes("bronze")) ornamentFamilies.push("bronze");
+  if (isBronze) ornamentFamilies.push("bronze");
   const uniqueOrnaments = [...new Set(ornamentFamilies)];
   return {
     id,
@@ -4242,6 +4291,9 @@ function getCatalogModelMeta(id, label = "") {
     hasStone: uniqueOrnaments.length > 0,
     isNewSmall,
     isNewMedium,
+    isBronze,
+    classicHead: isBronze ? "bronze" : (isSansTete ? "sans-tete" : "avec-tete"),
+    bronzeType: normalized.includes("keyring") ? "keyring" : "",
     isPlug: String(id || "").startsWith("plug-"),
     source,
   };
@@ -4465,15 +4517,15 @@ function getRootGemMeshes(object = root) {
     if (!child.isMesh || child.userData?.stemDecal) return;
     const materials = Array.isArray(child.material) ? child.material : [child.material];
     const explicitRole = child.userData?.classicPlugRole;
-    if (explicitRole === "metal") return;
+    if (explicitRole === "metal" || explicitRole === "bronze") return;
     if (explicitRole === "gem") {
       meshes.push(child);
       return;
     }
     const typedMaterialRole = materials.find((material) =>
-      ["metal", "gem"].includes(material?.userData?.jewelryMaterial?.type)
+      ["metal", "gem", "bronze"].includes(material?.userData?.jewelryMaterial?.type)
     )?.userData?.jewelryMaterial?.type;
-    if (typedMaterialRole === "metal") return;
+    if (typedMaterialRole === "metal" || typedMaterialRole === "bronze") return;
     const label = `${child.name || ""} ${materials.map((material) => material?.name || "").join(" ")}`.toLowerCase();
     const isGem = typedMaterialRole === "gem" ||
       isLikelyGemMaterial(materials[0], label);
@@ -4482,7 +4534,30 @@ function getRootGemMeshes(object = root) {
   return meshes;
 }
 
+function getRootBronzeMeshes(object = root) {
+  const meshes = [];
+  object?.traverse?.((child) => {
+    if (!child.isMesh || child.userData?.stemDecal) return;
+    const materials = Array.isArray(child.material) ? child.material : [child.material];
+    const typedRole = materials.find((material) => material?.userData?.jewelryMaterial?.type === "bronze");
+    if (child.userData?.classicPlugRole === "bronze" || typedRole) meshes.push(child);
+  });
+  return meshes;
+}
+
+function applyCatalogBronzeFinish(finishValue, options = {}) {
+  const bronzeMeshes = getRootBronzeMeshes(options.object || root);
+  bronzeMeshes.forEach((mesh) => {
+    applySingleMaterialToMesh(mesh, makeBronzeOrnamentMaterial(finishValue, mesh.name || "Bronze Keyring"));
+    mesh.userData.classicPlugRole = "bronze";
+    mesh.userData.catalogBronzeFinish = finishValue;
+  });
+  logDebug("material", "Finition bronze appliquée à l’ornement", { finishValue, meshes: bronzeMeshes.length });
+  return bronzeMeshes.length > 0;
+}
+
 function applyCatalogGemPreset(family, finishValue, options = {}) {
+  if (family === "bronze") return applyCatalogBronzeFinish(finishValue, options);
   const presetId = resolveCatalogGemPresetId(family, finishValue) || settings.activeCatalogGemPreset;
   if (!presetId || !gemPresets[presetId]) return false;
   settings.activeCatalogGemPreset = presetId;
@@ -4643,24 +4718,71 @@ function updateCompareModelSpacing(value) {
   if (settings.compareModelsEnabled) loadModelComparisonFromSelection();
 }
 
-function loadRhinoModelDetached(url, meshOptions = {}) {
+function loadRawRhinoObject(url, onProgress) {
   const loader = new Rhino3dmLoader();
   loader.setLibraryPath("https://unpkg.com/three@0.164.1/examples/jsm/libs/rhino3dm/");
-  const effectiveMeshOptions = { ...defaultRhinoMeshOptions, ...meshOptions, skipFrame: true, quiet: true };
-
   return new Promise((resolve, reject) => {
     loader.load(
       withCurrentModelVersion(url),
-      (object) => {
-        object.name = "Imported Rhino 3DM jewelry model";
-        applyRhinoCoordinateFrame(object, effectiveMeshOptions);
-        normalizeImportedModel(object, effectiveMeshOptions);
-        resolve(object);
-      },
-      undefined,
+      resolve,
+      onProgress,
       reject,
     );
   });
+}
+
+async function composeRhinoBronzeOrnament(object, meshOptions = {}, onProgress) {
+  if (!meshOptions.bronzeUrl) return object;
+  object.updateWorldMatrix(true, true);
+  const sourceEntries = collectImportedMeshVolumeEntries(object);
+  const replacedEntries = sourceEntries.filter((entry, index) => index > 0 && scoreClassicPlugGemCandidate(entry, sourceEntries[0]?.volume || 1) > 0);
+  const replacementBox = new THREE.Box3();
+  replacedEntries.forEach((entry) => replacementBox.union(entry.box));
+  const replacementCenter = isBoxEmpty(replacementBox)
+    ? getVisibleMeshBox(object).getCenter(new THREE.Vector3())
+    : replacementBox.getCenter(new THREE.Vector3());
+  replacedEntries.forEach(({ mesh }) => {
+    mesh.parent?.remove(mesh);
+    mesh.geometry?.dispose?.();
+    const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+    materials.filter(Boolean).forEach((material) => material.dispose?.());
+  });
+
+  const ornament = await loadRawRhinoObject(meshOptions.bronzeUrl, onProgress);
+  ornament.updateWorldMatrix(true, true);
+  const ornamentCenter = getVisibleMeshBox(ornament).getCenter(new THREE.Vector3());
+  const bronzeGroup = new THREE.Group();
+  bronzeGroup.name = "Bronze Keyring replacement group";
+  bronzeGroup.position.copy(replacementCenter);
+  [...ornament.children].forEach((child) => {
+    if (child.isMesh) {
+      child.geometry = child.geometry.clone();
+      child.updateMatrix();
+      child.geometry.applyMatrix4(child.matrix);
+      child.geometry.translate(-ornamentCenter.x, -ornamentCenter.y, -ornamentCenter.z);
+      child.position.set(0, 0, 0);
+      child.rotation.set(0, 0, 0);
+      child.scale.set(1, 1, 1);
+      child.updateMatrix();
+      child.name = "Bronze Keyring reference 26.8 mm";
+      child.userData.classicPlugRole = "bronze";
+    }
+    bronzeGroup.add(child);
+  });
+  object.add(bronzeGroup);
+  object.userData.compositeBronzeSource = meshOptions.bronzeUrl;
+  object.userData.replacedPrincipalOrnamentCount = replacedEntries.length;
+  return object;
+}
+
+async function loadRhinoModelDetached(url, meshOptions = {}) {
+  const effectiveMeshOptions = { ...defaultRhinoMeshOptions, ...meshOptions, skipFrame: true, quiet: true };
+  const object = await loadRawRhinoObject(url);
+  await composeRhinoBronzeOrnament(object, effectiveMeshOptions);
+  object.name = "Imported Rhino 3DM jewelry model";
+  applyRhinoCoordinateFrame(object, effectiveMeshOptions);
+  normalizeImportedModel(object, effectiveMeshOptions);
+  return object;
 }
 
 async function loadLibraryModelDetached(id) {
@@ -4831,7 +4953,7 @@ async function loadPreloadedLibraryModel(id, defaults) {
     });
     document.querySelector("#jewel-model").value = id;
     updateProductCopy(defaults);
-    prepareObjectMaterialEditor({ ensureStoneShowcase: !(defaults.meshOptions && defaults.meshOptions.classicPlugGem) });
+    prepareObjectMaterialEditor({ ensureStoneShowcase: !(defaults.meshOptions && (defaults.meshOptions.classicPlugGem || defaults.meshOptions.classicPlugBronze)) });
     buildGemOpticalEffect();
     syncEffectStatus();
     setCurrentRhinoSource(ext === "3dm" ? {
@@ -7296,6 +7418,11 @@ function getComparisonPlugDiameterMm(id) {
 function getComparisonCrystalSize(id) {
   const text = String(id || "").toLowerCase();
   if (text.includes("sans-tete")) return "";
+  if (text.includes("keyring")) {
+    if (text.includes("xxxl")) return "50 mm";
+    if (text.includes("xl-45") || text.includes("xxl-50")) return "35 mm";
+    return "27 mm";
+  }
   if (text.includes("new-small") || text.includes("new-medium")) return "12 mm";
   if (text.includes("classique-small-18")) return "18 mm";
   if (text.includes("classique-small")) return "16 mm";
@@ -7376,7 +7503,7 @@ function preparePlugForScaleComparison(entry, unit, upright) {
     else if (size.z > size.y) wrapper.rotation.x = -Math.PI / 2;
     wrapper.updateWorldMatrix(true, true);
 
-    const gemBox = getModelMeshBox(wrapper, (mesh) => mesh.userData?.classicPlugRole === "gem");
+    const gemBox = getModelMeshBox(wrapper, (mesh) => ["gem", "bronze"].includes(mesh.userData?.classicPlugRole));
     box = getVisibleMeshBox(wrapper);
     // La pierre appartient au cote tete : elle doit rester sous l'ogive en position verticale.
     if (!isBoxEmpty(gemBox) && gemBox.getCenter(new THREE.Vector3()).y > box.getCenter(new THREE.Vector3()).y) {
@@ -7868,6 +7995,10 @@ function wireInterface() {
   restoreMenuPanelWidth();
   setupControlsAccordion();
   applyDefaultControlsPanelState();
+  const catalogBackLink = document.querySelector(".viewer-back");
+  const cancelQualityWorkForCatalog = () => resetDiamondRayTraceQueue("retour immédiat au catalogue");
+  catalogBackLink?.addEventListener("pointerdown", cancelQualityWorkForCatalog, { capture: true });
+  catalogBackLink?.addEventListener("click", cancelQualityWorkForCatalog, { capture: true });
   document.querySelector("#menu-panel-width")?.addEventListener("input", (event) => applyMenuPanelWidth(event.target.value));
   document.querySelector("#material-visibility-table")?.addEventListener("change", (event) => {
     if (event.target.matches("input[type='checkbox'][data-material-id]")) {
@@ -8599,6 +8730,7 @@ function applyMetalPreset(id) {
     mat.needsUpdate = true;
   });
   updateFacetTextureMaterials();
+  updateStemDecalColors();
   showNotice(`${preset.label} appliqué au métal.`);
 }
 
@@ -8616,12 +8748,35 @@ function makeRhinoPolishedMetalMaterial(name = "Rhino polished gold") {
     envMapIntensity: Math.max(1.85, preset.env * 1.62),
     clearcoat: 1,
     clearcoatRoughness: 0.022,
-    anisotropy: 0.82,
+    anisotropy: 0,
     iridescence: 0.045,
   });
   mat.userData.jewelryMaterial = { type: "metal", preset: settings.metalPreset, rhinoPolished: true };
   installFacetTextureShader(mat);
   materialRegistry.metals.push(mat);
+  return mat;
+}
+
+function makeBronzeOrnamentMaterial(finishValue = "Shiny", name = "Bronze Keyring") {
+  const key = normalizeCatalogText(finishValue);
+  const preset = key.includes("patine")
+    ? { color: "#171716", roughness: 0.31, env: 0.82, clearcoat: 0.22 }
+    : key.includes("silver")
+      ? { color: "#d8dbdc", roughness: 0.12, env: 1.52, clearcoat: 0.88 }
+      : key.includes("gold")
+        ? { color: "#c99b45", roughness: 0.13, env: 1.42, clearcoat: 0.82 }
+        : { color: "#a96835", roughness: 0.1, env: 1.5, clearcoat: 0.92 };
+  const mat = new THREE.MeshPhysicalMaterial({
+    name,
+    color: preset.color,
+    metalness: 0.92,
+    roughness: preset.roughness,
+    envMapIntensity: preset.env,
+    clearcoat: preset.clearcoat,
+    clearcoatRoughness: 0.09,
+    anisotropy: 0,
+  });
+  mat.userData.jewelryMaterial = { type: "bronze", preset: finishValue };
   return mat;
 }
 
@@ -10591,43 +10746,39 @@ function applyRhinoCoordinateFrame(object, meshOptions = {}) {
   object.updateMatrixWorld(true);
 }
 
-function loadRhinoModel(url, meshOptions = {}) {
-  const loader = new Rhino3dmLoader();
-  loader.setLibraryPath("https://unpkg.com/three@0.164.1/examples/jsm/libs/rhino3dm/");
+async function loadRhinoModel(url, meshOptions = {}) {
   const effectiveMeshOptions = { ...defaultRhinoMeshOptions, ...meshOptions };
-
-  return new Promise((resolve, reject) => {
-    loader.load(
-      withCurrentModelVersion(url),
-      (object) => {
-        setLoadingProgress(64, "Décodage du document Rhino 3DM");
-        clearRhinoMeshPreview();
-        resetDiamondRayTraceQueue("chargement Rhino 3DM");
-        root.clear();
-        stoneShowcaseGroup = null;
-        stoneShowcaseMesh = null;
-        stoneShowcasePedestal = null;
-        stoneShowcaseLockedPosition = null;
-        centerGemMesh = null;
-        softStudioShadow.visible = false;
-        root.add(reflectionRig);
-        object.name = "Imported Rhino 3DM jewelry model";
-        applyRhinoCoordinateFrame(object, effectiveMeshOptions);
-        setLoadingProgress(72, "Analyse du maillage et des volumes");
-        normalizeImportedModel(object, effectiveMeshOptions);
-        root.add(object);
-        if (effectiveMeshOptions.classicPlugGem) settings.stoneShowcaseVisible = false;
-        setLoadingProgress(86, "Conversion des matériaux joaillerie");
-        prepareObjectMaterialEditor({ ensureStoneShowcase: !effectiveMeshOptions.classicPlugGem });
-        setLoadingProgress(93, "Préparation du rendu optique des pierres");
-        buildGemOpticalEffect();
-        setLoadingProgress(97, "Cadrage et finalisation de la scène");
-        resolve(object);
-      },
-      updateRhinoLoadingProgress,
-      reject,
-    );
-  });
+  const object = await loadRawRhinoObject(url, updateRhinoLoadingProgress);
+  setLoadingProgress(58, "Décodage du document Rhino 3DM");
+  if (effectiveMeshOptions.bronzeUrl) {
+    setLoadingProgress(61, "Chargement du bronze Keyring");
+    await composeRhinoBronzeOrnament(object, effectiveMeshOptions, (event) => {
+      updateLoadingFromProgressEvent(event, "Téléchargement du bronze Keyring", 61, 68);
+    });
+  }
+  setLoadingProgress(69, "Assemblage du corps et de l'ornement");
+  clearRhinoMeshPreview();
+  resetDiamondRayTraceQueue("chargement Rhino 3DM");
+  root.clear();
+  stoneShowcaseGroup = null;
+  stoneShowcaseMesh = null;
+  stoneShowcasePedestal = null;
+  stoneShowcaseLockedPosition = null;
+  centerGemMesh = null;
+  softStudioShadow.visible = false;
+  root.add(reflectionRig);
+  object.name = "Imported Rhino 3DM jewelry model";
+  applyRhinoCoordinateFrame(object, effectiveMeshOptions);
+  setLoadingProgress(74, "Analyse du maillage et des volumes");
+  normalizeImportedModel(object, effectiveMeshOptions);
+  root.add(object);
+  if (effectiveMeshOptions.classicPlugGem) settings.stoneShowcaseVisible = false;
+  setLoadingProgress(86, "Conversion des matériaux joaillerie");
+  prepareObjectMaterialEditor({ ensureStoneShowcase: !effectiveMeshOptions.classicPlugGem && !effectiveMeshOptions.classicPlugBronze });
+  setLoadingProgress(93, "Préparation du rendu optique des pierres");
+  buildGemOpticalEffect();
+  setLoadingProgress(97, "Cadrage et finalisation de la scène");
+  return object;
 }
 
 function loadObjModel(url) {
@@ -10814,7 +10965,7 @@ function scoreStemDecalCandidate(entry, largestVolume) {
 }
 
 function findStemDecalTarget(model) {
-  const entries = collectImportedMeshVolumeEntries(model).filter((entry) => entry.mesh.userData?.classicPlugRole !== "gem" && !entry.mesh.userData?.stemDecal);
+  const entries = collectImportedMeshVolumeEntries(model).filter((entry) => !["gem", "bronze"].includes(entry.mesh.userData?.classicPlugRole) && !entry.mesh.userData?.stemDecal);
   if (!entries.length) return null;
   const largestVolume = entries[0]?.volume || 1;
   const candidate = entries
@@ -11006,7 +11157,7 @@ function createStemDecalMaterial() {
   const material = new THREE.MeshBasicMaterial({
     name: "Decalcomanie ROSEBUDS tige",
     map: stemDecalTexture,
-    color: new THREE.Color("#111111"),
+    color: getStemDecalColor(),
     transparent: true,
     opacity: 0.92,
     alphaTest: 0.12,
@@ -11022,6 +11173,22 @@ function createStemDecalMaterial() {
   return material;
 }
 
+function getStemDecalColor() {
+  return new THREE.Color(String(settings.metalPreset || "").startsWith("aluminum-") ? "#ffffff" : "#8a5a2b");
+}
+
+function updateStemDecalColors() {
+  const color = getStemDecalColor();
+  root?.traverse?.((child) => {
+    if (!child.isMesh || !child.userData?.stemDecal) return;
+    const materials = Array.isArray(child.material) ? child.material : [child.material];
+    materials.filter(Boolean).forEach((material) => {
+      material.color?.copy(color);
+      material.needsUpdate = true;
+    });
+  });
+}
+
 function makeStemProjectionGeometry(mesh, placement) {
   const zAxis = placement.normal.clone().normalize();
   const yAxis = placement.heightAxis.clone().normalize();
@@ -11035,7 +11202,7 @@ function makeStemProjectionGeometry(mesh, placement) {
 function getEmbeddedClassicGemCenter(model) {
   let gemMesh = null;
   model.traverse((child) => {
-    if (!gemMesh && child.isMesh && child.userData?.classicPlugRole === "gem") gemMesh = child;
+    if (!gemMesh && child.isMesh && ["gem", "bronze"].includes(child.userData?.classicPlugRole)) gemMesh = child;
   });
   if (!gemMesh && centerGemMesh?.isMesh) {
     let belongsToModel = false;
@@ -11284,7 +11451,7 @@ function addStemDecalToClassicPlug(model, meshOptions = {}) {
   model.updateWorldMatrix(true, true);
   const targetEntry = findStemDecalTarget(model);
   if (!targetEntry) return;
-  const modelBox = getModelMeshBox(model, (child) => !child.userData?.stemDecal && child.userData?.classicPlugRole !== "gem");
+  const modelBox = getModelMeshBox(model, (child) => !child.userData?.stemDecal && !["gem", "bronze"].includes(child.userData?.classicPlugRole));
   const referenceBox = isBoxEmpty(modelBox) ? getVisibleMeshBox(model) : modelBox;
   if (isBoxEmpty(referenceBox)) return;
 
@@ -11388,11 +11555,12 @@ function scoreClassicPlugGemCandidate(entry, largestVolume = 1) {
   return score;
 }
 
-function selectClassicPlugGemEntry(entries, meshOptions = {}) {
+function selectClassicPlugGemEntry(entries, meshOptions = {}, excludedEntries = new Set()) {
   if (!meshOptions.classicPlugGem || entries.length <= 1) return null;
   const largestVolume = entries[0]?.volume || 1;
   // Le corps principal du plug est toujours le plus grand solide et doit rester metallique.
-  const gemCandidates = entries.slice(1);
+  const gemCandidates = entries.slice(1).filter((entry) => !excludedEntries.has(entry));
+  if (!gemCandidates.length) return null;
   const scored = gemCandidates
     .map((entry) => ({ entry, score: scoreClassicPlugGemCandidate(entry, largestVolume) }))
     .sort((a, b) => b.score - a.score);
@@ -11401,16 +11569,42 @@ function selectClassicPlugGemEntry(entries, meshOptions = {}) {
   return hasMaterialHint ? best.entry : gemCandidates[gemCandidates.length - 1];
 }
 
+function selectClassicPlugBronzeEntry(entries, meshOptions = {}) {
+  if (!meshOptions.classicPlugBronze || entries.length <= 1) return null;
+  const explicit = entries.find((entry) => /bronze|keyring/.test(getClassicPlugEntryText(entry)));
+  return explicit || entries[entries.length - 1];
+}
+
+function scaleClassicPlugBronzeOrnament(model, meshOptions = {}) {
+  const reference = Number(meshOptions.bronzeReferenceDiameterMm || 26.8);
+  const target = Number(meshOptions.bronzeTargetDiameterMm || reference);
+  if (!(reference > 0) || !(target > 0)) return;
+  const scale = target / reference;
+  getRootBronzeMeshes(model).forEach((mesh) => {
+    if (!mesh.userData.bronzeReferenceScale) mesh.userData.bronzeReferenceScale = mesh.scale.toArray();
+    const [x, y, z] = mesh.userData.bronzeReferenceScale;
+    mesh.scale.set(x * scale, y * scale, z * scale);
+    mesh.userData.bronzeReferenceDiameterMm = reference;
+    mesh.userData.bronzeTargetDiameterMm = target;
+    mesh.userData.bronzeScale = scale;
+  });
+  model.updateWorldMatrix(true, true);
+}
+
 function assignClassicPlugMaterialsByVolume(model, meshOptions = {}) {
   if (!meshOptions.classicPlugVolumeMaterials) return new Set();
   const entries = collectImportedMeshVolumeEntries(model);
   const assigned = new Set();
   if (!entries.length) return assigned;
   const largestVolume = entries[0]?.volume || 1;
-  const gemEntry = selectClassicPlugGemEntry(entries, meshOptions);
+  const bronzeEntry = selectClassicPlugBronzeEntry(entries, meshOptions);
+  const gemEntry = selectClassicPlugGemEntry(entries, meshOptions, new Set(bronzeEntry ? [bronzeEntry] : []));
   entries.forEach((entry) => {
     const sourceMaterial = Array.isArray(entry.mesh.material) ? entry.mesh.material[0] : entry.mesh.material;
-    if (entry === gemEntry) {
+    if (entry === bronzeEntry) {
+      entry.mesh.material = makeBronzeOrnamentMaterial("Shiny", sourceMaterial?.name || entry.mesh.name || "Bronze Keyring");
+      entry.mesh.userData.classicPlugRole = "bronze";
+    } else if (entry === gemEntry) {
       entry.mesh.material = makeGemMaterialFromSource(sourceMaterial, sourceMaterial?.name || entry.mesh.name || "pierre precieuse plug");
       entry.mesh.userData.classicPlugRole = "gem";
       centerGemMesh = entry.mesh;
@@ -11423,6 +11617,7 @@ function assignClassicPlugMaterialsByVolume(model, meshOptions = {}) {
   logDebug("import", "Materiaux plug attribues par volume", {
     meshes: entries.length,
     gemDetected: Boolean(gemEntry),
+    bronzeDetected: Boolean(bronzeEntry),
     gemMesh: gemEntry?.mesh?.name || null,
     volumes: entries.map((entry) => ({ name: entry.mesh.name || entry.mesh.material?.name || "mesh", role: entry.mesh.userData.classicPlugRole, volume: Number(entry.volume.toPrecision(5)), gemScore: Number(scoreClassicPlugGemCandidate(entry, largestVolume).toFixed(2)) })),
   });
@@ -11436,7 +11631,7 @@ function restoreCachedImportedModelState(model, meshOptions = {}) {
     child.castShadow = meshOptions.geometricShadow !== false;
     child.receiveShadow = true;
     const explicitRole = child.userData?.classicPlugRole;
-    if (explicitRole === "gem" || (explicitRole !== "metal" && !centerGemMesh && isLikelyGemMaterial(child.material, `${child.name} ${child.material?.name || ""}`.toLowerCase()))) {
+    if (explicitRole === "gem" || (!['metal', 'bronze'].includes(explicitRole) && !centerGemMesh && isLikelyGemMaterial(child.material, `${child.name} ${child.material?.name || ""}`.toLowerCase()))) {
       centerGemMesh = child;
     }
     child.userData.assignedMaterialName = Array.isArray(child.material) ?
@@ -11484,6 +11679,7 @@ function normalizeImportedModel(model, meshOptions = {}) {
   }
 
   const volumeAssignedMeshes = assignClassicPlugMaterialsByVolume(model, meshOptions);
+  scaleClassicPlugBronzeOrnament(model, meshOptions);
 
   model.traverse((child) => {
     if (!child.isMesh) return;
@@ -11571,6 +11767,12 @@ function applyImportedMeshProcessing(model, options = {}, meta = {}) {
 
   model.traverse((child) => {
     if (!child.isMesh || !child.geometry) return;
+    if (child.userData?.classicPlugRole === "bronze" && child.geometry.getAttribute("normal")) {
+      // Preserve the dense Rhino ornament normals without repeating body tessellation work.
+      child.geometry.normalizeNormals();
+      smoothImportedMeshMaterial(child);
+      return;
+    }
     if (processing.weldTolerance > 0 && !Array.isArray(child.material)) {
       child.geometry = weldGeometryVertices(child.geometry, processing.weldTolerance);
     }
@@ -11615,6 +11817,7 @@ function smoothImportedMeshMaterial(mesh) {
   materials.forEach((mat) => {
     if (!mat) return;
     mat.flatShading = false;
+    if (!mesh.geometry?.getAttribute("tangent") && "anisotropy" in mat) mat.anisotropy = 0;
     mat.side = mat.side || THREE.FrontSide;
     mat.needsUpdate = true;
   });
@@ -12031,7 +12234,7 @@ function frameClassicPlugGemModel(model, modelBox, safeRadius, distance, panelRa
   if (!gemBelongsToModel) return false;
 
   const gemBox = getVisibleMeshBox(centerGemMesh);
-  const metalBox = getModelMeshBox(model, (child) => child !== centerGemMesh && child.userData?.classicPlugRole !== "gem");
+  const metalBox = getModelMeshBox(model, (child) => child !== centerGemMesh && !["gem", "bronze"].includes(child.userData?.classicPlugRole));
   if (isBoxEmpty(gemBox) || isBoxEmpty(metalBox) || isBoxEmpty(modelBox)) return false;
 
   const gemCenter = gemBox.getCenter(new THREE.Vector3());
@@ -12592,7 +12795,7 @@ async function processDiamondRayTraceQueue() {
     }
     const boundsTree = await buildDiamondBoundsTree(geometry, controller.signal, (value) => {
       progress("Construction de l’accélérateur BVH en arrière-plan", 0.05 + value * 0.70);
-    });
+    }, mesh, () => progress("Accélérateur BVH restauré depuis le cache local", 0.75));
     if (!isCurrent()) return;
     await waitForViewerIdle(controller.signal, isCurrent, () => {
       progress("Rendu rapide interactif : finalisation en attente", 0.78);
@@ -12627,7 +12830,29 @@ async function processDiamondRayTraceQueue() {
   }
 }
 
-async function buildDiamondBoundsTree(geometry, signal, onProgress) {
+function getDiamondBvhCacheKey(mesh, geometry) {
+  geometry.computeBoundingBox();
+  const position = geometry.attributes.position;
+  const bounds = geometry.boundingBox;
+  const sample = [];
+  const stride = Math.max(1, Math.floor(position.count / 12));
+  for (let index = 0; index < position.count && sample.length < 36; index += stride) {
+    sample.push(position.getX(index).toFixed(4), position.getY(index).toFixed(4), position.getZ(index).toFixed(4));
+  }
+  return [
+    "rosebuds-bvh-v1",
+    MODEL_ASSET_VERSION,
+    mesh?.userData?.catalogModelId || settings.modelId || "model",
+    mesh?.name || "mesh",
+    position.count,
+    geometry.index?.count || 0,
+    bounds?.min?.toArray().map((value) => value.toFixed(4)).join(","),
+    bounds?.max?.toArray().map((value) => value.toFixed(4)).join(","),
+    sample.join(","),
+  ].join(":");
+}
+
+async function buildDiamondBoundsTree(geometry, signal, onProgress, mesh = null, onCacheHit = () => {}) {
   if (!diamondBVHModule?.MeshBVH || !geometry?.attributes?.position) return null;
   const position = geometry.attributes.position;
   const index = geometry.index;
@@ -12645,7 +12870,12 @@ async function buildDiamondBoundsTree(geometry, signal, onProgress) {
     geometry.userData.diamondBvhReuseCount = (geometry.userData.diamondBvhReuseCount || 0) + 1;
     return geometry.boundsTree;
   }
-  const serialized = await buildBVHInWorker(geometry, { signal, onProgress });
+  const serialized = await buildBVHInWorker(geometry, {
+    signal,
+    onProgress,
+    onCacheHit,
+    cacheKey: getDiamondBvhCacheKey(mesh, geometry),
+  });
   if (signal?.aborted || geometrySignature !== [geometry.uuid, position.count, position.version || 0,
     geometry.index?.count || 0, geometry.index?.version || 0].join(":")) throw abortError();
   geometry.boundsTree = diamondBVHModule.MeshBVH.deserialize(serialized, geometry);
@@ -13881,7 +14111,8 @@ async function updateViewerProductInformation(params, meta) {
     catalogModel: settings.modelId,
     modelLabel: String(modelDefaults[settings.modelId]?.title || meta.label || settings.modelId).replace(/\bclassique\b/gi, "Originale"),
     modelFamily: params.get("modelFamily") || meta.modelFamily,
-    classicHead: params.get("classicHead") || (normalizeCatalogText(meta.source).includes("sans tete") ? "sans-tete" : "avec-tete"),
+    classicHead: params.get("classicHead") || meta.classicHead || "avec-tete",
+    bronzeType: params.get("bronzeType") || meta.bronzeType || "",
     plugSize,
     plugSizeLabel: plugSize === "XL-45" ? "XL Plus" : plugSizeParts[0] || meta.metalSizeClass || "Plug",
     plugDiameterMm: Number(plugSizeParts.at(-1)) || meta.diameterMm || null,

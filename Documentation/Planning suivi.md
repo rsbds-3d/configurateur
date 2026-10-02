@@ -1,9 +1,10 @@
 # Planning et suivi
 
-Version : **v0.10-260929**
+Version : **v0.11-260930**
 
 | Date | Travail | État | Durée |
 |---|---|---|---|
+| 2026-09-30 | v0.11 : page de connexion publique autonome, garde d'accès avant rendu et conservation des liens directs vers les modèles | Code et tests en cours de validation | Non mesurée |
 | 2026-09-29 | v0.10 : remplacement contrôlé des 37 modèles 3DM optimisés, audit de tessellation, cache-buster et extension du glissement du logo à toute la surface | 35 tests, paquet web, EXE, installateur, réinstallation et publication GitHub validés | Non mesurée |
 | 2026-09-29 | Règle GLB parallèle au plug ; bouteille par défaut ; comparaison verticale inversée, arc réglable, centrage et halo du plug courant | Code, tests et contrôle visuel effectués ; livraison en cours | Non mesurée |
 | 2026-09-28 | Pièce de 1 euro GLB détaillée ; comparaison automatique des tailles à échelle commune, jeu 20 mm, pose au sol et orientation verticale | Code, 33 tests et contrôle visuel effectués | Non mesurée |
@@ -48,7 +49,15 @@ Version : **v0.10-260929**
 - 2026-09-29 : v0.8, règle ROSEBUDS GLB réelle et 34 tests en préparation de validation. Durée non mesurée.
 - 2026-09-29 : v0.9, bouteille par défaut, règle parallèle et comparaison en arc centrée avec halo ; 34 tests en préparation de validation. Durée non mesurée.
 - 2026-09-29 : v0.10, 37 modèles 3DM mis à jour et décalcomanie libérée jusqu'aux extrémités ; 35 tests, paquet web, EXE, installateur et réinstallation locale validés. Durée non mesurée.
+- 2026-09-30 : v0.11, séparation stricte entre la connexion GitHub Pages et le configurateur, avec redirection protégée et conservation des paramètres. Durée non mesurée.
 
 1. Profiler sur plusieurs téléphones la compilation GPU finale des modèles les plus lourds.
 2. Compléter les miniatures réelles au fil des nouveaux modèles importés.
-3. Étudier un cache persistant des maillages convertis et des BVH.
+3. Valider sur plusieurs appareils le cache BVH IndexedDB implemente en v0.11.
+
+## Suite du 2 octobre 2026
+
+- Keyring sur les 14 corps avec tete et quatre finitions : integres ; parcours guide corrige. Duree non mesuree.
+- 37 tests Node reussis ; paquet web et lanceur EXE generes.
+- Rendu metallique : controle visuel et ajustements en cours.
+- Installateur final, reinstallation et publication : a terminer apres validation visuelle.

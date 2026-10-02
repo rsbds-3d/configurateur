@@ -1,6 +1,6 @@
 # Configurateur de Bijoux Rosebuds
 
-Version actuelle : **v0.10-260929**
+Version actuelle : **v0.11-260930**
 
 Configurateur de plugs Rosebuds avec catalogue guidé, import de modèles Rhino 3DM, matériaux métalliques PBR, pierres transparentes avec shader optique BVH et mode caméra AR.
 
@@ -27,7 +27,7 @@ L'installateur Inno Setup est généré dans `FICHIER D'INSTALLATION/`. Les racc
 
 ## Version en ligne
 
-La version web est un livrable autonome distinct de l'application Windows. Elle reprend les mêmes fichiers fonctionnels, modèles et matériaux, puis ajoute son propre écran d'identification avant de charger le catalogue.
+La version web est un livrable autonome distinct de l'application Windows. Sa page publique `index.html` est exclusivement consacrée à l'identification. Après validation, elle ouvre `configurateur.html`, qui reprend les mêmes fichiers fonctionnels, modèles et matériaux que l'application de bureau. Un garde exécuté avant l'affichage renvoie toute ouverture directe non autorisée vers la page de connexion, en conservant les paramètres du modèle demandé.
 
 Génération locale :
 
@@ -64,4 +64,4 @@ La barrière d'accès GitHub Pages est exécutée côté navigateur. Elle empêc
 Get-ChildItem tests/*.test.cjs | ForEach-Object { node $_.FullName }
 ```
 
-La version `v0.10-260929` possède 35 fichiers de tests unitaires et de non-régression.
+La version `v0.11-260930` possède 37 fichiers de tests unitaires et de non-régression.

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Accès professionnel ROSEBUDS</title>
+    <link rel="stylesheet" href="./online.css?v=__CACHE_TOKEN__" />
+    <script src="./auth.js?v=__CACHE_TOKEN__" defer></script>
+  </head>
+  <body class="access-page">
+    <main class="access-shell">
+      <section id="access-gate" class="access-gate" aria-labelledby="access-title">
+        <img class="access-gate__logo" src="./assets/brand/rosebuds-logo.png?v=__CACHE_TOKEN__" alt="ROSEBUDS" width="284" height="117" />
+        <div class="access-gate__heading">
+          <p class="access-gate__eyebrow">Espace professionnel</p>
+          <h1 id="access-title">Accéder au configurateur</h1>
+          <p class="access-gate__intro">Identifiez-vous pour consulter les modèles Rosebuds et ouvrir le viewer 3D.</p>
+        </div>
+        <form id="access-form" class="access-form" novalidate>
+          <label for="access-username">
+            <span>Identifiant</span>
+            <input id="access-username" name="username" type="text" autocomplete="username" required />
+          </label>
+          <label for="access-password">
+            <span>Mot de passe</span>
+            <input id="access-password" name="password" type="password" autocomplete="current-password" required />
+          </label>
+          <p id="access-error" class="access-error" role="alert" aria-live="polite"></p>
+          <button id="access-submit" type="submit">Accéder au configurateur</button>
+        </form>
+        <div class="access-gate__footer">
+          <p>Accès réservé aux personnes autorisées.</p>
+          <span aria-label="Version du configurateur">v0.11-260930</span>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

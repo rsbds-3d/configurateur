@@ -3,7 +3,7 @@ $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $source = Join-Path $PSScriptRoot 'Program.cs'
 $output = Join-Path $projectRoot 'Configurateur de Bijoux Rosebuds.exe'
-$icon = Join-Path $projectRoot 'assets\icons\diamond-launcher.ico'
+$icon = Join-Path $projectRoot 'assets\icons\rosebuds-launcher.ico'
 $compiler = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
 
 foreach ($requiredFile in @($source, $icon, $compiler)) {

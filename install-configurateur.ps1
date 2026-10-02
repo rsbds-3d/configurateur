@@ -2,7 +2,7 @@
 
 $installRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $targetExe = Join-Path $installRoot 'Configurateur de Bijoux Rosebuds.exe'
-$iconPath = Join-Path $installRoot 'assets\icons\diamond-launcher.ico'
+$iconPath = Join-Path $installRoot 'assets\icons\rosebuds-launcher.ico'
 
 if (-not (Test-Path -LiteralPath $targetExe)) {
   throw "Application introuvable: $targetExe"

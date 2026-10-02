@@ -1,12 +1,72 @@
 export const abortError = () => new DOMException("Calcul optique annule", "AbortError");
 
+const BVH_CACHE_DATABASE = "rosebuds-diamond-bvh-v1";
+const BVH_CACHE_STORE = "trees";
+
+function openBvhCacheDatabase() {
+  if (!globalThis.indexedDB) return Promise.resolve(null);
+  return new Promise((resolve) => {
+    const request = indexedDB.open(BVH_CACHE_DATABASE, 1);
+    request.onupgradeneeded = () => {
+      if (!request.result.objectStoreNames.contains(BVH_CACHE_STORE)) {
+        request.result.createObjectStore(BVH_CACHE_STORE);
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => resolve(null);
+    request.onblocked = () => resolve(null);
+  });
+}
+
+export const persistentBvhCache = {
+  async get(key) {
+    const database = await openBvhCacheDatabase();
+    if (!database) return null;
+    return new Promise((resolve) => {
+      const transaction = database.transaction(BVH_CACHE_STORE, "readonly");
+      const request = transaction.objectStore(BVH_CACHE_STORE).get(key);
+      request.onsuccess = () => resolve(request.result || null);
+      request.onerror = () => resolve(null);
+      transaction.oncomplete = () => database.close();
+      transaction.onerror = transaction.onabort = () => {
+        database.close();
+        resolve(null);
+      };
+    });
+  },
+  async set(key, value) {
+    const database = await openBvhCacheDatabase();
+    if (!database) return;
+    await new Promise((resolve) => {
+      const transaction = database.transaction(BVH_CACHE_STORE, "readwrite");
+      transaction.objectStore(BVH_CACHE_STORE).put(value, key);
+      transaction.oncomplete = resolve;
+      transaction.onerror = resolve;
+      transaction.onabort = resolve;
+    });
+    database.close();
+  },
+};
+
 export async function buildBVHInWorker(geometry, {
   signal,
   onProgress = () => {},
+  onCacheHit = () => {},
+  cacheKey = "",
+  cache = persistentBvhCache,
   createWorker = () => new Worker(new URL("./bvh-worker.js", import.meta.url), { type: "module" }),
   timeoutMs = 180000,
 } = {}) {
   if (signal?.aborted) throw abortError();
+  if (cacheKey && cache?.get) {
+    const cached = await cache.get(cacheKey).catch(() => null);
+    if (signal?.aborted) throw abortError();
+    if (cached?.roots?.length && cached?.index) {
+      onCacheHit();
+      onProgress(1);
+      return cached;
+    }
+  }
   const attribute = geometry.getAttribute("position");
   if (!attribute || attribute.itemSize !== 3) throw new Error("Positions du maillage invalides");
   // Never transfer the live mesh buffers: the provisional rendering still uses them.
@@ -22,7 +82,7 @@ export async function buildBVHInWorker(geometry, {
   }
   const index = geometry.index ? geometry.index.array.slice() : null;
   if (signal?.aborted) throw abortError();
-  return new Promise((resolve, reject) => {
+  const serialized = await new Promise((resolve, reject) => {
     let worker;
     let timer;
     let settled = false;
@@ -58,6 +118,8 @@ export async function buildBVHInWorker(geometry, {
       finish(error);
     }
   });
+  if (cacheKey && cache?.set) Promise.resolve(cache.set(cacheKey, serialized)).catch(() => {});
+  return serialized;
 }
 
 export async function compileBeforeSwap({ renderer, candidate, camera, scene, renderTarget, isCurrent, install, dispose }) {

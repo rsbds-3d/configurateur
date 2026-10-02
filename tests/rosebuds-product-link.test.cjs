@@ -34,6 +34,10 @@ const { pathToFileURL } = require("url");
   assert(customUrl.searchParams.get("message").includes("XXXL"), "Le message de contact doit reprendre la taille choisie.");
   assert(customUrl.searchParams.get("message").includes("Clear"), "Le message de contact doit reprendre la finition choisie.");
 
+  const bronze = resolveRosebudsProductLink({ ...configuration, ornament: "bronze", ornamentFinish: "Gold" }, [
+    "https://rosebuds.net/fr/gamme-originale-inox/medium-30-mm-cristal-gold",
+  ]);
+  assert.strictEqual(bronze.custom, true, "Un bronze ne doit pas ouvrir une fiche cristal.");
   console.log("Rosebuds product and custom contact link regression test OK");
 })().catch((error) => {
   console.error(error);

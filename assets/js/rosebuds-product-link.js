@@ -99,12 +99,15 @@ export function resolveRosebudsProductLink(configuration = {}, productUrls = [])
 
   let best = null;
   for (const url of productUrls) {
+    if (configuration.ornament === "bronze" && !normalizeCatalogText(url).includes("bronze")) continue;
     const score = scoreProductUrl(url, configuration);
     if (!best || score > best.score) best = { url, score };
   }
   if (best && best.score >= 18) {
     return { url: best.url, custom: false, label: "Voir le produit Rosebuds", score: best.score };
   }
+
+  if (configuration.ornament === "bronze") return customResult(configuration, "Configuration sur mesure");
 
   if (configuration.modelFamily === "Classique" && configuration.metalFamily) {
     return {

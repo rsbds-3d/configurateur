@@ -14,15 +14,15 @@ using System.Windows.Forms;
 [assembly: AssemblyCompany("Charles Thierry de Ville d'Avray")]
 [assembly: AssemblyProduct("Configurateur de Bijoux Rosebuds")]
 [assembly: AssemblyCopyright("Copyright (C) 2026 Charles Thierry de Ville d'Avray")]
-[assembly: AssemblyVersion("0.10.0.0")]
-[assembly: AssemblyFileVersion("0.10.0.0")]
+[assembly: AssemblyVersion("0.11.0.0")]
+[assembly: AssemblyFileVersion("0.11.0.0")]
 
 namespace Rosebuds.Configurateur
 {
     internal static class Program
     {
         private const int Port = 8080;
-        private const string CacheToken = "20260929-optimized-3dm-decal-v10";
+        private const string CacheToken = "20260930-login-page-v11";
         private const string MutexName = @"Local\RosebudsConfigurateurBijoux";
         private static readonly string RootDirectory = AppDomain.CurrentDomain.BaseDirectory;
         private static readonly string LaunchUrl = "http://localhost:" + Port + "/?v=" + CacheToken;
@@ -223,7 +223,7 @@ namespace Rosebuds.Configurateur
                 "Content-Type: " + mimeType + "\r\n" +
                 "Content-Length: " + file.Length + "\r\n" +
                 "Cache-Control: no-store\r\n" +
-                "X-Rosebuds-Configurator: v0.10-260929\r\n" +
+                "X-Rosebuds-Configurator: v0.11-260930\r\n" +
                 "Connection: close\r\n\r\n";
             WriteBytes(stream, Encoding.ASCII.GetBytes(headers));
 
@@ -284,12 +284,37 @@ namespace Rosebuds.Configurateur
         {
             try
             {
+                string chromePath = FindChromePath();
+                if (!String.IsNullOrEmpty(chromePath))
+                {
+                    Process.Start(new ProcessStartInfo(chromePath, "--app=\"" + LaunchUrl + "\" --start-maximized")
+                    {
+                        UseShellExecute = false,
+                        WorkingDirectory = RootDirectory
+                    });
+                    return;
+                }
                 Process.Start(new ProcessStartInfo(LaunchUrl) { UseShellExecute = true });
             }
             catch (Exception ex)
             {
                 ShowError("Le navigateur n'a pas pu etre ouvert automatiquement. Ouvrez " + LaunchUrl + "\n\n" + ex.Message);
             }
+        }
+
+        private static string FindChromePath()
+        {
+            string[] candidates =
+            {
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Google", "Chrome", "Application", "chrome.exe"),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Google", "Chrome", "Application", "chrome.exe"),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Google", "Chrome", "Application", "chrome.exe")
+            };
+            foreach (string candidate in candidates)
+            {
+                if (File.Exists(candidate)) return candidate;
+            }
+            return null;
         }
 
         private static void ShowError(string message)

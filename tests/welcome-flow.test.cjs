@@ -15,11 +15,13 @@ assert(welcome.includes('import(`./app.js?v=${VIEWER_VERSION}`)'), "Le moteur 3D
 assert(welcome.includes('url.searchParams.set("catalogModel", modelId)'), "Le modèle choisi doit être transmis au viewer.");
 assert(welcome.includes('url.searchParams.set("metalFinish", resolved.metalFinish)'), "La finition métal compatible doit être transmise.");
 const familyQuestionIndex = welcome.indexOf('title: "Quel modèle de plug recherchez-vous ?"');
-const classicHeadQuestionIndex = welcome.indexOf('title: "Votre modèle Originale doit-il avoir une tête ?"');
+const classicHeadQuestionIndex = welcome.indexOf('title: "Quelle catégorie Originale recherchez-vous ?"');
+const bronzeTypeQuestionIndex = welcome.indexOf('title: "Quel type de bronze recherchez-vous ?"');
 const plugSizeQuestionIndex = welcome.indexOf('title: "Quelle taille de plug recherchez-vous ?"');
 const crystalSizeQuestionIndex = welcome.indexOf('title: "Quelle taille de cristal recherchez-vous ?"');
 assert(familyQuestionIndex >= 0, "La première question doit permettre de choisir la famille du modèle.");
 assert(classicHeadQuestionIndex > familyQuestionIndex, "Le choix avec ou sans tête doit suivre le choix de la famille.");
+assert(bronzeTypeQuestionIndex > classicHeadQuestionIndex, "Le type de bronze doit suivre la catégorie Originale.");
 assert(plugSizeQuestionIndex > classicHeadQuestionIndex, "La taille commerciale du plug doit être demandée après le choix avec ou sans tête.");
 assert(crystalSizeQuestionIndex > plugSizeQuestionIndex, "La taille du cristal doit rester une étape distincte après la taille du plug.");
 assert(welcome.includes('id: "Classique"'), "La famille Classique doit être proposée.");
@@ -30,14 +32,14 @@ assert(welcome.includes('visual: "profile-classic"'), "Le modèle Classique doit
 assert(welcome.includes('visual: "profile-new-medium"'), "Le modèle NEW MEDIUM doit avoir un schéma de profil.");
 assert(welcome.includes('visual: "profile-new-small"'), "Le modèle NEW SMALL doit avoir un schéma de profil.");
 assert(welcome.includes('visible: () => state.family === "Classique"'), "Le choix avec ou sans tête doit être réservé aux modèles Classiques.");
-assert(welcome.includes('id: "avec-tete"') && welcome.includes('id: "sans-tete"'), "Les deux variantes Classique doivent être proposées.");
+assert(welcome.includes('id: "avec-tete"') && welcome.includes('id: "bronze"'), "Les catégories Avec tête et Bronzes doivent être proposées.");
 assert(welcome.includes('const activeQuestions = getActiveQuestions();'), "Le nombre d'étapes doit s'adapter aux questions conditionnelles.");
 assert(welcome.includes('head: getModelHead(option.value)'), "Chaque modèle doit être classé avec ou sans tête depuis son identifiant stable.");
 assert(welcome.includes('model.family === state.family'), "Les tailles et résultats doivent être filtrés par famille.");
 assert(welcome.includes('matchesClassicHead(model, state.family, state.head)'), "Les tailles et résultats classiques doivent respecter le choix de tête.");
 assert(welcome.includes('availableOrnaments(models, state)'), "Les ornements doivent dépendre de la famille, de la tête, des deux tailles et du métal choisis.");
 assert(index.includes('id="welcome-progress-value">Étape 1 sur 7'), "Le parcours d'accueil doit annoncer sept étapes hors question Classique conditionnelle.");
-assert(welcome.includes('visible: () => state.family !== "Classique" || state.head !== "sans-tete"'), "Le choix du cristal doit être masqué pour un Classique sans tête.");
+assert(welcome.includes('visible: () => state.family === "Classique" && state.head === "bronze"'), "Le type de bronze doit être réservé à la catégorie Bronzes.");
 
 const restoreIndex = app.indexOf('.then(() => restorePersistentModelLibrary())');
 const welcomeConfigIndex = app.indexOf('.then(() => applyWelcomeLaunchConfiguration(launchParams))');
@@ -90,5 +92,28 @@ const classifiedWithoutHead = Array.from(withoutHeadBlock.matchAll(/"([^"]+)"/g)
 assert.deepStrictEqual(classifiedWithoutHead, expectedClassicModelsWithoutHead, "La branche Sans tête doit rester explicite et séparée.");
 assert(welcome.includes('CLASSIC_MODELS_WITH_HEAD.has(id)'), "La détection Avec tête doit utiliser la liste explicite.");
 assert(welcome.includes('CLASSIC_MODELS_WITHOUT_HEAD.has(id)'), "La détection Sans tête doit utiliser la liste explicite.");
+
+const expectedClassicBronzeModels = [
+  "plug-classique-large-35-keyring",
+  "plug-classique-medium-keyring",
+  "plug-classique-small-18-keyring",
+  "plug-classique-small-keyring",
+  "plug-classique-xl-35-keyring",
+  "plug-classique-xl-45-avec-assiette-keyring",
+  "plug-classique-xl-keyring",
+  "plug-classique-xxl-35-keyring",
+  "plug-classique-xxl-keyring",
+  "plug-classique-xxxl-60-keyring",
+  "plug-classique-xxxl-70-keyring",
+  "plug-classique-xxxl-80-keyring",
+  "plug-classique-xxxl-90-keyring",
+  "plug-classique-xxxl-100-keyring",
+];
+const bronzeBlock = welcome.match(/const CLASSIC_BRONZE_MODELS = new Set\(\[([\s\S]*?)\]\);/)?.[1] || "";
+const classifiedBronzes = Array.from(bronzeBlock.matchAll(/"([^"]+)"/g), (match) => match[1]);
+assert.deepStrictEqual(classifiedBronzes, expectedClassicBronzeModels, "La catégorie Bronzes doit proposer le Keyring sur tous les corps Originale avec tête.");
+assert(welcome.includes('bronzeType: model.bronzeType'), "Le type de bronze doit rester présent dans chaque configuration de résultat.");
+assert(welcome.includes('["Silver", "Silver (argent)"'), "L'orthographe Silver doit être utilisée pour le bronze argenté.");
+assert(welcome.includes('state.ornament = "bronze"'), "La catégorie Bronzes doit imposer l'ornement bronze sans altérer Avec tête.");
 
 console.log("Welcome to viewer flow regression test OK");

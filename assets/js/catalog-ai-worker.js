@@ -46,7 +46,7 @@ async function getGenerator(id) {
 
 function buildInstruction(userPrompt, schema = {}, fallback = {}) {
   const allowed = Object.fromEntries(Object.entries(schema).map(([key, options]) => [key, (options || []).map((option) => option.id)]));
-  return `Tu aides à filtrer un catalogue Rosebuds. Réponds uniquement par un objet JSON compact.\nChamps autorisés: family, head, plugSize, crystalSize, metal, metalFinish, ornament, ornamentFinish.\nValeurs autorisées: ${JSON.stringify(allowed)}\nAnalyse rapide déjà obtenue: ${JSON.stringify(fallback)}\nDescription utilisateur: ${JSON.stringify(userPrompt)}\nJSON:`;
+  return `Tu aides à filtrer un catalogue Rosebuds. Réponds uniquement par un objet JSON compact.\nChamps autorisés: family, head, bronzeType, plugSize, crystalSize, metal, metalFinish, ornament, ornamentFinish.\nValeurs autorisées: ${JSON.stringify(allowed)}\nAnalyse rapide déjà obtenue: ${JSON.stringify(fallback)}\nDescription utilisateur: ${JSON.stringify(userPrompt)}\nJSON:`;
 }
 
 function readGeneratedText(output) {

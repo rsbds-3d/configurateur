@@ -1,5 +1,14 @@
 # REPRISE DE SESSION
 
+## Mise a jour prioritaire du 2 octobre 2026
+Version preparee v0.11-260930 (VERSION 0.11). Les sections historiques ci-dessous decrivent la derniere livraison v0.10, pas l'etat de livraison actuel.
+Code : Keyring partage sur 14 corps avec tete ; finitions Gold/Silver/Shiny/Patine ; ordre actif des questions conserve Gold apres taille et metal ; normales lissees, anisotropie sans tangentes desactivee et OutputPass ; reflets MEDIUM inox et Keyring Shiny verifies visuellement ; logo blanc alu et marron dore inox ; BVH worker/IndexedDB et annulation catalogue ; erreurs de transaction cache resolues ; login autonome ; icone Rosebuds et Chrome --app.
+37 tests passes, regression supplementaire lien bronze passee. Web regenere. Inno final compile ; v0.10 desinstallee et v0.11 installee, VERSION/empreintes conformes et HTTP 200. Publication v0.11 encore a verifier.
+Priorites : relancer tests ; regenerer Inno ; reinstaller uniquement Rosebuds ; verifier HTTP/version/empreintes ; relire diff et publier master/Pages/release avec autorisation existante ; mettre a jour journal avec preuves.
+Fichiers recents : app.js, welcome.js, assets/js/diamond/background-bvh.js, assets/js/rosebuds-product-link.js, online/login.html, online/app-guard.js, scripts/build-bronze-models.py.
+Limites : cache BVH ne sauvegarde pas les programmes GPU ; AR physique non teste ; ComfyUI generatif non termine ; IA telechargee/cachee non totalement embarquee ; authentification Pages cote client ne protege pas les ressources publiques.
+Historique utile : Sauvegardes sessions/2026-10-02-01-continuation.md. Derniere demande : CONTINUE.
+
 NOM_SESSION_CIBLE : a calculer uniquement lors de la prochaine bascule de session
 CWD_SESSION : C:\Users\charl\Documents\CONFIGURATEUR DE BIJIOUX
 

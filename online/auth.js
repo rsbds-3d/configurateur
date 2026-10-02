@@ -1,31 +1,26 @@
 (() => {
   "use strict";
 
-  const APP_SCRIPT = "./welcome.js?v=20260929-scale-orientation-v09";
-  const SESSION_KEY = "rosebuds-online-access-v03";
+  const APP_PAGE = "./configurateur.html";
+  const SESSION_KEY = "rosebuds-online-access-v04";
   const CREDENTIAL_SALT = "rosebuds-configurator-v1";
   const CREDENTIAL_HASH = "773378c2ea078c94a654dac3bc5aba02721f3e4cc682f7160cce46c653873e9c";
 
-  const gate = document.getElementById("access-gate");
   const form = document.getElementById("access-form");
   const usernameInput = document.getElementById("access-username");
   const passwordInput = document.getElementById("access-password");
   const errorMessage = document.getElementById("access-error");
   const submitButton = document.getElementById("access-submit");
 
-  function startApplication() {
-    if (document.documentElement.dataset.rosebudsAppStarted === "true") return;
-    document.documentElement.dataset.rosebudsAppStarted = "true";
-    const script = document.createElement("script");
-    script.src = APP_SCRIPT;
-    script.defer = true;
-    document.body.appendChild(script);
+  function applicationUrl() {
+    const query = new URLSearchParams(window.location.search);
+    query.delete("logout");
+    const suffix = query.size ? `?${query.toString()}` : "";
+    return `${APP_PAGE}${suffix}${window.location.hash}`;
   }
 
-  function unlockApplication() {
-    document.body.classList.remove("auth-locked");
-    gate.hidden = true;
-    startApplication();
+  function openApplication() {
+    window.location.replace(applicationUrl());
   }
 
   async function sha256(value) {
@@ -38,11 +33,10 @@
   if (query.get("logout") === "1") sessionStorage.removeItem(SESSION_KEY);
 
   if (sessionStorage.getItem(SESSION_KEY) === "granted") {
-    unlockApplication();
+    openApplication();
     return;
   }
 
-  gate.hidden = false;
   window.requestAnimationFrame(() => usernameInput.focus());
 
   form.addEventListener("submit", async (event) => {
@@ -65,7 +59,7 @@
       }
 
       sessionStorage.setItem(SESSION_KEY, "granted");
-      unlockApplication();
+      openApplication();
     } catch (error) {
       errorMessage.textContent = error?.message || "La connexion n'a pas pu être vérifiée.";
     } finally {

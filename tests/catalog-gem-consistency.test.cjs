@@ -16,6 +16,6 @@ assert(
 assert(!app.includes('"#include <common>\\\\nattribute'), "Le shader doit recevoir de vrais retours a la ligne GLSL.");
 assert(!app.includes("float active ="), "Le shader ne doit pas employer le mot GLSL reserve active.");
 assert(!app.includes("gemMeshes.slice(0, 2).forEach"), "Toutes les pierres du modele doivent recevoir le rendu optique, sans limite arbitraire.");
-assert(app.includes('if (explicitRole === "metal") return'), "Le catalogue ne doit jamais appliquer une pierre a un maillage explicitement metallique.");
+assert(app.includes('if (explicitRole === "metal" || explicitRole === "bronze") return'), "Le catalogue ne doit jamais appliquer une pierre à un maillage explicitement métallique ou bronze.");
 
 console.log("catalog-gem-consistency.test.cjs: OK");
