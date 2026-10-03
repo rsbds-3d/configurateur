@@ -665,6 +665,11 @@ button {
   transition: transform 180ms ease, border-color 180ms ease;
 }
 
+.welcome-model-entry { display: grid; align-content: start; min-width: 0; gap: 8px; }
+.welcome-download-sheet { padding: 12px; border: 1px solid #d8d8d8; border-radius: 4px; background: white; color: #171717; cursor: pointer; }
+.welcome-download-sheet:hover { border-color: #ed2b86; }
+.welcome-download-sheet:disabled { cursor: progress; opacity: 0.65; }
+
 .welcome-model:hover,
 .welcome-model:focus-visible {
   outline: none;

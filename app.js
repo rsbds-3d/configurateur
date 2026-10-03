@@ -23,7 +23,7 @@ const MODEL_ASSET_VERSION = "20260929-optimized-3dm-v10";
 import { watermarkPngBlob } from "./assets/js/png-watermark.js";
 import { createBottleReference } from "./assets/js/bottle-reference.js";
 import { createCoinReference } from "./assets/js/coin-reference.js";
-import { createRulerReference } from "./assets/js/ruler-reference.js";
+import { createRulerReference, getRulerSideOffset } from "./assets/js/ruler-reference.js?v=20261003-catalog-sheet-ruler-v11";
 import { pointInPlacementFrame, placementInWorld, sampleAxialProfileRadius } from "./assets/js/decal-placement.js?v=20260930-login-page-v11";
 import { buildViewerProductSummary, resolveRosebudsProductLink } from "./assets/js/rosebuds-product-link.js";
 
@@ -4284,7 +4284,7 @@ function getCatalogModelMeta(id, label = "") {
     diameterMm: getCatalogDiameterFromSize(size),
     metalSizeClass,
     modelFamily,
-    metalFamilies: modelFamily === "Classique" && ["XXL", "XXXL"].includes(metalSizeClass)
+    metalFamilies: id === "plug-classique-xl-35" || (modelFamily === "Classique" && ["XXL", "XXXL"].includes(metalSizeClass))
       ? ["inox"]
       : ["alu", "inox"],
     ornamentFamilies: uniqueOrnaments,
@@ -7795,7 +7795,12 @@ async function refreshScaleReference() {
   const modelBox = getVisibleMeshBox(root);
   const objectBox = new THREE.Box3().setFromObject(object);
   const margin = Math.max(unit * 12, 0.08);
-  object.position.x += modelBox.max.x - objectBox.min.x + margin;
+  if (type === "ruler") {
+    object.position.add(getRulerSideOffset(modelBox, objectBox, getHorizontalPrincipalAxisAngle(root), margin));
+    object.userData.besidePlug = true;
+  } else {
+    object.position.x += modelBox.max.x - objectBox.min.x + margin;
+  }
   scaleReferenceGroup.add(object);
   scaleReferenceGroup.updateWorldMatrix(true, true);
   frameModelAndScaleReference();
@@ -7924,12 +7929,13 @@ function showOptimizedRender(blob, caption) {
 
 async function createOptimizedRender() {
   const button = document.querySelector("#optimized-render");
+  const originalPixelRatio = renderer.getPixelRatio();
   if (button) button.disabled = true;
   try {
     showAuxiliaryProgress(4, "Lissage adaptatif des surfaces métalliques");
     smoothMetalMeshesForOptimizedRender();
     await waitForProgressPaint();
-    const currentPixelRatio = renderer.getPixelRatio();
+    const currentPixelRatio = originalPixelRatio;
     const capturePixelRatio = Math.min(Math.max(currentPixelRatio, window.devicePixelRatio * 1.25), 2.5);
     renderer.setPixelRatio(capturePixelRatio);
     composer.setPixelRatio(capturePixelRatio);
@@ -7938,8 +7944,8 @@ async function createOptimizedRender() {
     showAuxiliaryProgress(18, "Calcul de l’éclairage PBR haute définition");
     await waitForProgressPaint();
     const sourceBlob = await renderCanvasToPngBlob(false);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    composer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(originalPixelRatio);
+    composer.setPixelRatio(originalPixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight, false);
     composer.setSize(window.innerWidth, window.innerHeight);
     showAuxiliaryProgress(28, "Préparation de la super-résolution IA locale");
@@ -7947,6 +7953,18 @@ async function createOptimizedRender() {
     const id = ++optimizedRenderJobId;
     optimizedRenderWorker ||= new Worker(new URL("./assets/js/render-enhance-worker.js", import.meta.url), { type: "module" });
     const enhanced = await new Promise((resolve, reject) => {
+      const worker = optimizedRenderWorker;
+      const cleanup = () => {
+        clearTimeout(timeout);
+        worker.removeEventListener("message", onMessage);
+        worker.removeEventListener("error", onError);
+      };
+      const timeout = setTimeout(() => {
+        cleanup();
+        worker.terminate();
+        if (optimizedRenderWorker === worker) optimizedRenderWorker = null;
+        reject(new Error("Delai de super-resolution depasse"));
+      }, 180000);
       const onMessage = async (event) => {
         const message = event.data || {};
         if (message.id !== id) return;
@@ -7954,14 +7972,16 @@ async function createOptimizedRender() {
           showAuxiliaryProgress(Math.max(28, message.progress || 0), message.label || "Optimisation IA locale");
           return;
         }
-        optimizedRenderWorker.removeEventListener("message", onMessage);
-        optimizedRenderWorker.removeEventListener("error", onError);
+        if (message.type !== "error" && message.type !== "result") return;
+        cleanup();
         if (message.type === "error") reject(new Error(message.message));
-        else resolve(await optimizedPixelsToBlob(message));
+        else {
+          try { resolve(await optimizedPixelsToBlob(message)); }
+          catch (error) { reject(error); }
+        }
       };
       const onError = (event) => {
-        optimizedRenderWorker.removeEventListener("message", onMessage);
-        optimizedRenderWorker.removeEventListener("error", onError);
+        cleanup();
         reject(event.error || new Error(event.message || "IA d’image interrompue"));
       };
       optimizedRenderWorker.addEventListener("message", onMessage);
@@ -7979,6 +7999,10 @@ async function createOptimizedRender() {
     finishAuxiliaryProgress("Rendu optimisé indisponible");
     showNotice("Le rendu optimisé n’a pas pu être créé.");
   } finally {
+    renderer.setPixelRatio(originalPixelRatio);
+    composer.setPixelRatio(originalPixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight, false);
+    composer.setSize(window.innerWidth, window.innerHeight);
     if (button) button.disabled = false;
   }
 }
@@ -14086,6 +14110,17 @@ function startJewelryConfigurator() {
     .then(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))))
     .then(() => {
       document.body.dataset.viewerReady = "true";
+      if (launchParams.get("thumbnail") === "1" && launchParams.get("previewExport") === "1" && window.parent !== window) {
+        return renderCanvasToPngBlob(false).then((blob) => new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            window.parent.postMessage({ type: "rosebuds-bronze-preview", image: reader.result }, window.location.origin);
+            resolve();
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        }));
+      }
     })
     .catch((error) => console.error("Initialisation de la bibliothèque impossible", error))
     .finally(() => finishLoading());
@@ -14095,6 +14130,9 @@ function startJewelryConfigurator() {
 function applyThumbnailCaptureComposition(params) {
   if (params.get("thumbnail") !== "1") return;
   const viewOffset = camera.position.clone().sub(controls.target).multiplyScalar(0.7);
+  if (params.get("previewExport") === "1" && params.get("ornament") === "bronze") {
+    viewOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
+  }
   camera.position.copy(controls.target).add(viewOffset);
   camera.updateProjectionMatrix();
   controls.update();

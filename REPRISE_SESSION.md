@@ -1,5 +1,11 @@
 # REPRISE DE SESSION
 
+## Continuation du 3 octobre 2026
+Regle placee sur le cote du plug, parallele a son axe, debuts de longueur alignes (getRulerSideOffset). Test ruler-placement ajoute ; 39 tests passent. Installation confirmee. Publication des corrections du 3 octobre en cours ; cache-token 20261003-catalog-sheet-ruler-v11.
+Fiche HTML autonome ajoutee sous chaque resultat, avec capture reelle du viewer et choix complets ; module assets/js/product-sheet.js et test tests/product-sheet.test.cjs. Imprimable PDF (pas un telechargement PDF natif). 38 tests passent, web genere, installateur compile et fonction installee, empreintes conformes. Publication GitHub reste a faire.
+Vignettes bronze corrigees : PNG inexistants remplaces par captures du vrai viewer, serialisees et chargees a la visibilite, cache memoire modele/finitions. XXXL 60 Gold controle (PNG 750 x 500) ; angle bronze retourne ensuite pour privilegier sa face. 37 tests passent. Installateur regenere et corrections du 3 octobre installees, empreintes app/welcome conformes. Web genere mais GitHub pas encore republie. Serveur temporaire de test arrete.
+Modifications locales non publiees : createOptimizedRender restaure le pixel ratio initial dans finally ; worker IA silencieux limite a 180 s avec repli HD ; erreurs de conversion des pixels rejetees correctement. Syntaxe app.js et regression viewer-tools verifiees. Journal 2026-10-03.md. ComfyUI generatif reste a integrer. Ne pas confondre ces corrections locales avec la release v0.11 deja publiee.
+
 ## Mise a jour prioritaire du 2 octobre 2026
 Version preparee v0.11-260930 (VERSION 0.11). Les sections historiques ci-dessous decrivent la derniere livraison v0.10, pas l'etat de livraison actuel.
 Code : Keyring partage sur 14 corps avec tete ; finitions Gold/Silver/Shiny/Patine ; ordre actif des questions conserve Gold apres taille et metal ; normales lissees, anisotropie sans tangentes desactivee et OutputPass ; reflets MEDIUM inox et Keyring Shiny verifies visuellement ; logo blanc alu et marron dore inox ; BVH worker/IndexedDB et annulation catalogue ; erreurs de transaction cache resolues ; login autonome ; icone Rosebuds et Chrome --app.

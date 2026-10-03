@@ -98,12 +98,16 @@ Le viewer est un rendu temps réel WebGL. Il simule plusieurs phénomènes optiq
 
 Le rendu optimisé emploie une super-résolution Swin2SR, pas encore un moteur de génération d’images ComfyUI. Les poids IA sont téléchargés au premier usage puis mis en cache ; ils ne sont pas intégralement embarqués dans l’installateur.
 
+Si la super-resolution ne repond pas dans les trois minutes, la capture haute definition est conservee sans IA. Une erreur de capture restaure la resolution initiale du viewer.
+
 ## Version en ligne
 
 La version publiée à l'adresse https://rsbds-3d.github.io/configurateur/ est indépendante de l'installation Windows mais fournit le même catalogue, les mêmes modèles, matériaux, fonctions 3D et fonctions AR. Son adresse d'entrée affiche uniquement une page de connexion : le catalogue et le viewer ne sont ni visibles ni chargés derrière le formulaire. Après validation, le navigateur ouvre la page protégée `configurateur.html`. Une adresse directe vers un modèle conserve tous ses paramètres pendant ce passage par la connexion. L'autorisation est mémorisée uniquement pendant la session de l'onglet.
 
 GitHub Pages étant statique, cette barrière protège l'accès normal à l'interface mais pas les fichiers contre une personne capable d'inspecter directement le dépôt ou les URL. Une authentification côté serveur reste nécessaire pour une confidentialité forte.
 # Complements v0.11
+
+Sous chaque resultat du catalogue, Telecharger la fiche genere un fichier HTML autonome avec les choix et un visuel 3D perspective. Ouvrir ce fichier dans un navigateur permet de l'imprimer ou de l'enregistrer en PDF. La capture peut demander un chargement initial du modele.
 
 Dans Originale, choisir Bronzes puis Keyring et sa finition Gold, Silver, Shiny ou Patine. Les corps sont ceux des modeles avec tete. Le bronze suit le diametre de l'ornement principal remplace.
 

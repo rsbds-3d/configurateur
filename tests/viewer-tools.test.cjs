@@ -14,6 +14,9 @@ assert(worker.includes("swin2SR-classical-sr-x2-64"), "Le rendu optimisé doit u
 assert(worker.includes("@huggingface/transformers"), "L'IA d'image doit être exécutée localement avec Transformers.js.");
 assert(app.includes("smoothMetalMeshesForOptimizedRender"), "Le lissage du métal doit précéder la capture optimisée.");
 assert(app.includes("showAuxiliaryProgress"), "Le calcul optimisé doit publier sa progression en bas de page.");
+assert(app.includes("renderer.setPixelRatio(originalPixelRatio)"), "La capture doit restaurer la resolution initiale.");
+assert(app.includes("Delai de super-resolution depasse"), "Une IA silencieuse doit avoir un delai limite.");
+assert(app.includes("catch (error) { reject(error); }"), "Une erreur de conversion de pixels doit permettre le repli HD.");
 
 assert(html.includes('id="scale-reference-enabled"'), "Le viewer doit permettre d'activer un objet d'échelle.");
 for (const value of ["coin", "bottle-1l", "ruler", "compare"]) {

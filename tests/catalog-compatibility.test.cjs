@@ -43,6 +43,12 @@ assert(app.includes('if (/\\b(?:XXXL|XXL)\\s*50\\b/.test(text)) return null;'), 
 assert(welcome.includes('model.family === "Classique" && ["XXL", "XXXL"].includes(model.metalSizeClass)'), "Les classiques au-delà de XL doivent exclure l'aluminium sur l'accueil.");
 assert(welcome.includes('function modelSupportsMetalFamily'), "Le choix du métal doit être filtré avant la finition.");
 assert(app.includes('modelFamily === "Classique" && ["XXL", "XXXL"].includes(metalSizeClass)'), "Les métadonnées du viewer doivent réserver les classiques XXL et XXXL à l'inox.");
+const metalFunction = welcome.slice(welcome.indexOf("function modelSupportsMetalFamily"), welcome.indexOf("function modelSupportsMetalFinish"));
+vm.runInNewContext(`${metalFunction}; this.supports = modelSupportsMetalFamily;`, sandbox);
+assert.strictEqual(sandbox.supports({ id: "plug-classique-xl-35", family: "Classique", metalSizeClass: "XL" }, "alu"), false);
+assert.strictEqual(sandbox.supports({ id: "plug-classique-xl-35", family: "Classique", metalSizeClass: "XL" }, "inox"), true);
+assert.strictEqual(sandbox.supports({ id: "plug-classique-xl", family: "Classique", metalSizeClass: "XL" }, "alu"), true);
+assert(app.includes('metalFamilies: id === "plug-classique-xl-35" ||'), "Le viewer doit aussi exclure l'aluminium pour XL cristal 35.");
 
 assert(welcome.includes('model.family === "NEW MEDIUM" && metalFamily === "alu" && ["gem", "pressed-glass"].includes(ornament)'), "NEW MEDIUM reserve gem et verre presse a l'inox.");
 assert(welcome.includes('["gem", "pressed-glass"].includes(ornament)'), "Gem et verre presse doivent partager une restriction de famille explicite.");

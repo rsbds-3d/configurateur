@@ -1,7 +1,65 @@
 (function () {
   "use strict";
 
-  const VIEWER_VERSION = "20260930-login-page-v11";
+  const VIEWER_VERSION = "20261003-catalog-sheet-ruler-v11";
+  const bronzePreviewCache = new Map();
+  let disposeBronzePreviews = () => {};
+
+  function prepareBronzePreviews(gallery) {
+    disposeBronzePreviews();
+    const pending = [];
+    let frame = null;
+    let timer = null;
+    let active = null;
+    let disposed = false;
+    const finish = (image) => {
+      clearTimeout(timer);
+      if (image && active?.isConnected) {
+        bronzePreviewCache.set(active.dataset.bronzePreview, image);
+        active.src = image;
+      }
+      frame?.remove();
+      frame = null;
+      active = null;
+      pump();
+    };
+    const onMessage = (event) => {
+      if (event.origin !== window.location.origin || event.source !== frame?.contentWindow) return;
+      if (event.data?.type === "rosebuds-bronze-preview" && typeof event.data.image === "string"
+        && event.data.image.startsWith("data:image/png;base64,")) finish(event.data.image);
+    };
+    const pump = () => {
+      if (disposed || frame || !pending.length) return;
+      active = pending.shift();
+      if (!active.isConnected) { active = null; pump(); return; }
+      const cached = bronzePreviewCache.get(active.dataset.bronzePreview);
+      if (cached) { active.src = cached; active = null; pump(); return; }
+      frame = document.createElement("iframe");
+      frame.setAttribute("aria-hidden", "true");
+      frame.tabIndex = -1;
+      frame.style.cssText = "position:fixed;left:-10000px;top:0;width:600px;height:400px;border:0;pointer-events:none";
+      frame.src = active.dataset.bronzePreview;
+      timer = setTimeout(() => finish(null), 90000);
+      document.body.append(frame);
+    };
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(({ target, isIntersecting }) => {
+        if (!isIntersecting) return;
+        observer.unobserve(target);
+        pending.push(target);
+      });
+      pump();
+    }, { rootMargin: "200px" });
+    window.addEventListener("message", onMessage);
+    gallery.querySelectorAll("img[data-bronze-preview]").forEach((image) => observer.observe(image));
+    disposeBronzePreviews = () => {
+      disposed = true;
+      observer.disconnect();
+      clearTimeout(timer);
+      frame?.remove();
+      window.removeEventListener("message", onMessage);
+    };
+  }
   const LOCAL_APPLICATION_URL = "http://localhost:8080/";
   const ALUMINUM_FINISHES_BY_SIZE_CLASS = Object.freeze({
     SMALL: Object.freeze(["aluminum-gray", "aluminum-black", "aluminum-red", "aluminum-violet"]),
@@ -455,7 +513,47 @@
       }
     });
 
-    gallery.addEventListener("click", (event) => {
+    gallery.addEventListener("click", async (event) => {
+      const sheetButton = event.target.closest("[data-download-sheet]");
+      if (sheetButton) {
+        const variant = resultVariants[Number(sheetButton.dataset.downloadSheet)];
+        if (!variant) return;
+        sheetButton.disabled = true;
+        sheetButton.textContent = "Preparation de la fiche...";
+        try {
+          const image = sheetButton.parentElement.querySelector("img");
+          if (!image.src.startsWith("data:image/png")) {
+            image.dataset.bronzePreview = image.dataset.sheetPreview;
+            prepareBronzePreviews(gallery);
+          }
+          const deadline = Date.now() + 95000;
+          while (!image.src.startsWith("data:image/png")) {
+            if (!image.isConnected || Date.now() > deadline) throw new Error("Capture indisponible");
+            await new Promise((resolve) => setTimeout(resolve, 150));
+          }
+          const { model, resolved } = variant;
+          const { buildProductSheet } = await import("./assets/js/product-sheet.js");
+          const html = buildProductSheet({ title: model.label, image: image.src,
+            version: document.querySelector(".app-version")?.textContent || "v0.11-260930",
+            choices: [["Gamme", getFamilyDisplayLabel(model.family)], ["Categorie", resolved.head === "bronze" ? "Bronzes" : "Avec tete"],
+              ["Type de bronze", resolved.bronzeType], ["Taille du plug", `${model.plugSizeLabel} - diametre ${model.plugDiameterMm} mm`],
+              ["Taille du cristal", resolved.crystalSize], ["Metal", resolved.metal === "alu" ? "Aluminium" : "Inox"],
+              ["Finition du metal", getSelectedLabel(metalFinishes[resolved.metal], resolved.metalFinish)],
+              ["Ornement", ornaments[resolved.ornament].label],
+              ["Finition de l'ornement", getSelectedLabel(ornamentFinishes[resolved.ornament], resolved.ornamentFinish)]] });
+          const url = URL.createObjectURL(new Blob([html], { type: "text/html;charset=utf-8" }));
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `rosebuds-${model.id}-fiche.html`;
+          link.click();
+          setTimeout(() => URL.revokeObjectURL(url), 60000);
+          sheetButton.textContent = "Telecharger la fiche";
+        } catch (error) {
+          console.error("Fiche produit", error);
+          sheetButton.textContent = "Reessayer le telechargement";
+        } finally { sheetButton.disabled = false; }
+        return;
+      }
       if (event.target.closest("[data-more-variants]")) {
         visibleResultCount += 60;
         renderVariantPage();
@@ -514,6 +612,7 @@
     }
 
     function renderResults(show, filters, allowClosest = false) {
+      disposeBronzePreviews();
       results.hidden = !show;
       if (!show) return;
       let compatible = models.filter((model) => modelMatchesFilters(model, filters));
@@ -533,9 +632,18 @@
         const finish = getSelectedLabel(ornamentFinishes[resolved.ornament], resolved.ornamentFinish);
         const metal = getSelectedLabel(metalFinishes[resolved.metal], resolved.metalFinish);
         const crystal = resolved.crystalSize ? ` · Cristal ${resolved.crystalSize}` : "";
-        return `<button type="button" class="welcome-model" data-open-model="${escapeHtml(model.id)}" data-variant-index="${index}">
+        const previewUrl = new URL(window.location.href);
+        previewUrl.search = new URLSearchParams({ viewer: "1", thumbnail: "1", previewExport: "1",
+          catalogModel: model.id, modelFamily: resolved.family, classicHead: resolved.head,
+          bronzeType: resolved.bronzeType || "", plugSize: resolved.plugSize,
+          metalFamily: resolved.metal, metalFinish: resolved.metalFinish,
+          ornament: resolved.ornament, ornamentFinish: resolved.ornamentFinish, v: VIEWER_VERSION }).toString();
+        const previewAttributes = resolved.ornament === "bronze"
+          ? `src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400'%3E%3Crect width='600' height='400' fill='%23f4f4f4'/%3E%3C/svg%3E" data-bronze-preview="${escapeHtml(previewUrl.toString())}"`
+          : `src="./assets/previews/models/${escapeHtml(model.id)}.png?v=${VIEWER_VERSION}"`;
+        return `<div class="welcome-model-entry"><button type="button" class="welcome-model" data-open-model="${escapeHtml(model.id)}" data-variant-index="${index}">
           <span class="welcome-model-visual">
-            <img src="./assets/previews/models/${escapeHtml(model.id)}.png?v=${VIEWER_VERSION}" alt="Vue 3D en perspective du ${escapeHtml(model.label)}" loading="lazy" decoding="async" />
+            <img ${previewAttributes} data-sheet-preview="${escapeHtml(previewUrl.toString())}" alt="Vue 3D en perspective du ${escapeHtml(model.label)}" loading="lazy" decoding="async" />
           </span>
           <span class="welcome-model-copy">
             <strong>${escapeHtml(model.label)}</strong>
@@ -544,11 +652,12 @@
             <span class="welcome-variant-material"><i style="background:${escapeHtml(getFinishColor(resolved.ornamentFinish))}" aria-hidden="true"></i>${escapeHtml(`${ornaments[resolved.ornament].label} · ${finish}`)}</span>
           </span>
           <span class="welcome-model-action">Ouvrir le viewer 3D</span>
-        </button>`;
+        </button><button type="button" class="welcome-download-sheet" data-download-sheet="${index}">Telecharger la fiche</button></div>`;
       }).join("") : '<p class="welcome-empty">Aucune géométrie ne correspond à cette combinaison.</p>';
       if (resultVariants.length > visibleResultCount) {
         gallery.insertAdjacentHTML("beforeend", `<button type="button" class="welcome-more-results" data-more-variants>Afficher la suite (${visibleResultCount} / ${resultVariants.length})</button>`);
       }
+      prepareBronzePreviews(gallery);
     }
 
     function renderChoice(key, option, selected) {
@@ -916,6 +1025,7 @@
 
   function modelSupportsMetalFamily(model, metalFamily) {
     if (metalFamily !== "alu") return true;
+    if (model.id === "plug-classique-xl-35") return false;
     return !(model.family === "Classique" && ["XXL", "XXXL"].includes(model.metalSizeClass));
   }
 

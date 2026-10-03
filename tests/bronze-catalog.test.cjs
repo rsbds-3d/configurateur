@@ -43,4 +43,8 @@ assert(app.includes('const scale = target / reference;'), "Le bronze doit suivre
 assert(app.includes('if (family === "bronze") return applyCatalogBronzeFinish'), "Les finitions bronze ne doivent pas être appliquées au corps métallique.");
 assert(app.includes('key.includes("silver")') && app.includes('key.includes("gold")') && app.includes('key.includes("patine")'), "Gold, Silver, Shiny et Patine doivent produire des matériaux distincts.");
 
+assert(welcome.includes("data-bronze-preview"), "Les bronzes doivent generer leurs apercus reels sans PNG absent.");
+assert(welcome.includes("event.source !== frame?.contentWindow"), "Seule la frame de capture attendue doit fournir l'image.");
+assert(welcome.includes("if (disposed || frame || !pending.length) return"), "Une seule capture doit etre active a la fois.");
+assert(app.includes('type: "rosebuds-bronze-preview"'), "Le viewer doit retourner la capture PNG du bronze.");
 console.log("Bronze catalog regression test OK");
