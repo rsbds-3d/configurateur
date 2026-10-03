@@ -2,6 +2,15 @@
   "use strict";
 
   const VIEWER_VERSION = "20261003-catalog-sheet-ruler-v11";
+  function acceptPromptSuggestion(event, field) {
+    if (event.key !== "Tab" || event.shiftKey || event.ctrlKey || event.altKey || event.metaKey || field.value.trim()) return;
+    const suggestion = field.placeholder.replace(/^Exemple\s*:\s*/i, "").trim();
+    if (!suggestion) return;
+    event.preventDefault();
+    field.value = suggestion;
+    field.setSelectionRange(suggestion.length, suggestion.length);
+    field.dispatchEvent(new Event("input", { bubbles: true }));
+  }
   const bronzePreviewCache = new Map();
   let disposeBronzePreviews = () => {};
 
@@ -235,6 +244,7 @@
     const aiPanel = document.querySelector("#welcome-ai-search");
     const aiForm = document.querySelector("#welcome-ai-form");
     const aiPrompt = document.querySelector("#welcome-ai-prompt");
+    aiPrompt?.addEventListener("keydown", (event) => acceptPromptSuggestion(event, aiPrompt));
     const aiProgress = document.querySelector("#welcome-ai-progress");
     const aiProgressLabel = document.querySelector("#welcome-ai-progress-label");
     const aiProgressPercent = document.querySelector("#welcome-ai-progress-percent");

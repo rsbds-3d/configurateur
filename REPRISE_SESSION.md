@@ -1,6 +1,8 @@
 # REPRISE DE SESSION
 
 ## Continuation du 3 octobre 2026
+Prompt : Tab dans textarea vide accepte le placeholder sans Exemple et garde texte editable ; texte existant et Shift+Tab preserves. Test prompt-suggestion ajoute, 40 tests passent. Installateur en regeneration ; modification pas encore publiee.
+Publication confirmee : commit f6b603e, Pages run 37144486583 success ; fichiers publics welcome.js/product-sheet.js/ruler-reference.js controles. Corrections du 3 octobre en ligne. Installation locale contient les fonctions ; derniers changements de cache-token non encore recompiles dans son installateur. ComfyUI generatif et essais AR physiques restent a traiter.
 Regle placee sur le cote du plug, parallele a son axe, debuts de longueur alignes (getRulerSideOffset). Test ruler-placement ajoute ; 39 tests passent. Installation confirmee. Publication des corrections du 3 octobre en cours ; cache-token 20261003-catalog-sheet-ruler-v11.
 Fiche HTML autonome ajoutee sous chaque resultat, avec capture reelle du viewer et choix complets ; module assets/js/product-sheet.js et test tests/product-sheet.test.cjs. Imprimable PDF (pas un telechargement PDF natif). 38 tests passent, web genere, installateur compile et fonction installee, empreintes conformes. Publication GitHub reste a faire.
 Vignettes bronze corrigees : PNG inexistants remplaces par captures du vrai viewer, serialisees et chargees a la visibilite, cache memoire modele/finitions. XXXL 60 Gold controle (PNG 750 x 500) ; angle bronze retourne ensuite pour privilegier sa face. 37 tests passent. Installateur regenere et corrections du 3 octobre installees, empreintes app/welcome conformes. Web genere mais GitHub pas encore republie. Serveur temporaire de test arrete.
