@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const VIEWER_VERSION = "20261004-viewer-sheet-v11";
+  const VIEWER_VERSION = "20261004-pdf-sheet-v11";
   function acceptPromptSuggestion(event, field) {
     if (event.key !== "Tab" || event.shiftKey || event.ctrlKey || event.altKey || event.metaKey || field.value.trim()) return;
     const suggestion = field.placeholder.replace(/^Exemple\s*:\s*/i, "").trim();
@@ -542,8 +542,8 @@
             await new Promise((resolve) => setTimeout(resolve, 150));
           }
           const { model, resolved } = variant;
-          const { buildProductSheet } = await import("./assets/js/product-sheet.js");
-          const html = buildProductSheet({ title: model.label, image: image.src,
+          const { buildProductSheetPdf } = await import("./assets/js/product-sheet.js?v=20261004-pdf");
+          const pdf = await buildProductSheetPdf({ title: model.label, image: image.src,
             version: document.querySelector(".app-version")?.textContent || "v0.11-260930",
             choices: [["Gamme", getFamilyDisplayLabel(model.family)], ["Categorie", resolved.head === "bronze" ? "Bronzes" : "Avec tete"],
               ["Type de bronze", resolved.bronzeType], ["Taille du plug", `${model.plugSizeLabel} - diametre ${model.plugDiameterMm} mm`],
@@ -551,10 +551,10 @@
               ["Finition du metal", getSelectedLabel(metalFinishes[resolved.metal], resolved.metalFinish)],
               ["Ornement", ornaments[resolved.ornament].label],
               ["Finition de l'ornement", getSelectedLabel(ornamentFinishes[resolved.ornament], resolved.ornamentFinish)]] });
-          const url = URL.createObjectURL(new Blob([html], { type: "text/html;charset=utf-8" }));
+          const url = URL.createObjectURL(pdf);
           const link = document.createElement("a");
           link.href = url;
-          link.download = `rosebuds-${model.id}-fiche.html`;
+          link.download = `rosebuds-${model.id}-fiche.pdf`;
           link.click();
           setTimeout(() => URL.revokeObjectURL(url), 60000);
           sheetButton.textContent = "Telecharger la fiche";

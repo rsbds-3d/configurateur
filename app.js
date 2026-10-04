@@ -7883,9 +7883,9 @@ async function downloadViewerProductSheet() {
       reader.onerror = () => reject(new Error("Capture indisponible"));
       reader.readAsDataURL(blob);
     });
-    const { buildProductSheet } = await import("./assets/js/product-sheet.js");
+    const { buildProductSheetPdf } = await import("./assets/js/product-sheet.js?v=20261004-pdf");
     const configuration = currentViewerConfiguration || {};
-    const html = buildProductSheet({
+    const pdf = await buildProductSheetPdf({
       title: document.querySelector("#viewer-product-summary")?.textContent || modelDefaults[settings.modelId]?.title || "Plug Rosebuds",
       image,
       version: document.querySelector(".app-version")?.textContent || "v0.11-260930",
@@ -7898,7 +7898,7 @@ async function downloadViewerProductSheet() {
         ["Finition du metal", metalPresets[settings.metalPreset]?.label || configuration.metalFinish],
         ["Ornement", configuration.ornament], ["Finition de l'ornement", configuration.ornamentFinish]],
     });
-    downloadBlob(new Blob([html], { type: "text/html;charset=utf-8" }), `rosebuds-${settings.modelId || "plug"}-fiche.html`);
+    downloadBlob(pdf, `rosebuds-${settings.modelId || "plug"}-fiche.pdf`);
     finishAuxiliaryProgress("Fiche produit prete");
   } catch (error) {
     finishAuxiliaryProgress("Fiche indisponible");
