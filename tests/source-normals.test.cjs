@@ -1,0 +1,20 @@
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const vm = require("node:vm");
+const path = require("node:path");
+const code = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+const source = code.slice(code.indexOf("function hasValidSourceNormals("), code.indexOf("function computeWeightedSmoothNormals("));
+const context = {};
+vm.createContext(context);
+vm.runInContext(source, context);
+const attribute = (values) => ({ count: values.length / 3, itemSize: 3,
+  getX: (i) => values[i * 3], getY: (i) => values[i * 3 + 1], getZ: (i) => values[i * 3 + 2] });
+const position = { count: 2 };
+assert(context.hasValidSourceNormals(position, attribute([0, 0, 1, 1, 0, 0])));
+assert(!context.hasValidSourceNormals(position, attribute([0, 0, 0, 1, 0, 0])));
+assert(!context.hasValidSourceNormals(position, attribute([NaN, 0, 1, 1, 0, 0])));
+assert(!context.hasValidSourceNormals(position, attribute([0, 0, 1])));
+assert(!context.hasValidSourceNormals(position, null));
+assert(code.includes("preserveSourceNormals: true"));
+assert(code.indexOf("if (preserveSourceNormals)") < code.indexOf("if (processing.weldTolerance > 0"));
+console.log("Source normals: OK");

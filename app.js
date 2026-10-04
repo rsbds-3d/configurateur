@@ -301,6 +301,7 @@ const defaultRhinoMeshOptions = {
   preserveAngle: meshQualityPresets.luxury.preserveAngle,
   weightedNormals: true,
   recomputeNormals: true,
+  preserveSourceNormals: true,
   creaseNormals: true,
   doubleSided: true,
   ignoreAnnotations: true,
@@ -11670,6 +11671,8 @@ function restoreCachedImportedModelState(model, meshOptions = {}) {
 function normalizeImportedModel(model, meshOptions = {}) {
   const stats = collectImportStats(model);
   if (meshOptions.ignoreAnnotations !== false) stripNonMeshImportObjects(model);
+  model.updateWorldMatrix(true, true);
+  const volumeAssignedMeshes = assignClassicPlugMaterialsByVolume(model, meshOptions);
   applyImportedMeshProcessing(model, meshOptions);
   model.updateWorldMatrix(true, true);
   const box = getVisibleMeshBox(model);
@@ -11702,7 +11705,6 @@ function normalizeImportedModel(model, meshOptions = {}) {
     model.userData.sceneUnitsPerMillimeter = 1;
   }
 
-  const volumeAssignedMeshes = assignClassicPlugMaterialsByVolume(model, meshOptions);
   scaleClassicPlugBronzeOrnament(model, meshOptions);
 
   model.traverse((child) => {
@@ -11791,6 +11793,31 @@ function applyImportedMeshProcessing(model, options = {}, meta = {}) {
 
   model.traverse((child) => {
     if (!child.isMesh || !child.geometry) return;
+    if (child.userData?.classicPlugRole === "gem") {
+      const materials = Array.isArray(child.material) ? child.material : [child.material];
+      if (materials.some((material) => material?.userData?.facetedGem === true)) {
+        if (child.geometry.index) {
+          const original = child.geometry;
+          child.geometry = original.toNonIndexed();
+          original.dispose();
+        }
+        child.geometry.computeVertexNormals();
+      }
+      // Gem geometry must not be welded, relaxed or smoothed like the metal body.
+      smoothImportedMeshMaterial(child);
+      return;
+    }
+    // Rhino normals retain planar faces and trimmed-surface boundaries.
+    const sourceNormals = child.geometry.getAttribute("normal");
+    const preserveSourceNormals = options.preserveSourceNormals === true
+      && processing.visualSubdivisions === 0 && processing.surfaceRelaxation === 0
+      && hasValidSourceNormals(child.geometry.getAttribute("position"), sourceNormals);
+    if (preserveSourceNormals) {
+      child.geometry.normalizeNormals();
+      smoothImportedMeshMaterial(child);
+      child.userData.meshProcessing = { ...processing, preservedSourceNormals: true };
+      return;
+    }
     if (child.userData?.classicPlugRole === "bronze" && child.geometry.getAttribute("normal")) {
       // Preserve the dense Rhino ornament normals without repeating body tessellation work.
       child.geometry.normalizeNormals();
@@ -11840,7 +11867,7 @@ function smoothImportedMeshMaterial(mesh) {
   const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
   materials.forEach((mat) => {
     if (!mat) return;
-    mat.flatShading = false;
+    mat.flatShading = mat.userData?.facetedGem === true;
     if (!mesh.geometry?.getAttribute("tangent") && "anisotropy" in mat) mat.anisotropy = 0;
     mat.side = mat.side || THREE.FrontSide;
     mat.needsUpdate = true;
@@ -12042,6 +12069,15 @@ function subdivideTriangleGeometry(geometry) {
   subdivided.computeBoundingSphere();
   geometry.dispose();
   return subdivided;
+}
+
+function hasValidSourceNormals(position, normal) {
+  if (!position || !normal || normal.count !== position.count || normal.itemSize !== 3) return false;
+  for (let i = 0; i < normal.count; i += 1) {
+    const lengthSquared = normal.getX(i) ** 2 + normal.getY(i) ** 2 + normal.getZ(i) ** 2;
+    if (!Number.isFinite(lengthSquared) || lengthSquared < 1e-12) return false;
+  }
+  return true;
 }
 
 function computeWeightedSmoothNormals(geometry, smoothAngle = 82) {
@@ -13919,7 +13955,8 @@ function applyGemReflectionFinish(material, preset = {}) {
     material.transparent = false;
     material.depthWrite = true;
   }
-  material.flatShading = !optical.isCabochon && optical.isOpticalGem;
+  material.userData.facetedGem = !optical.isCabochon && !optical.isPearl;
+  material.flatShading = material.userData.facetedGem;
   applyDiamondHdriReflectionToMaterial(material, preset);
   installGemOpticalShader(material, preset);
   material.needsUpdate = true;
