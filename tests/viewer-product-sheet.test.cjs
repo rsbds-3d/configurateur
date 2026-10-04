@@ -1,0 +1,15 @@
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
+const root = path.join(__dirname, "..");
+const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
+const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+assert(html.includes('id="download-product-sheet"'));
+assert(app.includes('addEventListener("click", downloadViewerProductSheet)'));
+const implementation = app.slice(app.indexOf("async function downloadViewerProductSheet()"), app.indexOf("async function shareCurrentView()"));
+assert(implementation.includes("await renderCanvasToPngBlob()"));
+assert(implementation.includes("buildProductSheet"));
+assert(implementation.includes("currentViewerConfiguration"));
+assert(implementation.includes("button.disabled = false"));
+assert(implementation.includes('type: "text/html;charset=utf-8"'));
+console.log("Viewer product sheet: OK");

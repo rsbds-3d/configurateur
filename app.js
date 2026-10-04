@@ -7870,6 +7870,44 @@ async function downloadCurrentView() {
   }
 }
 
+async function downloadViewerProductSheet() {
+  const button = document.querySelector("#download-product-sheet");
+  if (button?.disabled) return;
+  if (button) button.disabled = true;
+  try {
+    showAuxiliaryProgress(12, "Preparation de la fiche produit");
+    const blob = await renderCanvasToPngBlob();
+    const image = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error("Capture indisponible"));
+      reader.readAsDataURL(blob);
+    });
+    const { buildProductSheet } = await import("./assets/js/product-sheet.js");
+    const configuration = currentViewerConfiguration || {};
+    const html = buildProductSheet({
+      title: document.querySelector("#viewer-product-summary")?.textContent || modelDefaults[settings.modelId]?.title || "Plug Rosebuds",
+      image,
+      version: document.querySelector(".app-version")?.textContent || "v0.11-260930",
+      choices: [["Gamme", configuration.modelFamily === "Classique" ? "Originale" : configuration.modelFamily],
+        ["Categorie", configuration.classicHead === "bronze" ? "Bronzes" : "Avec tete"],
+        ["Type de bronze", configuration.bronzeType],
+        ["Taille du plug", configuration.plugSizeLabel], ["Diametre du plug", configuration.plugDiameterMm ? `${configuration.plugDiameterMm} mm` : ""],
+        ["Taille du cristal", configuration.crystalSize],
+        ["Metal", configuration.metalFamily === "alu" ? "Aluminium" : "Inox"],
+        ["Finition du metal", metalPresets[settings.metalPreset]?.label || configuration.metalFinish],
+        ["Ornement", configuration.ornament], ["Finition de l'ornement", configuration.ornamentFinish]],
+    });
+    downloadBlob(new Blob([html], { type: "text/html;charset=utf-8" }), `rosebuds-${settings.modelId || "plug"}-fiche.html`);
+    finishAuxiliaryProgress("Fiche produit prete");
+  } catch (error) {
+    finishAuxiliaryProgress("Fiche indisponible");
+    showNotice("Impossible de preparer la fiche produit. Reessayez apres le chargement du modele.");
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
 async function shareCurrentView() {
   try {
     showAuxiliaryProgress(12, "Préparation de l’image à partager");
@@ -8092,6 +8130,7 @@ function wireInterface() {
   });
   document.querySelector("#scale-comparison-radius")?.addEventListener("change", refreshScaleReference);
   document.querySelector("#download-view-png")?.addEventListener("click", downloadCurrentView);
+  document.querySelector("#download-product-sheet")?.addEventListener("click", downloadViewerProductSheet);
   document.querySelector("#png-export-close")?.addEventListener("click", () => document.querySelector("#png-export-dialog")?.close());
   document.querySelector("#png-export-dialog")?.addEventListener("close", clearPngExport);
   window.addEventListener("pagehide", clearPngExport);
@@ -14176,6 +14215,7 @@ function applyThumbnailCaptureComposition(params) {
 }
 
 let rosebudsProductUrlsPromise = null;
+let currentViewerConfiguration = null;
 
 async function updateViewerProductInformation(params, meta) {
   const plugSize = params.get("plugSize") || meta.size || "";
@@ -14198,6 +14238,7 @@ async function updateViewerProductInformation(params, meta) {
     ornamentFinish: params.get("ornamentFinish") || "",
   };
   const summary = document.querySelector("#viewer-product-summary");
+  currentViewerConfiguration = configuration;
   if (summary) summary.textContent = buildViewerProductSummary(configuration);
 
   const link = document.querySelector("#viewer-product-link");
