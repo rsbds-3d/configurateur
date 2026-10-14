@@ -104,6 +104,14 @@
       <button id="toggle-ar" class="ar-toggle" type="button" aria-pressed="false">Voir en AR</button>
       <p id="ar-status" class="ar-status" role="status" hidden></p>
       <section class="viewer-actions" aria-label="Actions du viewer 3D">
+        <select id="studio-decor" aria-label="Decor du studio">
+          <option value="silk-leather">Soie et cuir (automatique)</option>
+          <option value="fur-champagne">Fourrure et velours - Champagne</option>
+          <option value="fur-pink">Fourrure et velours - Rose pale</option>
+          <option value="fur-pearl">Fourrure et velours - Gris perle</option>
+          <option value="fur-black">Fourrure et velours - Noir</option>
+          <option value="classic">Studio classique</option>
+        </select>
         <button id="optimized-render" type="button">Rendu optimisé</button>
         <label class="viewer-scale-toggle">
           <input id="scale-reference-enabled" type="checkbox" />
@@ -756,7 +764,10 @@
             <span>Support noble</span>
             <select id="support-material">
               <option value="hidden">Masquer le sol</option>
-              <option value="velvet-black" selected>Velours noir</option>
+              <option value="silk-auto" selected>Soie automatique (noire / rose pale)</option>
+              <option value="silk-black">Soie noire</option>
+              <option value="silk-pink">Soie rose pale</option>
+              <option value="velvet-black">Velours noir</option>
               <option value="velvet-burgundy">Velours bordeaux</option>
               <option value="velvet-emerald">Velours vert émeraude</option>
               <option value="velvet-sapphire">Velours bleu nuit</option>
@@ -1010,7 +1021,7 @@
       </section>
     </main>
 
-    <script src="./welcome.js?v=20261004-pdf-sheet-v11" defer></script>
+    <script src="./welcome.js?v=20261013-comparison-textile-v11" defer></script>
   </body>
 </html>
 

@@ -1,0 +1,10 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const code = fs.readFileSync(require('node:path').join(__dirname, '..', 'app.js'), 'utf8');
+const pose = code.slice(code.indexOf('function standPlugBesideBottle('), code.indexOf('async function refreshScaleReference('));
+assert(pose.includes('root.position.y += floor.position.y - box.min.y'));
+assert(pose.includes('["gem", "bronze"].includes'));
+assert(pose.includes('root.rotateOnWorldAxis'));
+assert(code.includes('if (type === "bottle-1l") standPlugBesideBottle();'));
+assert(code.includes('root.quaternion.copy(bottlePlugPose.quaternion)'));
+console.log('Bottle upright pose: OK');

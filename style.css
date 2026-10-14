@@ -2268,10 +2268,12 @@ canvas.is-decal-dragging {
   left: 170px;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 8px;
   min-width: 0;
-  pointer-events: none;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  pointer-events: auto;
 }
 
 .viewer-actions > * {
@@ -2520,6 +2522,26 @@ body:has(.controls.is-collapsed) .viewer-actions {
 }
 
 @media (max-width: 720px) {
+  .controls.is-collapsed {
+    top: 12px;
+    right: 12px;
+    bottom: auto;
+    left: auto;
+    width: 58px;
+    max-height: 58px;
+    padding: 8px;
+    transform: none;
+    overflow: hidden;
+  }
+
+  .controls.is-collapsed::before {
+    display: none;
+  }
+
+  .controls.is-collapsed .controls__header {
+    margin-bottom: 0;
+    justify-content: center;
+  }
   .brand-panel {
     top: 12px;
     left: 12px;

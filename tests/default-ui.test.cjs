@@ -15,7 +15,7 @@ function assert(condition, message) {
 
 assert(app.includes('metalPreset: "silver"'), "Le métal par défaut doit être Argent poli.");
 assert(/<option value="silver" selected>Argent poli<\/option>/.test(html), "La liste métal HTML doit sélectionner Argent poli par défaut.");
-assert(app.includes('supportMaterial: "rhino-wood-olivier-poli"'), "Le sol par défaut doit être Olivier poli.");
+assert(app.includes('supportMaterial: "silk-auto"'), "Le sol par defaut doit etre la soie automatique.");
 assert(app.includes("setControlsPanelCollapsed(true);"), "Le panneau de réglages doit être réduit par défaut.");
 assert(/<aside class="controls is-collapsed"/.test(html), "Le panneau doit être réduit dès le HTML initial.");
 assert(/id="toggle-panel"[^>]+aria-label="Ouvrir le panneau"[^>]+aria-expanded="false"/.test(html), "Le bouton du panneau doit annoncer l'état réduit.");

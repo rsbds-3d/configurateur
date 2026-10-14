@@ -61,3 +61,9 @@ Version : **v0.11-260930**
 - 37 tests Node reussis ; paquet web et lanceur EXE generes.
 - Rendu metallique : controle visuel et ajustements en cours.
 - Installateur final, reinstallation et publication : a terminer apres validation visuelle.
+
+## Suite du 13 octobre 2026
+
+- Comparatif : correction des exclusions liees aux finitions et de la classification abusive du metal comme pierre. Controle Chrome et tests de regression. Duree non mesuree.
+- Decors : soie/cuir automatique, fourrure/velours en quatre coloris, textures locales, masquage AR. Livraison en cours. Duree non mesuree.
+- Classeur catalogue : 51 modeles et 2 314 combinaisons, filtres et choix dependants. Validation en cours. Duree non mesuree.

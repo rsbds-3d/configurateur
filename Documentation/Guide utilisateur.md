@@ -107,7 +107,15 @@ La version publiée à l'adresse https://rsbds-3d.github.io/configurateur/ est i
 GitHub Pages étant statique, cette barrière protège l'accès normal à l'interface mais pas les fichiers contre une personne capable d'inspecter directement le dépôt ou les URL. Une authentification côté serveur reste nécessaire pour une confidentialité forte.
 # Complements v0.11
 
-Sous chaque resultat du catalogue, Telecharger la fiche genere un fichier HTML autonome avec les choix et un visuel 3D perspective. Ouvrir ce fichier dans un navigateur permet de l'imprimer ou de l'enregistrer en PDF. La capture peut demander un chargement initial du modele.
+Dans le viewer, la liste Decor bascule entre soie et cuir automatiques, fourrure et velours (champagne, rose pale, gris perle, noir), et studio classique. La soie est rose pale pour un metal noir, noire pour les autres. Les textures restent sur le sol et derriere le modele, sans deplacement de geometrie qui masquerait le plug. Le decor est masque en AR.
+
+La comparaison des tailles conserve visuellement la finition choisie meme lorsqu'elle n'est pas commercialisee pour une autre taille. Elle ne constitue pas une liste de produits disponibles. Les roles metal/pierre/bronze restent separes pour ne pas appliquer le rendu facette du cristal au corps metallique.
+
+Avec la bouteille d'echelle, le plug est automatiquement vertical, ogive en haut et tete au sol. Desactiver la reference ou choisir un autre objet restaure la pose precedente.
+
+Sous chaque resultat du catalogue et dans le viewer, Telecharger la fiche genere directement un fichier PDF avec les choix et un visuel 3D perspective. La capture peut demander un chargement initial du modele. Dans le viewer, elle reprend la vue courante.
+
+L'icone Windows et le favicon utilisent la couronne seule du logo Rosebuds. Apres une mise a jour, fermer puis rouvrir l'application pour actualiser son icone.
 
 Dans Originale, choisir Bronzes puis Keyring et sa finition Gold, Silver, Shiny ou Patine. Les corps sont ceux des modeles avec tete. Le bronze suit le diametre de l'ornement principal remplace.
 

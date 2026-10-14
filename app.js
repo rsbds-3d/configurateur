@@ -262,7 +262,8 @@ const settings = {
   keyLight: 5.2,
   rimLight: 4.4,
   fillLight: 1.7,
-  supportMaterial: "rhino-wood-olivier-poli",
+  supportMaterial: "silk-auto",
+  decorPreset: "silk-leather",
   panelWidth: 430,
   autoRotate: false,
   caustics: false,
@@ -2972,6 +2973,13 @@ Object.assign(metalPresets, {
 });
 
 const supportPresets = {
+  "fur-champagne": { label: "Fourrure champagne", family: "fur", color: "#e8cfac", roughness: 0.95, metalness: 0, env: 0.22, sheen: 0.9, sheenColor: "#fff0df" },
+  "fur-pink": { label: "Fourrure rose pale", family: "fur", color: "#f3cbd5", roughness: 0.95, metalness: 0, env: 0.22, sheen: 0.9, sheenColor: "#ffeef2" },
+  "fur-pearl": { label: "Fourrure gris perle", family: "fur", color: "#c3c6ce", roughness: 0.95, metalness: 0, env: 0.22, sheen: 0.9, sheenColor: "#f0f0f5" },
+  "fur-black": { label: "Fourrure noire", family: "fur", color: "#171717", roughness: 0.95, metalness: 0, env: 0.22, sheen: 0.9, sheenColor: "#353535" },
+  "silk-auto": { label: "Soie automatique (noire / rose pale)", family: "silk", color: "#151515", roughness: 0.38, metalness: 0, env: 0.45, sheen: 0.9, sheenColor: "#dadada" },
+  "silk-black": { label: "Soie noire", family: "silk", color: "#151515", roughness: 0.38, metalness: 0, env: 0.45, sheen: 0.9, sheenColor: "#dadada" },
+  "silk-pink": { label: "Soie rose pale", family: "silk", color: "#f3cbd5", roughness: 0.38, metalness: 0, env: 0.45, sheen: 0.9, sheenColor: "#fff2f6" },
   "velvet-black": { label: "Velours noir", color: "#151213", roughness: 0.9, metalness: 0, env: 0.16, sheen: 0.82, sheenColor: "#3a2532" },
   "velvet-burgundy": { label: "Velours bordeaux", color: "#2b0711", roughness: 0.9, metalness: 0, env: 0.09, sheen: 0.82, sheenColor: "#7b1d35" },
   walnut: { label: "Bois noyer satiné", color: "#3b2114", roughness: 0.58, metalness: 0, env: 0.24, sheen: 0.18, sheenColor: "#8a5637" },
@@ -3882,7 +3890,7 @@ const fillLight = new THREE.PointLight("#ffd4ec", settings.fillLight, 8, 1.7);
 fillLight.position.set(0, 1.2, 3.2);
 scene.add(fillLight);
 
-const floorMaterial = new THREE.MeshStandardMaterial({
+const floorMaterial = new THREE.MeshPhysicalMaterial({
   color: backgrounds.black.floor,
   roughness: 0.92,
   metalness: 0,
@@ -3917,6 +3925,32 @@ floor.rotation.x = -Math.PI / 2;
 floor.position.y = -1.16;
 floor.receiveShadow = true;
 scene.add(floor);
+
+const silkFloorTexture = supportTextureLoader.load("./assets/materials/textile/silk-ivory.png");
+const furFloorTexture = supportTextureLoader.load("./assets/materials/textile/fur-ivory.png");
+furFloorTexture.colorSpace = THREE.SRGBColorSpace;
+furFloorTexture.wrapS = furFloorTexture.wrapT = THREE.RepeatWrapping;
+furFloorTexture.repeat.set(12, 12);
+furFloorTexture.anisotropy = renderer.capabilities.getMaxAnisotropy?.() || 8;
+const velvetBackdropTexture = supportTextureLoader.load("./assets/materials/textile/velvet-ivory.png");
+velvetBackdropTexture.colorSpace = THREE.SRGBColorSpace;
+velvetBackdropTexture.wrapS = THREE.RepeatWrapping;
+velvetBackdropTexture.repeat.set(12, 1);
+silkFloorTexture.colorSpace = THREE.SRGBColorSpace;
+silkFloorTexture.wrapS = silkFloorTexture.wrapT = THREE.RepeatWrapping;
+silkFloorTexture.repeat.set(6, 6);
+silkFloorTexture.anisotropy = renderer.capabilities.getMaxAnisotropy?.() || 8;
+const leatherBackdropTexture = supportTextureLoader.load("./assets/materials/textile/leather-black.png");
+leatherBackdropTexture.colorSpace = THREE.SRGBColorSpace;
+leatherBackdropTexture.wrapS = THREE.RepeatWrapping;
+leatherBackdropTexture.repeat.set(12, 1);
+const leatherBackdrop = new THREE.Mesh(
+  new THREE.CylinderGeometry(30, 30, 40, 128, 1, true),
+  new THREE.MeshBasicMaterial({ map: leatherBackdropTexture, side: THREE.BackSide, fog: false }),
+);
+leatherBackdrop.position.y = floor.position.y + 19;
+leatherBackdrop.name = "Tenture cuir (decor)";
+scene.add(leatherBackdrop);
 
 const softStudioShadow = new THREE.Mesh(
   new THREE.CircleGeometry(0.5, 96),
@@ -4833,12 +4867,8 @@ function getComparisonArrangementAxis(models) {
 function refreshComparisonGemRendering(group, options = {}) {
   const gems = [];
   centerGemMesh = null;
-  group.traverse((child) => {
-    if (!child.isMesh) return;
+  getRootGemMeshes(group).forEach((child) => {
     const material = Array.isArray(child.material) ? child.material[0] : child.material;
-    const label = `${child.name || ""} ${material?.name || ""}`.toLowerCase();
-    const isGem = child.userData?.classicPlugRole === "gem" || isDiamondRayTraceTarget(child) || isLikelyGemMaterial(material, label);
-    if (!isGem) return;
     gems.push(child);
     if (!centerGemMesh) centerGemMesh = child;
     const preset = getMaterialPresetForGem(material) || (material?.userData?.jewelryMaterial?.preset && gemPresets[material.userData.jewelryMaterial.preset]) || gemPresets.diamond;
@@ -7275,11 +7305,13 @@ async function startCameraAR() {
     arSceneState = {
       background: scene.background,
       floorVisible: floor.visible,
+      backdropVisible: leatherBackdrop.visible,
       floorReceiveShadow: floor.receiveShadow,
       softShadowVisible: softStudioShadow.visible,
     };
     scene.background = arVideoTexture;
     floor.visible = false;
+    leatherBackdrop.visible = false;
     floor.receiveShadow = false;
     softStudioShadow.visible = false;
     document.body.classList.add("is-ar-mode");
@@ -7316,6 +7348,7 @@ function stopCameraAR(announce = true) {
   if (arSceneState) {
     scene.background = arSceneState.background;
     floor.visible = arSceneState.floorVisible;
+    leatherBackdrop.visible = arSceneState.backdropVisible;
     floor.receiveShadow = arSceneState.floorReceiveShadow;
     softStudioShadow.visible = arSceneState.softShadowVisible;
     arSceneState = null;
@@ -7438,15 +7471,13 @@ function getAutomaticScaleComparisonModelIds() {
   const currentMeta = getCatalogModelMeta(currentId, modelDefaults[currentId]?.title || currentId);
   const ornament = params.get("ornament") || (currentMeta.ornamentFamilies[0] || "none");
   const metalFamily = params.get("metalFamily") || (settings.metalPreset.startsWith("aluminum-") ? "alu" : "inox");
-  const metalFinish = params.get("metalFinish") || settings.metalPreset;
-  const withoutHead = params.get("classicHead") === "sans-tete" || currentId.includes("sans-tete");
   const desiredCrystalSize = params.get("crystalSize") || getComparisonCrystalSize(currentId);
   const candidates = Object.keys(modelDefaults).filter((id) => {
     if (!id.startsWith("plug-") || id === "plug-decalcomanie") return false;
     const meta = getCatalogModelMeta(id, modelDefaults[id]?.title || id);
     if (meta.modelFamily !== currentMeta.modelFamily) return false;
-    if (meta.modelFamily === "Classique" && id.includes("sans-tete") !== withoutHead) return false;
-    if (!catalogModelSupportsMetalFinish(meta, metalFamily, metalFinish)) return false;
+    if (meta.modelFamily === "Classique" && meta.classicHead !== currentMeta.classicHead) return false;
+    // Size comparison is visual, not a list of commercially available finishes.
     if (ornament === "none") return !meta.hasStone;
     if (!catalogModelSupportsOrnament(meta, ornament, metalFamily)) return false;
     if (["gem", "pressed-glass"].includes(ornament) && meta.modelFamily !== "Classique") {
@@ -7646,6 +7677,19 @@ async function makeAutomaticScaleComparison(unit, upright, arcEnabled, arcRadius
   }
   if (!entries.length) throw new Error("Aucun modèle compatible à comparer");
   const comparison = arrangeAutomaticScaleComparison(entries, unit, upright, arcEnabled, arcRadiusMm);
+  const metalPreset = metalPresets[settings.metalPreset];
+  comparison.traverse((mesh) => {
+    if (!mesh.isMesh || mesh.userData?.classicPlugRole !== "metal" || !metalPreset) return;
+    const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+    materials.filter(Boolean).forEach((material) => {
+      material.color.set(metalPreset.color);
+      material.metalness = 1;
+      material.roughness = metalPreset.roughness;
+      material.envMapIntensity = metalPreset.env;
+      material.flatShading = false;
+      material.needsUpdate = true;
+    });
+  });
   const params = new URLSearchParams(window.location.search);
   const ornament = params.get("ornament");
   const ornamentFinish = params.get("ornamentFinish");
@@ -7717,16 +7761,52 @@ function frameModelAndScaleReference() {
   const center = currentBox && !isBoxEmpty(currentBox)
     ? currentBox.getCenter(new THREE.Vector3())
     : box.getCenter(new THREE.Vector3());
-  const radius = Math.max(size.x, size.y, size.z, 0.8);
+  const extent = box.getCenter(new THREE.Vector3()).distanceTo(center);
+  const radius = Math.max(size.x, size.y, size.z, 0.8) + extent;
   controls.target.copy(center);
-  camera.position.set(center.x + radius * 1.5, center.y + radius * 0.75, center.z + radius * 1.85);
+  camera.position.set(center.x + radius * 0.15, center.y + radius * 0.65, center.z + radius * 2.8);
   camera.near = Math.max(0.001, radius / 2400);
   camera.far = Math.max(1000, radius * 12);
   camera.updateProjectionMatrix();
   controls.update();
 }
 
+let bottlePlugPose = null;
+
+function restoreBottlePlugPose() {
+  if (!bottlePlugPose) return;
+  if (bottlePlugPose.modelId === settings.modelId) {
+    root.position.copy(bottlePlugPose.position);
+    root.quaternion.copy(bottlePlugPose.quaternion);
+    root.updateWorldMatrix(true, true);
+  }
+  bottlePlugPose = null;
+}
+
+function standPlugBesideBottle() {
+  bottlePlugPose = { modelId: settings.modelId, position: root.position.clone(), quaternion: root.quaternion.clone() };
+  const originalCenter = getVisibleMeshBox(root).getCenter(new THREE.Vector3());
+  const size = getVisibleMeshBox(root).getSize(new THREE.Vector3());
+  if (size.x >= size.z && size.x > size.y) root.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), Math.PI / 2);
+  else if (size.z > size.y) root.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), -Math.PI / 2);
+  root.updateWorldMatrix(true, true);
+  const head = getModelMeshBox(root, mesh => ["gem", "bronze"].includes(mesh.userData?.classicPlugRole));
+  let box = getVisibleMeshBox(root);
+  if (!isBoxEmpty(head) && head.getCenter(new THREE.Vector3()).y > box.getCenter(new THREE.Vector3()).y) {
+    root.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), Math.PI);
+    root.updateWorldMatrix(true, true);
+    box = getVisibleMeshBox(root);
+  }
+  const center = box.getCenter(new THREE.Vector3());
+  root.position.x += originalCenter.x - center.x;
+  root.position.z += originalCenter.z - center.z;
+  root.position.y += floor.position.y - box.min.y;
+  root.updateWorldMatrix(true, true);
+  updateSoftStudioShadow(root, true);
+}
+
 async function refreshScaleReference() {
+  restoreBottlePlugPose();
   const request = ++scaleReferenceRequest;
   root.visible = true;
   scaleComparisonActive = false;
@@ -7793,6 +7873,7 @@ async function refreshScaleReference() {
     object.userData.parallelToPlug = true;
     object.updateWorldMatrix(true, true);
   }
+  if (type === "bottle-1l") standPlugBesideBottle();
   const modelBox = getVisibleMeshBox(root);
   const objectBox = new THREE.Box3().setFromObject(object);
   const margin = Math.max(unit * 12, 0.08);
@@ -8378,6 +8459,7 @@ function wireInterface() {
     requestDiamondRayTraceRebake("intensite HDRI");
   });
   document.querySelector("#lighting-preset").addEventListener("change", (event) => applyLightingPreset(event.target.value));
+  document.querySelector("#studio-decor")?.addEventListener("change", (event) => applyStudioDecor(event.target.value));
   bindRange("#metal-intensity", "metalIntensity", updateMetalMaterials);
   bindRange("#metal-roughness", "metalRoughness", updateMetalMaterials);
   wireFacetTextureControls();
@@ -8795,6 +8877,7 @@ function applyMetalPreset(id) {
   });
   updateFacetTextureMaterials();
   updateStemDecalColors();
+  if (settings.supportMaterial === "silk-auto") applySupportMaterial("silk-auto");
   showNotice(`${preset.label} appliqué au métal.`);
 }
 
@@ -10046,10 +10129,40 @@ function applyBackground(name) {
   settings.background = backgrounds[name] ? name : "black";
   scene.background = bg.color;
   scene.fog.color.copy(bg.fog);
+  leatherBackdrop.visible = name === "black" && !arCameraStream;
   if (settings.supportMaterial === "legacy-background") {
     floorMaterial.color.copy(bg.floor);
   }
   syncBackgroundButtons();
+}
+
+function applyStudioDecor(id) {
+  settings.decorPreset = id;
+  const select = document.querySelector("#studio-decor");
+  if (select) select.value = id;
+  applyBackground("black");
+  if (id.startsWith("fur-") && supportPresets[id]) {
+    applySupportMaterial(id);
+    leatherBackdrop.material.map = velvetBackdropTexture;
+    leatherBackdrop.material.color.set(supportPresets[id].color);
+  } else {
+    applySupportMaterial(id === "classic" ? "velvet-black" : "silk-auto");
+    leatherBackdrop.material.map = leatherBackdropTexture;
+    leatherBackdrop.material.color.set("#ffffff");
+  }
+  leatherBackdrop.visible = id !== "classic" && !arCameraStream;
+  leatherBackdrop.material.needsUpdate = true;
+  groundCurrentPlug();
+}
+
+function groundCurrentPlug() {
+  if (!root.visible) return;
+  root.updateWorldMatrix(true, true);
+  const box = getVisibleMeshBox(root);
+  if (isBoxEmpty(box)) return;
+  root.position.y += floor.position.y - box.min.y;
+  root.updateWorldMatrix(true, true);
+  updateSoftStudioShadow(root, true);
 }
 
 function applySupportMaterial(id) {
@@ -10057,6 +10170,28 @@ function applySupportMaterial(id) {
   settings.supportMaterial = id;
   floor.visible = !preset.hidden;
   floor.receiveShadow = !preset.hidden;
+  floor.scale.setScalar(["silk", "fur"].includes(preset.family) ? 3 : 1);
+  if (["silk", "fur"].includes(preset.family)) {
+    const fur = preset.family === "fur";
+    const blackPlug = /black|noir/i.test(settings.metalPreset);
+    const pink = id === "silk-pink" || (id === "silk-auto" && blackPlug);
+    floorMaterial.color.set(fur ? preset.color : pink ? "#f3cbd5" : "#030303");
+    floorMaterial.map = fur ? furFloorTexture : silkFloorTexture;
+    floorMaterial.normalMap = null;
+    floorMaterial.roughnessMap = null;
+    floorMaterial.bumpMap = fur ? furFloorTexture : silkFloorTexture;
+    floorMaterial.bumpScale = fur ? 0.055 : 0.035;
+    floorMaterial.displacementMap = null;
+    floorMaterial.roughness = preset.roughness;
+    floorMaterial.metalness = 0;
+    floorMaterial.envMapIntensity = fur || pink ? preset.env : 0.12;
+    floorMaterial.sheen = preset.sheen;
+    floorMaterial.sheenColor.set(fur ? preset.sheenColor : pink ? "#fff2f6" : "#161216");
+    floorMaterial.sheenRoughness = 0.35;
+    floorMaterial.clearcoat = 0;
+    floorMaterial.needsUpdate = true;
+    return;
+  }
   if (preset.hidden) {
     softStudioShadow.visible = false;
     floorMaterial.map = null;
@@ -11737,7 +11872,7 @@ function normalizeImportedModel(model, meshOptions = {}) {
     const fittedMin = fittedBox.min;
     model.position.x -= fittedCenter.x;
     model.position.z -= fittedCenter.z;
-    model.position.y += floor.position.y - fittedMin.y + 0.08;
+    model.position.y += floor.position.y - fittedMin.y + (/^(silk|fur)-/.test(settings.supportMaterial) ? 0.004 : 0.08);
     model.userData.sceneUnitsPerMillimeter = scale;
     model.updateWorldMatrix(true, true);
   } else {
@@ -11851,10 +11986,16 @@ function applyImportedMeshProcessing(model, options = {}, meta = {}) {
     const preserveSourceNormals = options.preserveSourceNormals === true
       && processing.visualSubdivisions === 0 && processing.surfaceRelaxation === 0
       && hasValidSourceNormals(child.geometry.getAttribute("position"), sourceNormals);
-    if (preserveSourceNormals) {
+    if (preserveSourceNormals && !(child.userData?.classicPlugRole === "metal" && hasFacetedSourceNormals(child.geometry))) {
       child.geometry.normalizeNormals();
       smoothImportedMeshMaterial(child);
       child.userData.meshProcessing = { ...processing, preservedSourceNormals: true };
+      return;
+    }
+    if (preserveSourceNormals && child.userData?.classicPlugRole === "metal") {
+      computeWeightedSmoothNormals(child.geometry, 45);
+      smoothImportedMeshMaterial(child);
+      child.userData.meshProcessing = { ...processing, repairedFacetedSourceNormals: true };
       return;
     }
     if (child.userData?.classicPlugRole === "bronze" && child.geometry.getAttribute("normal")) {
@@ -12108,6 +12249,26 @@ function subdivideTriangleGeometry(geometry) {
   subdivided.computeBoundingSphere();
   geometry.dispose();
   return subdivided;
+}
+
+function hasFacetedSourceNormals(geometry) {
+  const normal = geometry.getAttribute("normal");
+  if (!normal || normal.count < 6) return false;
+  const count = geometry.index?.count || normal.count;
+  let flat = 0;
+  let total = 0;
+  let varied = false;
+  const vertex = (i) => geometry.index ? geometry.index.getX(i) : i;
+  const dot = (a, b) => normal.getX(a) * normal.getX(b)
+    + normal.getY(a) * normal.getY(b) + normal.getZ(a) * normal.getZ(b);
+  const first = vertex(0);
+  for (let i = 0; i + 2 < count; i += 3) {
+    const a = vertex(i), b = vertex(i + 1), c = vertex(i + 2);
+    total += 1;
+    if (dot(a, b) > 0.99999 && dot(a, c) > 0.99999) flat += 1;
+    if (dot(first, a) < 0.99) varied = true;
+  }
+  return varied && total > 0 && flat / total > 0.9;
 }
 
 function hasValidSourceNormals(position, normal) {
@@ -14147,7 +14308,12 @@ function animate() {
 window.addEventListener("resize", () => {
   const width = window.innerWidth;
   const height = window.innerHeight;
+  const previousAspect = camera.aspect;
   camera.aspect = width / height;
+  if (!arCameraStream) {
+    const factor = Math.max(1, 1 / camera.aspect) / Math.max(1, 1 / previousAspect);
+    camera.position.sub(controls.target).multiplyScalar(factor).add(controls.target);
+  }
   camera.updateProjectionMatrix();
   renderer.setSize(width, height);
   composer.setSize(width, height);
@@ -14176,12 +14342,13 @@ function startJewelryConfigurator() {
   const initialModelLoad = Promise.resolve(loadJewelryExample(settings.modelId, { applyGemDefault: false }));
   buildGemOpticalEffect();
   applyBackground("black");
-  applySupportMaterial(settings.supportMaterial);
+  applyStudioDecor(settings.decorPreset);
   wireInterface();
   initialModelLoad
     .then(() => restorePersistentModelLibrary())
     .then(() => loadInitialModelFromUrl())
     .then(() => applyWelcomeLaunchConfiguration(launchParams))
+    .then(() => groundCurrentPlug())
     .then(() => applyThumbnailCaptureComposition(launchParams))
     .then(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))))
     .then(() => {
