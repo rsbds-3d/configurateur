@@ -2276,6 +2276,44 @@ canvas.is-decal-dragging {
   pointer-events: auto;
 }
 
+.viewer-settings-toggle {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  z-index: 20;
+  color: #111;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 26px;
+  cursor: pointer;
+}
+
+.viewer-visible-version { position: fixed; top: 20px; right: 68px; z-index: 20; padding: 4px 6px; font-size: 11px; color: #111; background: rgba(255,255,255,0.9); }
+.controls:not([hidden]) #toggle-panel { display: none; }
+.controls:not([hidden]) .controls__header { padding-right: 44px; }
+.is-thumbnail-capture .viewer-visible-version { display: none; }
+
+#viewer-settings {
+  width: min(420px, calc(100vw - 32px));
+  padding: 24px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  color: #111;
+}
+
+#viewer-settings::backdrop { background: rgba(0, 0, 0, 0.35); }
+#viewer-settings header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+#viewer-settings h2 { margin: 0; font-size: 20px; }
+#viewer-settings h3 { margin-top: 24px; font-size: 16px; }
+#viewer-settings header button { width: 32px; height: 32px; padding: 0; font-size: 24px; }
+#viewer-settings label { display: flex; align-items: center; gap: 10px; }
+.is-thumbnail-capture .viewer-settings-toggle { display: none; }
+
 .viewer-actions > * {
   flex: 0 0 auto;
   pointer-events: auto;
@@ -2527,9 +2565,13 @@ body:has(.controls.is-collapsed) .viewer-actions {
     right: 12px;
     bottom: auto;
     left: auto;
-    width: 58px;
-    max-height: 58px;
-    padding: 8px;
+    width: 44px;
+    height: 44px;
+    max-height: 44px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
     transform: none;
     overflow: hidden;
   }
@@ -2539,8 +2581,17 @@ body:has(.controls.is-collapsed) .viewer-actions {
   }
 
   .controls.is-collapsed .controls__header {
+    height: 44px;
+    min-height: 44px;
     margin-bottom: 0;
     justify-content: center;
+  }
+
+  .controls.is-collapsed #toggle-panel {
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+    padding: 0;
   }
   .brand-panel {
     top: 12px;

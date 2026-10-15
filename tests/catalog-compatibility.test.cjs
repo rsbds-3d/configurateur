@@ -20,7 +20,7 @@ vm.runInNewContext(`${rulesSource}\nthis.rules = {
 };`, sandbox);
 
 const plain = (value) => JSON.parse(JSON.stringify(value));
-assert.deepStrictEqual(plain(sandbox.rules.aluminumByFamily["NEW SMALL"]), ["aluminum-black"], "NEW SMALL aluminium doit rester uniquement noir.");
+assert.deepStrictEqual(plain(sandbox.rules.aluminumByFamily["NEW SMALL"]), [], "NEW SMALL doit exclure l'aluminium.");
 assert.deepStrictEqual(plain(sandbox.rules.aluminumBySize.SMALL), ["aluminum-gray", "aluminum-black", "aluminum-red", "aluminum-violet"], "SMALL aluminium doit proposer gris, noir, rouge et violet.");
 assert.strictEqual(sandbox.rules.aluminumBySize.MEDIUM.length, 9, "MEDIUM aluminium doit proposer les neuf couleurs.");
 assert.deepStrictEqual(plain(sandbox.rules.aluminumBySize.LARGE), ["aluminum-black", "aluminum-red"], "LARGE aluminium doit proposer noir et rouge.");
@@ -48,7 +48,10 @@ vm.runInNewContext(`${metalFunction}; this.supports = modelSupportsMetalFamily;`
 assert.strictEqual(sandbox.supports({ id: "plug-classique-xl-35", family: "Classique", metalSizeClass: "XL" }, "alu"), false);
 assert.strictEqual(sandbox.supports({ id: "plug-classique-xl-35", family: "Classique", metalSizeClass: "XL" }, "inox"), true);
 assert.strictEqual(sandbox.supports({ id: "plug-classique-xl", family: "Classique", metalSizeClass: "XL" }, "alu"), true);
-assert(app.includes('metalFamilies: id === "plug-classique-xl-35" ||'), "Le viewer doit aussi exclure l'aluminium pour XL cristal 35.");
+assert(app.includes('isNewSmall || isBronze || id === "plug-classique-xl-35" ||'), "Le viewer doit exclure l'aluminium pour NEW SMALL, bronzes et XL cristal 35.");
+assert.strictEqual(sandbox.supports({family:"NEW SMALL"},"alu"),false);
+assert.strictEqual(sandbox.supports({family:"Classique",head:"bronze"},"alu"),false);
+assert.strictEqual(sandbox.supports({family:"Classique",head:"bronze"},"inox"),true);
 
 assert(welcome.includes('model.family === "NEW MEDIUM" && metalFamily === "alu" && ["gem", "pressed-glass"].includes(ornament)'), "NEW MEDIUM reserve gem et verre presse a l'inox.");
 assert(welcome.includes('["gem", "pressed-glass"].includes(ornament)'), "Gem et verre presse doivent partager une restriction de famille explicite.");

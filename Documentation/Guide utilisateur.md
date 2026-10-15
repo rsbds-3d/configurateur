@@ -2,6 +2,16 @@
 
 Version : **v0.11-260930**
 
+## Corrections du 16 octobre 2026
+
+La roue en haut a droite ouvre Reglages. Dans Affichage, activer la case pour afficher le panneau accordeon, masque au demarrage.
+
+NEW SMALL et les bronzes sont uniquement en inox. Les anciennes adresses incompatibles sont corrigees au chargement. Les cabochons restent lisses et les cristaux facettes.
+
+Le sol textile possede un relief geometrique et s'adapte aux objets visibles, avec 10 % de marge par cote. Le choix de decor permet de basculer entre soie/cuir et fourrure/velours.
+
+Classeur interactif : choisir de haut en bas. Apres changement d'un choix precedent, revoir les valeurs suivantes ; sans macro, Excel ne les efface pas automatiquement. Le catalogue complet dispose de filtres.
+
 ## Objectif
 
 Le configurateur permet de choisir un plug Rosebuds compatible par taille, métal, finition et ornement, puis de l'examiner dans un viewer Three.js photoréaliste.

@@ -2,6 +2,16 @@
 
 Version : **v0.11-260930**
 
+## Precisions du 16 octobre 2026
+
+- Aluminium exclu pour NEW SMALL et les bronzes, y compris les anciens liens.
+- Normales lisses pour les cabochons, facettes pour les cristaux.
+- Contact bronze-assiette hors tige de fixation.
+- Sol circulaire adapte a la diagonale de l'emprise visible, marge de 10 % par cote ; relief textile sans recouvrir les objets.
+- Panneau lateral masque initialement, activation dans Reglages / Affichage.
+- Titre, lien produit et fiche PDF synchronises avec les materiaux ; melanges non catalogues sur mesure.
+- Le cache BVH ne remplace pas la compilation GPU. Precalcul hors ligne restant a etudier et mesurer.
+
 ## Révision du 30 septembre 2026
 
 - La version GitHub Pages sépare physiquement la page de connexion `index.html` de l'application `configurateur.html`.

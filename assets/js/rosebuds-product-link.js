@@ -60,7 +60,7 @@ export function getFamilyDisplayLabel(family) {
 export function buildViewerProductSummary(configuration = {}) {
   const family = getFamilyDisplayLabel(configuration.modelFamily);
   const plug = configuration.plugSizeLabel || String(configuration.plugSize || "").split("-")[0] || "Plug";
-  const metal = METAL_LABELS[configuration.metalFamily] || configuration.metalFamily || "Métal";
+  const metal = configuration.metalDisplay || METAL_LABELS[configuration.metalFamily] || configuration.metalFamily || "Métal";
   const finish = configuration.ornamentFinish || ORNAMENT_LABELS[configuration.ornament] || "Sans ornement";
   return [family, plug, metal, finish].filter(Boolean).join(" - ");
 }
@@ -75,8 +75,8 @@ export function buildCustomRequestMessage(configuration = {}) {
     `Modèle 3D : ${configuration.modelLabel || configuration.catalogModel || "Non précisé"}`,
     `Taille du plug : ${plugLabel} (diamètre ${plugDiameter} mm)`,
     `Taille du cristal : ${configuration.crystalSize || "Sans cristal / non précisée"}`,
-    `Métal : ${METAL_LABELS[configuration.metalFamily] || configuration.metalFamily || "Non précisé"}`,
-    `Finition du métal : ${METAL_FINISH_LABELS[configuration.metalFinish] || configuration.metalFinish || "Non précisée"}`,
+    `Métal : ${configuration.metalDisplay || METAL_LABELS[configuration.metalFamily] || configuration.metalFamily || "Non précisé"}`,
+    `Finition du métal : ${configuration.metalFinishLabel || METAL_FINISH_LABELS[configuration.metalFinish] || configuration.metalFinish || "Non précisée"}`,
     `Ornement : ${ORNAMENT_LABELS[configuration.ornament] || configuration.ornament || "Non précisé"}`,
     `Finition de l’ornement : ${configuration.ornamentFinish || "Non précisée"}`,
     "",
@@ -93,6 +93,7 @@ export function buildCustomContactUrl(configuration = {}) {
 }
 
 export function resolveRosebudsProductLink(configuration = {}, productUrls = []) {
+  if (configuration.forceCustom || configuration.mixedMaterials) return customResult(configuration, "Configuration sur mesure");
   const customByGeometry = configuration.classicHead === "sans-tete"
     || Number(configuration.plugDiameterMm || String(configuration.plugSize || "").match(/\d+/)?.[0] || 0) > 50;
   if (customByGeometry) return customResult(configuration, "Configuration sur mesure");

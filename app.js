@@ -22,10 +22,11 @@ import { attachDecalGesture } from "./assets/js/decal-gesture.js?v=20260929-opti
 const MODEL_ASSET_VERSION = "20260929-optimized-3dm-v10";
 import { watermarkPngBlob } from "./assets/js/png-watermark.js";
 import { createBottleReference } from "./assets/js/bottle-reference.js";
-import { createCoinReference } from "./assets/js/coin-reference.js";
+import { createCoinReference } from "./assets/js/coin-reference.js?v=20261016";
+import { stageLayout, createStageGeometry } from "./assets/js/studio-stage.js?v=20261016";
 import { createRulerReference, getRulerSideOffset } from "./assets/js/ruler-reference.js?v=20261003-catalog-sheet-ruler-v11";
 import { pointInPlacementFrame, placementInWorld, sampleAxialProfileRadius } from "./assets/js/decal-placement.js?v=20260930-login-page-v11";
-import { buildViewerProductSummary, resolveRosebudsProductLink } from "./assets/js/rosebuds-product-link.js";
+import { buildViewerProductSummary, resolveRosebudsProductLink } from "./assets/js/rosebuds-product-link.js?v=20261016";
 
 const canvas = document.querySelector("#jewel-canvas");
 const loaderEl = document.querySelector("#loader");
@@ -4132,7 +4133,7 @@ const ALUMINUM_FINISHES_BY_SIZE_CLASS = Object.freeze({
   XXXL: Object.freeze(["aluminum-black", "aluminum-red", "aluminum-violet", "aluminum-orange"]),
 });
 const ALUMINUM_FINISHES_BY_MODEL_FAMILY = Object.freeze({
-  "NEW SMALL": Object.freeze(["aluminum-black"]),
+  "NEW SMALL": Object.freeze([]),
 });
 const STAINLESS_FINISHES_BY_SIZE_CLASS = Object.freeze({
   SMALL: Object.freeze(["stainless-mirror-silver"]),
@@ -4319,7 +4320,7 @@ function getCatalogModelMeta(id, label = "") {
     diameterMm: getCatalogDiameterFromSize(size),
     metalSizeClass,
     modelFamily,
-    metalFamilies: id === "plug-classique-xl-35" || (modelFamily === "Classique" && ["XXL", "XXXL"].includes(metalSizeClass))
+    metalFamilies: isNewSmall || isBronze || id === "plug-classique-xl-35" || (modelFamily === "Classique" && ["XXL", "XXXL"].includes(metalSizeClass))
       ? ["inox"]
       : ["alu", "inox"],
     ornamentFamilies: uniqueOrnaments,
@@ -7239,6 +7240,8 @@ function setControlsPanelCollapsed(collapsed) {
 }
 
 function applyDefaultControlsPanelState() {
+  const panel = document.querySelector(".controls");
+  if (panel) panel.hidden = true;
   setControlsPanelCollapsed(true);
 }
 
@@ -7818,6 +7821,7 @@ async function refreshScaleReference() {
   if (select) select.disabled = !enabled;
   if (!enabled) {
     finishAuxiliaryProgress("Objet d’échelle masqué");
+    groundCurrentPlug();
     frameImportedModel(root);
     return;
   }
@@ -7860,6 +7864,7 @@ async function refreshScaleReference() {
     controls.enablePan = false;
     scaleReferenceGroup.add(object);
     scaleReferenceGroup.updateWorldMatrix(true, true);
+    updateStudioStage();
     updateSoftStudioShadow(object, true);
     frameModelAndScaleReference();
     finishAuxiliaryProgress(object.userData.comparisonArc
@@ -7885,6 +7890,7 @@ async function refreshScaleReference() {
   }
   scaleReferenceGroup.add(object);
   scaleReferenceGroup.updateWorldMatrix(true, true);
+  updateStudioStage();
   frameModelAndScaleReference();
   finishAuxiliaryProgress("Objet d’échelle prêt");
 }
@@ -7975,8 +7981,8 @@ async function downloadViewerProductSheet() {
         ["Type de bronze", configuration.bronzeType],
         ["Taille du plug", configuration.plugSizeLabel], ["Diametre du plug", configuration.plugDiameterMm ? `${configuration.plugDiameterMm} mm` : ""],
         ["Taille du cristal", configuration.crystalSize],
-        ["Metal", configuration.metalFamily === "alu" ? "Aluminium" : "Inox"],
-        ["Finition du metal", metalPresets[settings.metalPreset]?.label || configuration.metalFinish],
+        ["Metal", configuration.metalDisplay || (configuration.metalFamily === "alu" ? "Aluminium" : "Inox")],
+        ["Finition du metal", configuration.metalFinishLabel || metalPresets[settings.metalPreset]?.label || configuration.metalFinish],
         ["Ornement", configuration.ornament], ["Finition de l'ornement", configuration.ornamentFinish]],
     });
     downloadBlob(pdf, `rosebuds-${settings.modelId || "plug"}-fiche.pdf`);
@@ -8518,6 +8524,12 @@ function wireInterface() {
     const panel = document.querySelector(".controls");
     setControlsPanelCollapsed(!panel.classList.contains("is-collapsed"));
   });
+  document.querySelector("#open-viewer-settings")?.addEventListener("click", () => document.querySelector("#viewer-settings")?.showModal());
+  document.querySelector("#show-viewer-panel")?.addEventListener("change", (event) => {
+    const panel = document.querySelector(".controls");
+    if (panel) panel.hidden = !event.target.checked;
+    if (event.target.checked) setControlsPanelCollapsed(false);
+  });
   document.querySelectorAll("[data-bg]").forEach((button) => {
     button.addEventListener("click", () => applyBackground(button.dataset.bg));
   });
@@ -8863,6 +8875,7 @@ function applyMetalPreset(id) {
 
   materialRegistry.metals.forEach((mat) => {
     mat.color.set(preset.color);
+    if (mat.userData?.jewelryMaterial) mat.userData.jewelryMaterial.preset = id;
     mat.roughness = preset.roughness;
     mat.envMapIntensity = preset.env;
     mat.metalness = 1;
@@ -8878,6 +8891,7 @@ function applyMetalPreset(id) {
   updateFacetTextureMaterials();
   updateStemDecalColors();
   if (settings.supportMaterial === "silk-auto") applySupportMaterial("silk-auto");
+  if (currentViewerConfiguration) syncViewerConfigurationFromMaterialChange("metal", id);
   showNotice(`${preset.label} appliqué au métal.`);
 }
 
@@ -9030,6 +9044,7 @@ function applySingleMaterialToMesh(mesh, nextMaterial, options = {}) {
     material.needsUpdate = true;
   }
   mesh.material = material;
+  if (material.userData?.jewelryMaterial?.type === "gem") configureGemMeshNormals(mesh, material);
   if (options.clearGroups !== false && mesh.geometry?.clearGroups) mesh.geometry.clearGroups();
   mesh.visible = true;
   mesh.frustumCulled = false;
@@ -10077,10 +10092,12 @@ function applyMaterialToSelectedObject(type, id) {
     return;
   }
 
+  const previousRole = selectedSceneObject.userData?.classicPlugRole;
   if (type === "metal") {
     const material = makeMetalMaterialFromPreset(id, `Objet - ${metalPresets[id]?.label || "métal"}`);
     applySingleMaterialToMesh(selectedSceneObject, material);
-    selectedSceneObject.userData.classicPlugRole = "metal";
+    selectedSceneObject.userData.classicPlugRole = previousRole === "bronze" ? "bronze" : "metal";
+    if (previousRole === "bronze") material.userData.jewelryMaterial.type = "bronze";
     if (centerGemMesh === selectedSceneObject) {
       centerGemMesh = null;
       reflectionRig.clear();
@@ -10102,6 +10119,7 @@ function applyMaterialToSelectedObject(type, id) {
 
   selectSceneObject(selectedSceneObject);
   if (type === "gem") buildGemOpticalEffect();
+  syncViewerConfigurationFromMaterialChange(type === "gem" ? "gem" : previousRole === "bronze" ? "bronze" : "metal", id);
 }
 
 function commitManipulatorPosition() {
@@ -10163,6 +10181,36 @@ function groundCurrentPlug() {
   root.position.y += floor.position.y - box.min.y;
   root.updateWorldMatrix(true, true);
   updateSoftStudioShadow(root, true);
+  updateStudioStage();
+}
+
+function updateStudioStage() {
+  if (arCameraStream || !floor.visible) return;
+  const box = new THREE.Box3();
+  const contacts = [];
+  if (root.visible) {
+    const bounds = getVisibleMeshBox(root);
+    if (!isBoxEmpty(bounds)) { box.union(bounds); contacts.push(bounds); }
+  }
+  if (scaleReferenceGroup.visible) {
+    const bounds = getVisibleMeshBox(scaleReferenceGroup);
+    if (!isBoxEmpty(bounds)) { box.union(bounds); contacts.push(bounds); }
+  }
+  if (isBoxEmpty(box)) return;
+  const layout = stageLayout(box);
+  const geometry = createStageGeometry(layout, supportPresets[settings.supportMaterial]?.family, contacts);
+  floor.geometry.dispose();
+  floor.geometry = geometry;
+  floor.scale.setScalar(1);
+  floor.position.x = layout.center.x;
+  floor.position.z = layout.center.z;
+  leatherBackdrop.scale.set(layout.radius * 1.02 / 30, layout.height / 40, layout.radius * 1.02 / 30);
+  leatherBackdrop.position.set(layout.center.x, floor.position.y + layout.height / 2 - 0.02, layout.center.z);
+  floor.userData.stageMargin = 0.1;
+  silkFloorTexture.repeat.set(1.5, 1.5);
+  furFloorTexture.repeat.set(3, 3);
+  leatherBackdropTexture.repeat.set(3, 1);
+  velvetBackdropTexture.repeat.set(3, 1);
 }
 
 function applySupportMaterial(id) {
@@ -10170,7 +10218,7 @@ function applySupportMaterial(id) {
   settings.supportMaterial = id;
   floor.visible = !preset.hidden;
   floor.receiveShadow = !preset.hidden;
-  floor.scale.setScalar(["silk", "fur"].includes(preset.family) ? 3 : 1);
+  floor.scale.setScalar(1);
   if (["silk", "fur"].includes(preset.family)) {
     const fur = preset.family === "fur";
     const blackPlug = /black|noir/i.test(settings.metalPreset);
@@ -10180,16 +10228,18 @@ function applySupportMaterial(id) {
     floorMaterial.normalMap = null;
     floorMaterial.roughnessMap = null;
     floorMaterial.bumpMap = fur ? furFloorTexture : silkFloorTexture;
-    floorMaterial.bumpScale = fur ? 0.055 : 0.035;
+    floorMaterial.bumpScale = fur ? 0.018 : 0.004;
     floorMaterial.displacementMap = null;
-    floorMaterial.roughness = preset.roughness;
+    floorMaterial.roughness = fur ? preset.roughness : 0.62;
+    floorMaterial.specularIntensity = fur ? 0.25 : 0.2;
     floorMaterial.metalness = 0;
     floorMaterial.envMapIntensity = fur || pink ? preset.env : 0.12;
-    floorMaterial.sheen = preset.sheen;
+    floorMaterial.sheen = fur ? preset.sheen : 0.4;
     floorMaterial.sheenColor.set(fur ? preset.sheenColor : pink ? "#fff2f6" : "#161216");
     floorMaterial.sheenRoughness = 0.35;
     floorMaterial.clearcoat = 0;
     floorMaterial.needsUpdate = true;
+    updateStudioStage();
     return;
   }
   if (preset.hidden) {
@@ -10219,6 +10269,7 @@ function applySupportMaterial(id) {
   floorMaterial.clearcoat = preset.clearcoat ?? (preset.metalness > 0 ? 0.6 : preset.family === "marble" ? 0.32 : preset.family === "wood" ? 0.28 : 0.05);
   floorMaterial.clearcoatRoughness = preset.clearcoatRoughness ?? (preset.family === "marble" ? 0.18 : preset.family === "wood" ? 0.24 : 0.45);
   floorMaterial.needsUpdate = true;
+  updateStudioStage();
   logDebug("support", `Support applique : ${preset.label}`, preset);
 }
 
@@ -11788,6 +11839,40 @@ function scaleClassicPlugBronzeOrnament(model, meshOptions = {}) {
     mesh.userData.bronzeScale = scale;
   });
   model.updateWorldMatrix(true, true);
+  seatBronzeAgainstPlate(model);
+}
+
+function seatBronzeAgainstPlate(model) {
+  const bodyBox = getModelMeshBox(model, mesh => mesh.userData?.classicPlugRole === "metal");
+  if (isBoxEmpty(bodyBox)) return;
+  const size = bodyBox.getSize(new THREE.Vector3());
+  const axis = size.x >= size.y && size.x >= size.z ? "x" : size.y >= size.z ? "y" : "z";
+  const radialAxes = ["x", "y", "z"].filter(value => value !== axis);
+  const bodyCenter = bodyBox.getCenter(new THREE.Vector3());
+  getRootBronzeMeshes(model).forEach(mesh => {
+    const box = new THREE.Box3().setFromObject(mesh);
+    const center = box.getCenter(new THREE.Vector3());
+    const direction = center[axis] < bodyCenter[axis] ? 1 : -1;
+    const plate = direction > 0 ? bodyBox.min[axis] : bodyBox.max[axis];
+    const radialRadius = Math.max(...radialAxes.map(value => box.max[value] - box.min[value])) / 2;
+    const position = mesh.geometry.getAttribute("position");
+    const vertex = new THREE.Vector3();
+    let seat = direction > 0 ? -Infinity : Infinity;
+    // Ignore the central fixing stem: seat the ornament's back against the plate.
+    const step = Math.max(1, Math.floor(position.count / 10000));
+    for (let i = 0; i < position.count; i += step) {
+      vertex.fromBufferAttribute(position, i).applyMatrix4(mesh.matrixWorld);
+      const radius = Math.hypot(...radialAxes.map(value => vertex[value] - center[value]));
+      if (radius < radialRadius * 0.4) continue;
+      seat = direction > 0 ? Math.max(seat, vertex[axis]) : Math.min(seat, vertex[axis]);
+    }
+    if (!Number.isFinite(seat)) return;
+    const world = mesh.getWorldPosition(new THREE.Vector3());
+    world[axis] += plate - seat;
+    mesh.position.copy(mesh.parent.worldToLocal(world));
+    mesh.userData.bronzePlateContact = { axis, plate, seatBefore: seat, gapAfter: 0 };
+  });
+  model.updateWorldMatrix(true, true);
 }
 
 function assignClassicPlugMaterialsByVolume(model, meshOptions = {}) {
@@ -11948,6 +12033,26 @@ function collectImportStats(model) {
   return stats;
 }
 
+function configureGemMeshNormals(mesh, material) {
+  if (!material || !mesh.geometry) return;
+  const faceted = material.userData?.facetedGem === true;
+  const style = faceted ? "faceted" : "smooth";
+  if (mesh.userData.gemNormalStyle === style) return;
+  if (faceted) {
+    if (mesh.geometry.index) {
+      const original = mesh.geometry;
+      mesh.geometry = original.toNonIndexed();
+      original.dispose();
+    }
+    mesh.geometry.computeVertexNormals();
+  } else {
+    computeWeightedSmoothNormals(mesh.geometry, 60);
+  }
+  material.flatShading = faceted;
+  material.needsUpdate = true;
+  mesh.userData.gemNormalStyle = style;
+}
+
 function applyImportedMeshProcessing(model, options = {}, meta = {}) {
   const processing = {
     recomputeNormals: options.recomputeNormals === true,
@@ -11969,14 +12074,7 @@ function applyImportedMeshProcessing(model, options = {}, meta = {}) {
     if (!child.isMesh || !child.geometry) return;
     if (child.userData?.classicPlugRole === "gem") {
       const materials = Array.isArray(child.material) ? child.material : [child.material];
-      if (materials.some((material) => material?.userData?.facetedGem === true)) {
-        if (child.geometry.index) {
-          const original = child.geometry;
-          child.geometry = original.toNonIndexed();
-          original.dispose();
-        }
-        child.geometry.computeVertexNormals();
-      }
+      configureGemMeshNormals(child, materials[0]);
       // Gem geometry must not be welded, relaxed or smoothed like the metal body.
       smoothImportedMeshMaterial(child);
       return;
@@ -12907,10 +13005,8 @@ function shouldUseDiamondRayTracing(material, preset = {}) {
   if (!material || !isTransparentOpticalGemPreset(merged, material)) return false;
   const optical = getGemOpticalQualityProfile(merged, material);
   const transmission = getGemPresetNumber(merged, material, "transmission", Number(material.transmission) || 0);
-  // The GPU path is cheap enough to serve every transparent optical stone,
-  // including cabochons and pressed crystal. Opaque stones and pearls remain
-  // on their dedicated PBR materials.
-  return Boolean(optical.isOpticalGem && !optical.isOpaque && !optical.isPearl && transmission >= 0.16);
+  // Smooth cabochons use continuous PBR optics without compiling the faceted BVH shader.
+  return Boolean(optical.isOpticalGem && !optical.isOpaque && !optical.isPearl && !optical.isCabochon && transmission >= 0.16);
 }
 
 function loadDiamondBVHModule() {
@@ -14334,6 +14430,10 @@ function startJewelryConfigurator() {
     if (modelSelect) modelSelect.value = requestedCatalogModel;
   }
   const requestedMeta = getCatalogModelMeta(settings.modelId, modelDefaults[settings.modelId]?.title || "");
+  if ((requestedMetalFamily && !requestedMeta.metalFamilies.includes(requestedMetalFamily))
+    || (requestedMeta.metalFamilies.length === 1 && settings.metalPreset.startsWith("aluminum-"))) {
+    settings.metalPreset = "stainless-mirror-silver";
+  }
   if (requestedMetalFinish && metalPresets[requestedMetalFinish]
     && catalogModelSupportsMetalFinish(requestedMeta, requestedMetalFamily, requestedMetalFinish)) {
     settings.metalPreset = requestedMetalFinish;
@@ -14384,7 +14484,48 @@ function applyThumbnailCaptureComposition(params) {
 let rosebudsProductUrlsPromise = null;
 let currentViewerConfiguration = null;
 
-async function updateViewerProductInformation(params, meta) {
+let viewerProductInformationGeneration = 0;
+
+function syncViewerConfigurationFromMaterialChange(role, id) {
+  if (!currentViewerConfiguration) return;
+  const params = new URLSearchParams(window.location.search);
+  const meta = getCatalogModelMeta(settings.modelId, modelDefaults[settings.modelId]?.title || "");
+  const overrides = {};
+  if (role === "metal") {
+    settings.metalPreset = id;
+    const family = id.startsWith("aluminum-") ? "alu" : "inox";
+    params.set("metalFamily", family);
+    params.set("metalFinish", id);
+    const finishes = new Set();
+    root.traverse(mesh => {
+      if (!mesh.isMesh || mesh.userData?.classicPlugRole !== "metal") return;
+      const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      materials.forEach(material => {
+        const preset = material?.userData?.jewelryMaterial?.preset;
+        if (preset) finishes.add(preset);
+      });
+    });
+    overrides.mixedMaterials = finishes.size > 1;
+    overrides.metalFinishLabel = [...finishes].map(value => metalPresets[value]?.label || value).join(" / ");
+    overrides.metalDisplay = overrides.metalFinishLabel;
+    overrides.forceCustom = !catalogModelSupportsMetalFinish(meta, family, id);
+    updateStemDecalColors();
+    if (settings.supportMaterial === "silk-auto") applySupportMaterial("silk-auto");
+  } else {
+    const preset = role === "bronze" ? metalPresets[id] : gemPresets[id];
+    params.set("ornamentFinish", preset?.label || id);
+    params.set("ornament", role === "bronze" ? "bronze" : preset?.cabochon ? "gem" : "crystal");
+    overrides.mixedMaterials = currentViewerConfiguration.mixedMaterials;
+    overrides.forceCustom = currentViewerConfiguration.forceCustom;
+    overrides.metalDisplay = currentViewerConfiguration.metalDisplay;
+    overrides.metalFinishLabel = currentViewerConfiguration.metalFinishLabel;
+  }
+  history.replaceState(null, "", `${window.location.pathname}?${params}`);
+  updateViewerProductInformation(params, meta, overrides);
+}
+
+async function updateViewerProductInformation(params, meta, overrides = {}) {
+  const generation = ++viewerProductInformationGeneration;
   const plugSize = params.get("plugSize") || meta.size || "";
   const plugSizeParts = plugSize.split("-");
   const metalFinish = params.get("metalFinish") || settings.metalPreset || "";
@@ -14405,6 +14546,9 @@ async function updateViewerProductInformation(params, meta) {
     ornamentFinish: params.get("ornamentFinish") || "",
   };
   const summary = document.querySelector("#viewer-product-summary");
+  Object.assign(configuration, overrides);
+  configuration.metalFinish = settings.metalPreset;
+  configuration.metalFamily = settings.metalPreset.startsWith("aluminum-") ? "alu" : "inox";
   currentViewerConfiguration = configuration;
   if (summary) summary.textContent = buildViewerProductSummary(configuration);
 
@@ -14415,11 +14559,13 @@ async function updateViewerProductInformation(params, meta) {
       .then((response) => response.ok ? response.json() : Promise.reject(new Error(`Catalogue HTTP ${response.status}`)))
       .then((payload) => Array.isArray(payload?.urls) ? payload.urls : []);
     const productUrls = await rosebudsProductUrlsPromise;
+    if (generation !== viewerProductInformationGeneration) return;
     const result = resolveRosebudsProductLink(configuration, productUrls);
     link.href = result.url;
     link.textContent = result.label;
     link.dataset.custom = String(result.custom);
   } catch (error) {
+    if (generation !== viewerProductInformationGeneration) return;
     const result = resolveRosebudsProductLink(configuration, []);
     link.href = result.url;
     link.textContent = result.label;
@@ -14430,8 +14576,13 @@ async function updateViewerProductInformation(params, meta) {
 
 async function applyWelcomeLaunchConfiguration(params) {
   const meta = getCatalogModelMeta(settings.modelId, modelDefaults[settings.modelId]?.title || "");
-  const metalFamily = params.get("metalFamily");
-  const metalFinish = params.get("metalFinish");
+  const requestedFamily = params.get("metalFamily");
+  const metalFamily = meta.metalFamilies.includes(requestedFamily) ? requestedFamily : meta.metalFamilies[0];
+  const requestedFinish = params.get("metalFinish");
+  const metalFinish = catalogModelSupportsMetalFinish(meta, metalFamily, requestedFinish)
+    ? requestedFinish : metalFamily === "inox" ? "stainless-mirror-silver" : settings.metalPreset;
+  params.set("metalFamily", metalFamily);
+  params.set("metalFinish", metalFinish);
   if (metalFinish && metalPresets[metalFinish] && catalogModelSupportsMetalFinish(meta, metalFamily, metalFinish)) {
     const preset = metalPresets[metalFinish];
     const metalSelect = document.querySelector("#metal-preset");

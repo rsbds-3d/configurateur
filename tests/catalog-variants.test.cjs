@@ -29,12 +29,12 @@ context.model = { family: "NEW SMALL", label: "NEW SMALL cabochon", metalSizeCla
 context.metals = { alu: [["aluminum-black"], ["aluminum-red"]], inox: [["stainless-mirror-silver"]] };
 context.finishes = { gem: [["Blue Agata"], ["Onyx"]], "pressed-glass": [["Green"], ["Purple cabochon"]] };
 const variants = vm.runInContext("enumerateModelConfigurations(model, {}, metals, finishes)", context);
-assert.equal(variants.length, 8);
+assert.equal(variants.length, 4);
 assert.equal(new Set(variants.map(JSON.stringify)).size, variants.length);
 assert(variants.every((v) => v.metalFinish !== "aluminum-red"));
 const filtered = vm.runInContext('enumerateModelConfigurations(model, {metal:"alu",ornamentFinish:"Onyx"}, metals, finishes)', context);
-assert.equal(filtered.length, 1); assert.equal(filtered[0].ornament, "gem");
-assert.equal(filtered[0].metalFinish, "aluminum-black");
+assert.equal(filtered.length, 0);
+assert(variants.every(v=>v.metal === "inox"));
 assert(source.includes("openViewer(variant.model.id, variant.resolved)"), "A result opens its own exact materials");
 assert(source.includes("slice(0, visibleResultCount)"), "Do not build thousands of DOM cards at once");
 for (const translated of ['"Agate bleue"', '"Pourpre"', '"Aigue-marine"']) assert(!source.includes(translated));

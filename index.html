@@ -8,6 +8,10 @@
       content="Viewer 3D joaillerie luxe pour bague en or, gemme padparadscha et pavage diamant."
     />
     <title>Configurateur de bijoux Rosebuds</title>
+    <style>
+      [hidden] { display: none !important; }
+      #app:not(.viewer-ready) { visibility: hidden; }
+    </style>
     <link rel="icon" href="./assets/icons/rosebuds-launcher.ico?v=20261004-crown" sizes="any" />
     <link rel="apple-touch-icon" href="./assets/icons/rosebuds-launcher.png?v=20261004-crown" />
     <link rel="stylesheet" href="./welcome.css?v=20261004-source-normals-faceted-v11" />
@@ -98,6 +102,16 @@
     </section>
 
     <main id="app" hidden>
+      <button id="open-viewer-settings" class="viewer-settings-toggle" type="button" title="Reglages" aria-label="Reglages"><span aria-hidden="true">&#9881;</span></button>
+      <span class="viewer-visible-version">v0.11-260930</span>
+      <dialog id="viewer-settings" aria-labelledby="viewer-settings-title">
+        <form method="dialog">
+          <header><h2 id="viewer-settings-title">Reglages</h2><button type="submit" aria-label="Fermer">&#215;</button></header>
+          <span class="viewer-version">v0.11-260930</span>
+          <h3>Affichage</h3>
+          <label><input id="show-viewer-panel" type="checkbox" /> Afficher le menu accordeon a droite</label>
+        </form>
+      </dialog>
       <a class="viewer-back" href="./" aria-label="Revenir au catalogue">Catalogue</a>
       <video id="ar-camera-feed" class="ar-camera-feed" autoplay muted playsinline hidden aria-label="Image filmée par la caméra"></video>
       <canvas id="jewel-canvas" aria-label="Viewer 3D interactif de bijou"></canvas>
@@ -218,7 +232,7 @@
         <a id="viewer-product-link" href="https://rosebuds.net/fr/6-gamme-originale-inox" target="_blank" rel="noopener">Voir la gamme Rosebuds</a>
       </section>
 
-      <aside class="controls is-collapsed" aria-label="Réglages du viewer 3D">
+      <aside class="controls is-collapsed" aria-label="Réglages du viewer 3D" hidden>
         <div class="controls__header">
           <div>
             <p class="eyebrow">Studio WebGL</p>
@@ -1021,7 +1035,7 @@
       </section>
     </main>
 
-    <script src="./welcome.js?v=20261013-comparison-textile-v11" defer></script>
+    <script src="./welcome.js?v=20261016-catalog-stage-v11" defer></script>
   </body>
 </html>
 

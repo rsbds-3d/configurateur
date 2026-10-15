@@ -8,6 +8,17 @@ export function createCoinReference(source, unitsPerMillimeter, floorY = 0) {
     child.geometry = child.geometry.clone();
     child.material = Array.isArray(child.material)
       ? child.material.map((material) => material.clone()) : child.material.clone();
+    const materials = Array.isArray(child.material) ? child.material : [child.material];
+    materials.forEach((material) => {
+      // The GLB reuses its RGB photo as a normal map, which is not tangent-space data.
+      material.normalMap = null;
+      material.bumpMap = null;
+      material.roughnessMap = null;
+      material.metalness = 1;
+      material.roughness = 0.3;
+      material.envMapIntensity = 0.8;
+      material.needsUpdate = true;
+    });
     child.castShadow = true;
     child.receiveShadow = true;
     child.userData.nonMaterialEditable = true;

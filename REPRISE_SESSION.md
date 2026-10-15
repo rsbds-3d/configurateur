@@ -1,6 +1,35 @@
 # REPRISE DE SESSION
 
+CWD_SESSION : C:\Users\charl\Documents\CONFIGURATEUR DE BIJIOUX
+
+## Etat prioritaire du 16 octobre 2026
+
+Branche master, version v0.11-260930. Dernier commit publie avant cette continuation : 75ebd92. Corrections locales : exclusions alu NEW SMALL/bronze, cabochons lisses PBR, contact bronze-assiette, piece sans fausse normal map, sol textile geometrique adapte +10 %, roue Reglages panneau masque, attente CSS et metadonnees synchronisees. Cache 20261016-catalog-stage-v11.
+
+49 fichiers de tests passent. Chrome headless controle : cabochon Green Agate smooth/flatShading false ; panneau masque puis activable ; ancien lien bronze alu converti en stainless-mirror-silver ; aucune erreur JavaScript. Captures tmp/current-cabochon.png et current-bronze.png. Serveur test PID3776 port8082 a arreter a la fin.
+
+Classeur outputs/rosebuds-20261013/Catalogue interactif Rosebuds.xlsx regenere : 51 modeles, 2167 combinaisons, neuf validations dependantes, scan erreurs nul ; Excel natif non teste. Generation tmp/workbook/build.mjs.
+
+Installateur compile mais recompilation avec documentation actualisee, installation et publication restent a effectuer a cet instant. Ne pas annoncer la livraison avant verification. Preserver modification utilisateur Journal des modifications/2026-10-03.md. ComfyUI generatif, AR physique et precalcul GPU hors ligne non termines.
+
+## Etat prioritaire du 13 octobre 2026
+Demandes en cours : correction comparatif seul/facettise, decors soie/cuir puis fourrure/velours quatre coloris, mise a jour application, classeur interactif catalogue. Code local corrige, 47 tests passes. Cause facettes comparaison confirmee : refreshComparisonGemRendering appliquait finition gem au metal, remplace par getRootGemMeshes. Textures assets/materials/textile embarquees ; select studio-decor. Classeur outputs/rosebuds-20261013/Catalogue interactif Rosebuds.xlsx (51 modeles, 2314 combinaisons). Controle visuel final, installation, publication et validation xlsx en cours. Cache 20261013-comparison-textile-v11. Ne pas confondre avec livraison du 4 octobre ci-dessous.
+
+## Etat prioritaire du 4 octobre 2026
+Couronne seule livree : commit a640f25, Pages37212791204 success et favicon public HTTP200 controle. PNG/ICO7 tailles generes depuis logo original via launcher/build-crown-icon.ps1. EXE recompile, installateur compile (20.125 s) et installe ; empreintes EXE/index/ICO conformes. 45 tests passent. Icone Windows controlee comme ressource generee/compilee, pas par capture native. Release GitHub EXE historique non remplacee.
+PDF publication : Pages37212439169 success et module product-sheet.js public controle. Export PDF installe et en ligne.
+Fiches PDF natives : commit adc5f64 pousse ; jsPDF4.2.1 embarque avec licence ; catalogue et viewer exportent .pdf. 44 tests passent, PDF reel genere et pages1/2 rendues/inspectees avec Poppler. Installateur compile et installe avec empreintes app/welcome/product-sheet/jspdf conformes. Cache 20261004-pdf-sheet-v11. Pages run37212439169 a confirmer. Les mentions HTML ci-dessous sont historiques.
+Fiche viewer livree : commit 720c149, Pages 37211295233 success, installation empreinte app.js conforme. Bouton visible ; 43 tests passent. Essai download dans IAB expire sans evenement ni erreur console, bouton reactive : fichier telecharge non confirme. Export HTML imprimable PDF, capture courante filigranee. Cache 20261004-viewer-sheet-v11.
+Publication confirmee : Pages run 37207255344 success ; app.js public contient preservation normales et facetedGem. Les corrections du 4 octobre sont en ligne et installees.
+Etat prioritaire final : corrections normales/facettes INSTALLEES et commit 6466508 pousse. Viewer XL Jet net et face NEW MEDIUM35 rose uniforme verifies visuellement avec zoom. Classification par volume avant processing. Pages run 37207255344 en verification. 42 tests passent. Les mentions NON installe ci-dessous sont historiques.
+Pierres : correction locale facetedGem (Jet opaque inclus), flatShading preserve ; gem contourne lissage metal, normales par triangle sur geometrie non indexee. Cabochons/perles non facettes. 42 fichiers de tests passent. NON installe/NON publie ; verification visuelle a faire avec XL Jet et cabochon.
+Correction locale supplementaire app.js : preserveSourceNormals=true par defaut ; normales Rhino valides conservees avant soudure/lissage si geometrie non subdivisee/non relaxee. Tests source-normals : 41 fichiers passent. NON publie/non installe ; comparaison visuelle NEW MEDIUM 35 cristal necessaire pour confirmer disparition etoile et jonction. Ne pas annoncer cause geometrique definitivement exclue.
+Dernier code publie et installe : v0.11 avec Tab, fiche HTML, vignettes bronze, regle laterale et restriction XL35 inox. 40 tests repasses avec succes. Les mentions de publication en cours ci-dessous sont historiques.
+Chantier restant principal : moteur generatif ComfyUI. NVIDIA RTX 4070 Laptop detectee (VRAM exacte non mesuree), aucun service local sur 8188. Ne pas confondre Swin2SR avec generation IA ; aucune installation ComfyUI ou telechargement de poids realise dans cette continuation.
+AR/partage telephone et profilage GPU restent des validations physiques non effectuees. Journal 2026-10-04.md.
+
 ## Continuation du 3 octobre 2026
+Tab publie : commit ebec1ad, Pages 37155622910 success ; fonction acceptPromptSuggestion verifiee dans welcome.js public. Fonction egalement installee localement et empreinte conforme. 40 tests passes lors de la livraison precedente. ComfyUI generatif et AR physique restent non termines.
 Prompt : Tab dans textarea vide accepte le placeholder sans Exemple et garde texte editable ; texte existant et Shift+Tab preserves. Test prompt-suggestion ajoute, 40 tests passent. Installateur en regeneration ; modification pas encore publiee.
 Publication confirmee : commit f6b603e, Pages run 37144486583 success ; fichiers publics welcome.js/product-sheet.js/ruler-reference.js controles. Corrections du 3 octobre en ligne. Installation locale contient les fonctions ; derniers changements de cache-token non encore recompiles dans son installateur. ComfyUI generatif et essais AR physiques restent a traiter.
 Regle placee sur le cote du plug, parallele a son axe, debuts de longueur alignes (getRulerSideOffset). Test ruler-placement ajoute ; 39 tests passent. Installation confirmee. Publication des corrections du 3 octobre en cours ; cache-token 20261003-catalog-sheet-ruler-v11.
@@ -33,7 +62,18 @@ Sources et CWD identiques : `C:\Users\charl\Documents\CONFIGURATEUR DE BIJIOUX`.
 `master`, origin `https://github.com/rsbds-3d/configurateur.git`. Aucun worktree.
 
 ## Version actuelle
-`v0.10-260929`, VERSION = `0.10`, cache interface `20260929-optimized-3dm-decal-v10`, cache geometrie `20260929-optimized-3dm-v10`.
+`v0.11-260930`, VERSION = `0.11`. Dernier commit fonctionnel publie : `a640f25`. Cache interface : `20261004-pdf-sheet-v11` ; favicon : `20261004-crown`.
+
+## Livraison actuelle et limites
+- Code du 4 octobre publie sur GitHub Pages et installe localement ; 45 fichiers de tests repasses avec succes le 4 octobre.
+- La piece jointe EXE de la release GitHub v0.11 date du 2 octobre : elle ne contient pas les derniers correctifs du 3 octobre. L'installateur local a ete regenere depuis.
+- Rendu optimise actuel : Swin2SR, pas un moteur generatif ComfyUI. Installation et poids non presents ; accord demande pour le telechargement de plusieurs Go.
+- Fiche telechargeable : PDF natif dans catalogue et viewer, jsPDF embarque ; generation et mise en page controlees. Telechargement interactif IAB non confirme.
+- Authentification GitHub Pages cote client : les ressources publiques ne sont pas protegees par un serveur.
+- Tests AR sur telephone, partage natif et mesures GPU restant a effectuer.
+
+## Historique v0.10
+Les sections suivantes decrivent la livraison precedente ; elles ne doivent pas etre utilisees comme etat actuel.
 
 ## Etat actuel
 La v0.10 est integree, testee, reinstallee et publiee. Les 37 nouveaux modeles 3DM et la course complete du logo sont disponibles localement et sur GitHub Pages.

@@ -54,7 +54,9 @@ const root = path.resolve(__dirname, "..");
     const clonedMesh = reference.children[0].children[0];
     assert.notEqual(clonedMesh.geometry, mesh.geometry);
     assert.notEqual(clonedMesh.material, mesh.material);
-    assert.equal(clonedMesh.material.metalness, 0.8);
+    assert.equal(clonedMesh.material.metalness, 1);
+    assert.equal(clonedMesh.material.normalMap, null);
+    assert.equal(mesh.material.metalness, 0.8, "Le materiau source doit rester intact.");
     assert.equal(clonedMesh.userData.nonMaterialEditable, true);
   }
 

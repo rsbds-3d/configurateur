@@ -6,8 +6,8 @@ const source = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
 
 assert.match(
   source,
-  /return Boolean\(optical\.isOpticalGem && !optical\.isOpaque && !optical\.isPearl && transmission >= 0\.16\)/,
-  "Le shader BVH doit rester disponible pour les cristaux et cabochons transparents.",
+  /return Boolean\(optical\.isOpticalGem && !optical\.isOpaque && !optical\.isPearl && !optical\.isCabochon && transmission >= 0\.16\)/,
+  "Les cristaux conservent le BVH ; les cabochons utilisent le rendu PBR lisse rapide.",
 );
 assert.doesNotMatch(
   source,

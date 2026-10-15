@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const VIEWER_VERSION = "20261013-comparison-textile-v11";
+  const VIEWER_VERSION = "20261016-catalog-stage-v11";
   function acceptPromptSuggestion(event, field) {
     if (event.key !== "Tab" || event.shiftKey || event.ctrlKey || event.altKey || event.metaKey || field.value.trim()) return;
     const suggestion = field.placeholder.replace(/^Exemple\s*:\s*/i, "").trim();
@@ -79,7 +79,7 @@
     XXXL: Object.freeze(["aluminum-black", "aluminum-red", "aluminum-violet", "aluminum-orange"]),
   });
   const ALUMINUM_FINISHES_BY_MODEL_FAMILY = Object.freeze({
-    "NEW SMALL": Object.freeze(["aluminum-black"]),
+    "NEW SMALL": Object.freeze([]),
   });
   const STAINLESS_FINISHES_BY_SIZE_CLASS = Object.freeze({
     SMALL: Object.freeze(["stainless-mirror-silver"]),
@@ -214,7 +214,6 @@
     document.body.classList.add("is-viewer");
     if (params.get("thumbnail") === "1") document.body.classList.add("is-thumbnail-capture");
     if (welcome) welcome.hidden = true;
-    if (app) app.hidden = false;
 
     const stylesheet = document.createElement("link");
     stylesheet.rel = "stylesheet";
@@ -222,12 +221,19 @@
     stylesheet.id = "viewer-style";
     document.head.appendChild(stylesheet);
 
-    const loadApplication = () => import(`./app.js?v=${VIEWER_VERSION}`).catch((error) => {
+    const loadApplication = () => import(`./app.js?v=${VIEWER_VERSION}`).then(() => {
+      if (app) { app.classList.add("viewer-ready"); app.hidden = false; }
+    }).catch((error) => {
       console.error("Impossible de charger le viewer 3D.", error);
       document.body.dataset.viewerError = "true";
     });
     stylesheet.addEventListener("load", loadApplication, { once: true });
-    stylesheet.addEventListener("error", loadApplication, { once: true });
+    stylesheet.addEventListener("error", () => {
+      document.body.dataset.viewerError = "true";
+      const message = document.createElement("p");
+      message.textContent = "Le style du viewer n'a pas pu etre charge. Rechargez la page.";
+      document.body.append(message);
+    }, { once: true });
   }
 
   function startWelcome() {
@@ -1035,6 +1041,7 @@
 
   function modelSupportsMetalFamily(model, metalFamily) {
     if (metalFamily !== "alu") return true;
+    if (model.family === "NEW SMALL" || model.head === "bronze") return false;
     if (model.id === "plug-classique-xl-35") return false;
     return !(model.family === "Classique" && ["XXL", "XXXL"].includes(model.metalSizeClass));
   }
