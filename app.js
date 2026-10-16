@@ -23,7 +23,8 @@ const MODEL_ASSET_VERSION = "20260929-optimized-3dm-v10";
 import { watermarkPngBlob } from "./assets/js/png-watermark.js";
 import { createBottleReference } from "./assets/js/bottle-reference.js";
 import { createCoinReference } from "./assets/js/coin-reference.js?v=20261016";
-import { stageLayout, fitStageToCamera, createStageGeometry } from "./assets/js/studio-stage.js?v=20261016b";
+import { stageLayout, fitStageToCamera, createStageGeometry, stageHeightAt } from "./assets/js/studio-stage.js?v=20261016c";
+import { createStudioFur, createFurAlphaTexture, disposeStudioFur } from "./assets/js/studio-fur.js?v=20261016";
 import { createRulerReference, getRulerSideOffset } from "./assets/js/ruler-reference.js?v=20261003-catalog-sheet-ruler-v11";
 import { pointInPlacementFrame, placementInWorld, sampleAxialProfileRadius } from "./assets/js/decal-placement.js?v=20260930-login-page-v11";
 import { buildViewerProductSummary, resolveRosebudsProductLink } from "./assets/js/rosebuds-product-link.js?v=20261016";
@@ -10184,6 +10185,8 @@ function groundCurrentPlug() {
   updateStudioStage();
 }
 
+let studioFurMesh = null;
+let studioFurAlpha = null;
 function updateStudioStage() {
   if (arCameraStream || !floor.visible) return;
   const box = new THREE.Box3();
@@ -10202,6 +10205,7 @@ function updateStudioStage() {
   if (last && Math.abs(last.radius - layout.radius) < layout.radius * 0.005
     && Math.abs(last.height - layout.height) < layout.height * 0.005
     && last.center.distanceTo(layout.center) < 0.001
+    && last.mobile === (window.innerWidth < 700)
     && last.material === settings.supportMaterial) return;
   const geometry = createStageGeometry(layout, supportPresets[settings.supportMaterial]?.family, contacts);
   floor.geometry.dispose();
@@ -10209,9 +10213,28 @@ function updateStudioStage() {
   floor.scale.setScalar(1);
   floor.position.x = layout.center.x;
   floor.position.z = layout.center.z;
+  const fur = supportPresets[settings.supportMaterial]?.family === "fur";
+  const furKey = [settings.supportMaterial, window.innerWidth < 700,
+    ...contacts.flatMap(bounds => [...bounds.min.toArray(), ...bounds.max.toArray()])].join(",");
+  const reuseFur = fur && studioFurMesh?.userData.layoutKey === furKey
+    && studioFurMesh.userData.coverageRadius >= layout.radius;
+  if (!reuseFur && studioFurMesh) { disposeStudioFur(studioFurMesh); studioFurMesh = null; }
+  if (fur && !reuseFur) {
+    studioFurAlpha ||= createFurAlphaTexture();
+    const size = box.getSize(new THREE.Vector3());
+    studioFurMesh = createStudioFur({
+      layout: { ...layout, radius: layout.radius * 1.3 }, contactBoxes: contacts, objectSize: Math.max(size.x, size.y, size.z),
+      color: supportPresets[settings.supportMaterial].color, alphaMap: studioFurAlpha,
+      heightAt: (x, y) => stageHeightAt(x, y, layout, "fur", contacts),
+      mobile: window.innerWidth < 700,
+    });
+    studioFurMesh.userData.layoutKey = furKey;
+    studioFurMesh.userData.coverageRadius = layout.radius * 1.3;
+    floor.add(studioFurMesh);
+  }
   leatherBackdrop.scale.set(layout.curtainRadius / 30, (layout.height + layout.radius * 0.08) / 40, layout.curtainRadius / 30);
   leatherBackdrop.position.set(layout.center.x, floor.position.y + (layout.height - layout.radius * 0.08) / 2, layout.center.z);
-  floor.userData.studioLayout = { ...layout, material: settings.supportMaterial };
+  floor.userData.studioLayout = { ...layout, material: settings.supportMaterial, mobile: window.innerWidth < 700 };
   floor.userData.stageMargin = 0.1;
   silkFloorTexture.repeat.set(1.5, 1.5);
   furFloorTexture.repeat.set(3, 3);
@@ -14431,6 +14454,7 @@ window.addEventListener("resize", () => {
   composer.setSize(width, height);
   bloomPass.setSize(width, height);
   updateArVideoTextureTransform();
+  updateStudioStage();
 });
 
 

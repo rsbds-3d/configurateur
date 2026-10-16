@@ -4,7 +4,9 @@ CWD_SESSION : C:\Users\charl\Documents\CONFIGURATEUR DE BIJIOUX
 
 ## Etat prioritaire du 16 octobre 2026
 
-Derniere correction en cours : decor ferme adapte a la camera, sol rayon=rideau*1.1 (5 % du diametre par cote), bas rideau sous plis ; cache 20261016-camera-stage-v11. 49 tests passes et captures NEW SMALL/MEDIUM/XXXL60 desktop/mobile/orbite sans zones noires. Installation et publication de cette correction supplementaire a confirmer, ne pas confondre avec livraison 7b00f5c ci-dessous.
+Fourrure 3D en cours de livraison : assets/js/studio-fur.js, rubans courbes instancies 52000/18000 portant 12 fibres par masque procedural. PBR et transparence douce ; tassement elliptique statique (pas moteur physique). Relief stable lors du cadrage. 50 tests passes ; Chrome clair/noir/mobile et reutilisation/nettoyage passes. Cache 20261016-fur-fibers-v11. Installation/publication de cette derniere modification a confirmer.
+
+Derniere correction LIVREE : commit f412485, Pages 38864714478 success. Decor ferme adapte a la camera, sol rayon=rideau*1.1 (5 % du diametre par cote), bas rideau sous plis ; cache 20261016-camera-stage-v11. 49 tests passes et captures NEW SMALL/MEDIUM/XXXL60 desktop/mobile/orbite sans zones noires. Installation exit0, empreintes app/welcome/index/stage conformes. Installateur decor-camera-261016 ajoute a GitHub sans supprimer les precedents.
 
 Branche master, version v0.11-260930. Dernier commit publie avant cette continuation : 75ebd92. Corrections locales : exclusions alu NEW SMALL/bronze, cabochons lisses PBR, contact bronze-assiette, piece sans fausse normal map, sol textile geometrique adapte +10 %, roue Reglages panneau masque, attente CSS et metadonnees synchronisees. Cache 20261016-catalog-stage-v11.
 

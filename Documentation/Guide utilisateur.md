@@ -12,6 +12,8 @@ Le sol textile possede un relief geometrique et s'adapte aux objets visibles, av
 
 Le decor s'agrandit aussi selon la camera pour ne laisser aucun vide visible pendant la rotation, le zoom ou le redimensionnement. Sa taille ne descend pas sous celle calculee pour les objets. Le sol depasse le rideau de 5 % du diametre du rideau de chaque cote ; le rideau descend sous les plis pour fermer la jonction.
 
+Les quatre decors Fourrure affichent automatiquement des meches 3D courbees, portant des fibres detourees, en complement de la texture du sol. Les pointes depassent du contour. La densite est reduite sur petit ecran ; les meches sont reutilisees lors des rotations. Un tassement progressif est calcule dans l'emprise des objets : c'est une approximation statique, sans moteur physique ni simulation de chaque poil. Le mode Soie retire les meches et libere leurs ressources.
+
 Classeur interactif : choisir de haut en bas. Apres changement d'un choix precedent, revoir les valeurs suivantes ; sans macro, Excel ne les efface pas automatiquement. Le catalogue complet dispose de filtres.
 
 ## Objectif

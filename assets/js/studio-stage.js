@@ -25,7 +25,22 @@ export function fitStageToCamera(layout, camera, floorY) {
   }
   const height = Math.max(layout.height, top - floorY) * 1.05;
   // Radial overlap is 5% of the curtain diameter on every side.
-  return { ...layout, radius: curtainRadius * 1.1, curtainRadius, height };
+  return { ...layout, reliefRadius: layout.radius, radius: curtainRadius * 1.1, curtainRadius, height };
+}
+
+export function stageHeightAt(x, y, layout, family, contactBoxes = []) {
+  const radius = layout.reliefRadius || layout.radius;
+  const amplitude = radius * (family === "fur" ? 0.009 : 0.025);
+    const wx = layout.center.x + x, wz = layout.center.z - y;
+    let compression = 1;
+    for (const box of contactBoxes) {
+      const dx = Math.max(box.min.x - wx, 0, wx - box.max.x);
+      const dz = Math.max(box.min.z - wz, 0, wz - box.max.z);
+      compression = Math.min(compression, Math.min(1, Math.hypot(dx, dz) / (radius * 0.12)));
+    }
+    const wave = Math.sin(x / radius * 15 + y / radius * 4)
+      * Math.cos(y / radius * 11 - x / radius * 2);
+    return -amplitude * (1 + wave) * compression;
 }
 
 export function createStageGeometry(layout, family, contactBoxes = []) {
@@ -33,18 +48,8 @@ export function createStageGeometry(layout, family, contactBoxes = []) {
   if (!relief) return new THREE.CircleGeometry(layout.radius, 128);
   const rings = 40, sectors = 128;
   const positions = [], uv = [], indices = [];
-  const amplitude = layout.radius * (family === "fur" ? 0.009 : 0.025);
   const append = (x, y) => {
-    const wx = layout.center.x + x, wz = layout.center.z - y;
-    let compression = 1;
-    for (const box of contactBoxes) {
-      const dx = Math.max(box.min.x - wx, 0, wx - box.max.x);
-      const dz = Math.max(box.min.z - wz, 0, wz - box.max.z);
-      compression = Math.min(compression, Math.min(1, Math.hypot(dx, dz) / (layout.radius * 0.12)));
-    }
-    const wave = Math.sin(x / layout.radius * 15 + y / layout.radius * 4)
-      * Math.cos(y / layout.radius * 11 - x / layout.radius * 2);
-    const height = -amplitude * (1 + wave) * compression;
+    const height = stageHeightAt(x, y, layout, family, contactBoxes);
     positions.push(x, y, height);
     uv.push(0.5 + x / (layout.radius * 2), 0.5 + y / (layout.radius * 2));
   };

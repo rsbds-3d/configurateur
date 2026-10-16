@@ -12,6 +12,7 @@ Version : **v0.11-260930**
 - Panneau lateral masque initialement, activation dans Reglages / Affichage.
 - Titre, lien produit et fiche PDF synchronises avec les materiaux ; melanges non catalogues sur mesure.
 - Le cache BVH ne remplace pas la compilation GPU. Precalcul hors ligne restant a etudier et mesurer.
+- Fourrure : meches courbees instanciees, masques de fibres proceduraux, materiau PBR et transparence douce ; densite 52000 meches bureau / 18000 petit ecran. Tassement elliptique progressif dans l'emprise des objets, sans pretendre simuler leur poids ou la dynamique individuelle des poils. Reutilisation des instances lors des rotations ; nettoyage lors des changements de decor.
 
 ## Révision du 30 septembre 2026
 
