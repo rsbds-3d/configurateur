@@ -14,6 +14,8 @@ Le decor s'agrandit aussi selon la camera pour ne laisser aucun vide visible pen
 
 Les quatre decors Fourrure affichent automatiquement des meches 3D courbees, portant des fibres detourees, en complement de la texture du sol. Les pointes depassent du contour. La densite est reduite sur petit ecran ; les meches sont reutilisees lors des rotations. Un tassement progressif est calcule dans l'emprise des objets : c'est une approximation statique, sans moteur physique ni simulation de chaque poil. Le mode Soie retire les meches et libere leurs ressources.
 
+Les meches sont reparties uniformement sur le sol : aucun disque de surdensite ou halo sombre artificiel n'est ajoute autour du produit.
+
 Classeur interactif : choisir de haut en bas. Apres changement d'un choix precedent, revoir les valeurs suivantes ; sans macro, Excel ne les efface pas automatiquement. Le catalogue complet dispose de filtres.
 
 ## Objectif

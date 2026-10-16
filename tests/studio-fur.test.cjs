@@ -30,6 +30,14 @@ const {pathToFileURL} = require('node:url');
   assert.ok(desktop.material.alphaTest > 0);
   const matrix = new THREE.Matrix4(); desktop.getMatrixAt(1,matrix);
   assert.ok(matrix.elements.every(Number.isFinite));
+  const annuli = [0, 0, 0, 0];
+  for (let i = 0; i < desktop.count; i++) {
+    desktop.getMatrixAt(i, matrix);
+    const radiusSquared = matrix.elements[12] ** 2 + matrix.elements[13] ** 2;
+    annuli[Math.min(3, Math.floor(radiusSquared / options.layout.radius ** 2 * 4))]++;
+  }
+  annuli.forEach(count => assert.ok(Math.abs(count / desktop.count - .25) < .015,
+    'Equal-area annuli must have equal density: no dark central disk'));
   disposeStudioFur(desktop); disposeStudioFur(mobile);
   console.log('Fur: real geometry, density, contact compression and disposal passed.');
 })().catch(error=>{console.error(error);process.exitCode=1;});

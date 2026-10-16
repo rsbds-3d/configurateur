@@ -75,10 +75,9 @@ export function createStudioFur({ layout, contactBoxes, objectSize, color, alpha
   mesh.userData.fiberLength = length;
   const random = randomGenerator(), transform = new THREE.Object3D();
   const tint = new THREE.Color();
-  const nearRadius = Math.min(layout.radius, objectSize * 1.1);
   let compressed = 0;
   for (let i = 0; i < count; i++) {
-    const radius = Math.sqrt(random()) * (i % 2 ? nearRadius : layout.radius);
+    const radius = Math.sqrt(random()) * layout.radius;
     const angle = random() * Math.PI * 2;
     const x = radius * Math.cos(angle), y = radius * Math.sin(angle);
     const compression = furCompression(layout.center.x + x, layout.center.z - y, contactBoxes, length);

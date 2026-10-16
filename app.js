@@ -24,7 +24,7 @@ import { watermarkPngBlob } from "./assets/js/png-watermark.js";
 import { createBottleReference } from "./assets/js/bottle-reference.js";
 import { createCoinReference } from "./assets/js/coin-reference.js?v=20261016";
 import { stageLayout, fitStageToCamera, createStageGeometry, stageHeightAt } from "./assets/js/studio-stage.js?v=20261016c";
-import { createStudioFur, createFurAlphaTexture, disposeStudioFur } from "./assets/js/studio-fur.js?v=20261016-dense";
+import { createStudioFur, createFurAlphaTexture, disposeStudioFur } from "./assets/js/studio-fur.js?v=20261016-uniform";
 import { createRulerReference, getRulerSideOffset } from "./assets/js/ruler-reference.js?v=20261003-catalog-sheet-ruler-v11";
 import { pointInPlacementFrame, placementInWorld, sampleAxialProfileRadius } from "./assets/js/decal-placement.js?v=20260930-login-page-v11";
 import { buildViewerProductSummary, resolveRosebudsProductLink } from "./assets/js/rosebuds-product-link.js?v=20261016";
