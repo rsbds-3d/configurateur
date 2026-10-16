@@ -58,7 +58,7 @@ export function createFurAlphaTexture() {
 }
 
 export function createStudioFur({ layout, contactBoxes, objectSize, color, alphaMap, heightAt, mobile = false }) {
-  const count = mobile ? 18000 : 52000;
+  const count = mobile ? 24000 : 68000;
   const length = THREE.MathUtils.clamp(objectSize * .045, .07, .26);
   const geometry = createFurBladeGeometry();
   const material = new THREE.MeshPhysicalMaterial({
