@@ -2,6 +2,12 @@
 
 Version : **v0.11-260930**
 
+## Demande de devis integree
+
+Dans le viewer, le bouton « Demander un devis pour cette configuration » ouvre le recapitulatif, un apercu PNG et le formulaire de coordonnees. Le message est pre-rempli et modifiable. Un PNG, JPEG ou PDF facultatif de 2 Mo peut etre ajoute. Fermer le formulaire ne change pas le produit et conserve les champs dans la session.
+
+L'envoi reel exige le backend configure par l'administrateur. Tant qu'il ne l'est pas, le formulaire l'indique et propose de copier le message ou d'ouvrir le contact officiel, sans afficher de reussite. Voir « Formulaire de devis - deploiement.md ». Aucun test de reception reel n'a ete effectue.
+
 ## Corrections du 16 octobre 2026
 
 La roue en haut a droite ouvre Reglages. Dans Affichage, activer la case pour afficher le panneau accordeon, masque au demarrage.

@@ -4,6 +4,7 @@ Version : **v0.11-260930**
 
 | Date | Travail | État | Durée |
 |---|---|---|---|
+| 2026-10-16 | Formulaire devis integre, capture, API securisee et tests simules ; correction classification Silk Shimmer/Ghost Light | Code et tests en cours de livraison ; envoi reel non active faute d'acces prestataire | Non mesuree |
 | 2026-10-16 | Suppression du disque sombre : distribution uniforme des meches, regression statistique | 50 tests passes ; verification visuelle et livraison en cours | Non mesuree |
 | 2026-10-16 | Fourrure 3D instanciee, contour de fibres, tassement sous objets et densite mobile | 50 tests passes ; controles visuels Chrome ; livraison en cours | Non mesuree |
 | 2026-10-16 | Compatibilites, cabochons, contact bronze, sol en relief, reglages et classeur | 49 tests passes ; Chrome controle ; application installee et site publie | Non mesuree |

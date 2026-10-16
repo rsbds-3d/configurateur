@@ -1,6 +1,12 @@
 .tmp-*
 *.before-*
 *.log
+.env
+.env.*
+!.env.example
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
 *.lnk
 online/dist/
 Configurateur de Bijoux Rosebuds.exe

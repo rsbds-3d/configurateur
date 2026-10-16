@@ -2,6 +2,10 @@
 
 Version : **v0.11-260930**
 
+## Devis integre
+
+Modale responsive, configuration et capture PNG du viewer, message editable, coordonnees obligatoires et document facultatif. Envoi via API Node24/Resend, destinataire serveur fixe info@rosebuds.net, expediteur de domaine verifie et Reply-To client. Turnstile serveur, rate-limit persistant, idempotence, validation et analyse antivirus des fichiers, webhook signe pour suivi des rebonds/rejets. Aucun secret cote navigateur. Newsletter absente faute de mecanisme reel. L'activation et le test de reception autorise restent requis avant de declarer le service operationnel.
+
 ## Precisions du 16 octobre 2026
 
 - Aluminium exclu pour NEW SMALL et les bronzes, y compris les anciens liens.

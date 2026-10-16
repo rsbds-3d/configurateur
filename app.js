@@ -2405,13 +2405,13 @@ const rhinoMaterialSheetGemPresets = [
   ["rh7-black-diamond-shimmer", "Black diamond Shimmer", "#1a1a1d", "#ffffff", 2.42, 0.28, 0.018, 0.7, false, false, false, 0.22],
   ["rh7-peridot-shimmer", "Peridot Shimmer", "#8bd44e", "#e7ff95", 1.67, 0.66, 0.032, 0.44, false, false, false, 0.22],
   ["rh7-cobalt-shimmer", "Cobalt Shimmer", "#184ed5", "#75b8ff", 1.62, 0.62, 0.032, 0.52, false, false, false, 0.28],
-  ["rh7-silk-shimmer", "Silk Shimmer", "#f1d1b4", "#fff2df", 1.54, 0.52, 0.09, 0.24, true, false, true, 0.28],
+  ["rh7-silk-shimmer", "Silk Shimmer", "#f1d1b4", "#fff2df", 1.54, 0.52, 0.032, 0.24, false, false, false, 0.28],
   ["rh7-tangerine-shimmer", "Tangerine Shimmer", "#ff8b2b", "#ffd26a", 1.61, 0.64, 0.035, 0.5, false, false, false, 0.22],
   ["rh7-cristal-shine", "Cristal Shine", "#ffffff", "#dff6ff", 2.42, 0.94, 0.008, 0.88, false, false, false, 0.18],
   ["rh7-violet-blue", "Violet Blue", "#8d6ec7", "#7ec8ff", 1.58, 0.66, 0.03, 0.56, false, false, false, 0.44],
   ["rh7-fuschia", "Fuschia", "#d247b0", "#ff9de5", 1.62, 0.62, 0.034, 0.42, false, false, false, 0.14],
   ["rh7-paradise-shine", "Paradise Shine", "#9cb3b7", "#ff9fe7", 1.58, 0.72, 0.03, 0.8, false, false, false, 0.86],
-  ["rh7-ghost-light", "Ghost Light", "#c7b1d7", "#ffffff", 1.52, 0.64, 0.08, 0.38, true, false, false, 0.54],
+  ["rh7-ghost-light", "Ghost Light", "#c7b1d7", "#ffffff", 1.52, 0.64, 0.032, 0.38, false, false, false, 0.54],
   ["rh7-silver-night", "Silver Night", "#22242c", "#cfd6ff", 1.62, 0.46, 0.055, 0.48, false, false, false, 0.28],
   ["rh7-capriblue", "Capriblue", "#8bb6d9", "#c8f5ff", 1.58, 0.68, 0.028, 0.38, false, false, false, 0.18],
   ["rh7-los-angeles", "Los angeles", "#61ce81", "#ffc364", 1.57, 0.68, 0.036, 0.66, false, false, false, 0.72],
@@ -8219,6 +8219,13 @@ function wireInterface() {
   document.querySelector("#scale-comparison-radius")?.addEventListener("change", refreshScaleReference);
   document.querySelector("#download-view-png")?.addEventListener("click", downloadCurrentView);
   document.querySelector("#download-product-sheet")?.addEventListener("click", downloadViewerProductSheet);
+  document.querySelector("#request-product-quote")?.addEventListener("click", async () => {
+    if (!currentViewerConfiguration) { showNotice("Attendez le chargement de la configuration."); return; }
+    try {
+      const { openQuoteForm } = await import("./assets/js/contact-form.js?v=20261016-contact");
+      await openQuoteForm({ configuration: currentViewerConfiguration, capture: () => renderCanvasToPngBlob() });
+    } catch { showNotice("Le formulaire de devis n’a pas pu s’ouvrir."); }
+  });
   document.querySelector("#png-export-close")?.addEventListener("click", () => document.querySelector("#png-export-dialog")?.close());
   document.querySelector("#png-export-dialog")?.addEventListener("close", clearPngExport);
   window.addEventListener("pagehide", clearPngExport);

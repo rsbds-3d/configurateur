@@ -1,0 +1,7 @@
+{
+  "name": "rosebuds-contact-api",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24" },
+  "scripts": { "start": "node --env-file=.env start.mjs" }
+}
