@@ -10,6 +10,8 @@ NEW SMALL et les bronzes sont uniquement en inox. Les anciennes adresses incompa
 
 Le sol textile possede un relief geometrique et s'adapte aux objets visibles, avec 10 % de marge par cote. Le choix de decor permet de basculer entre soie/cuir et fourrure/velours.
 
+Le decor s'agrandit aussi selon la camera pour ne laisser aucun vide visible pendant la rotation, le zoom ou le redimensionnement. Sa taille ne descend pas sous celle calculee pour les objets. Le sol depasse le rideau de 5 % du diametre du rideau de chaque cote ; le rideau descend sous les plis pour fermer la jonction.
+
 Classeur interactif : choisir de haut en bas. Apres changement d'un choix precedent, revoir les valeurs suivantes ; sans macro, Excel ne les efface pas automatiquement. Le catalogue complet dispose de filtres.
 
 ## Objectif

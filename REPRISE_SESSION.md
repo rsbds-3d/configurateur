@@ -4,13 +4,15 @@ CWD_SESSION : C:\Users\charl\Documents\CONFIGURATEUR DE BIJIOUX
 
 ## Etat prioritaire du 16 octobre 2026
 
+Derniere correction en cours : decor ferme adapte a la camera, sol rayon=rideau*1.1 (5 % du diametre par cote), bas rideau sous plis ; cache 20261016-camera-stage-v11. 49 tests passes et captures NEW SMALL/MEDIUM/XXXL60 desktop/mobile/orbite sans zones noires. Installation et publication de cette correction supplementaire a confirmer, ne pas confondre avec livraison 7b00f5c ci-dessous.
+
 Branche master, version v0.11-260930. Dernier commit publie avant cette continuation : 75ebd92. Corrections locales : exclusions alu NEW SMALL/bronze, cabochons lisses PBR, contact bronze-assiette, piece sans fausse normal map, sol textile geometrique adapte +10 %, roue Reglages panneau masque, attente CSS et metadonnees synchronisees. Cache 20261016-catalog-stage-v11.
 
 49 fichiers de tests passent. Chrome headless controle : cabochon Green Agate smooth/flatShading false ; panneau masque puis activable ; ancien lien bronze alu converti en stainless-mirror-silver ; aucune erreur JavaScript. Captures tmp/current-cabochon.png et current-bronze.png. Serveur test PID3776 port8082 a arreter a la fin.
 
 Classeur outputs/rosebuds-20261013/Catalogue interactif Rosebuds.xlsx regenere : 51 modeles, 2167 combinaisons, neuf validations dependantes, scan erreurs nul ; Excel natif non teste. Generation tmp/workbook/build.mjs.
 
-Installateur compile mais recompilation avec documentation actualisee, installation et publication restent a effectuer a cet instant. Ne pas annoncer la livraison avant verification. Preserver modification utilisateur Journal des modifications/2026-10-03.md. ComfyUI generatif, AR physique et precalcul GPU hors ligne non termines.
+Livraison confirmee : commit 7b00f5c pousse ; Pages 38815652026 success ; welcome.js public contient le cache actuel, modules stage/coin HTTP200. Installateur recompile avec documentation puis installe (exit0) : empreintes app/welcome/style/index/stage/coin identiques aux sources. Application installee demarree, HTTP8080 welcome.js actuel confirme. Installateur ajoute a la release v0.11-260930 sous Configurateur-Rosebuds-v0.11-260930-maj-261016.exe sans supprimer l'ancien. Preserver modification utilisateur Journal des modifications/2026-10-03.md. ComfyUI generatif, AR physique et precalcul GPU hors ligne non termines.
 
 ## Etat prioritaire du 13 octobre 2026
 Demandes en cours : correction comparatif seul/facettise, decors soie/cuir puis fourrure/velours quatre coloris, mise a jour application, classeur interactif catalogue. Code local corrige, 47 tests passes. Cause facettes comparaison confirmee : refreshComparisonGemRendering appliquait finition gem au metal, remplace par getRootGemMeshes. Textures assets/materials/textile embarquees ; select studio-decor. Classeur outputs/rosebuds-20261013/Catalogue interactif Rosebuds.xlsx (51 modeles, 2314 combinaisons). Controle visuel final, installation, publication et validation xlsx en cours. Cache 20261013-comparison-textile-v11. Ne pas confondre avec livraison du 4 octobre ci-dessous.

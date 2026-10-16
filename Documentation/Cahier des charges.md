@@ -8,6 +8,7 @@ Version : **v0.11-260930**
 - Normales lisses pour les cabochons, facettes pour les cristaux.
 - Contact bronze-assiette hors tige de fixation.
 - Sol circulaire adapte a la diagonale de l'emprise visible, marge de 10 % par cote ; relief textile sans recouvrir les objets.
+- Taille minimale conservee ; extension selon la camera, rideau ferme autour de celle-ci, sol de rayon egal a 1,1 fois le rayon du rideau. Recouvrement vertical sous les plis pour supprimer les jours. Recalcul uniquement lors des changements de camera, au plus dix fois par seconde.
 - Panneau lateral masque initialement, activation dans Reglages / Affichage.
 - Titre, lien produit et fiche PDF synchronises avec les materiaux ; melanges non catalogues sur mesure.
 - Le cache BVH ne remplace pas la compilation GPU. Precalcul hors ligne restant a etudier et mesurer.

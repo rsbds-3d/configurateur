@@ -7,6 +7,27 @@ export function stageLayout(box, margin = 0.1) {
   return { radius: diameter / 2, height: Math.max(size.y * 1.6, diameter), center };
 }
 
+export function fitStageToCamera(layout, camera, floorY) {
+  camera.updateMatrixWorld();
+  const dx = camera.position.x - layout.center.x;
+  const dz = camera.position.z - layout.center.z;
+  // Keep the camera inside the closed curtain, including during orbit/zoom.
+  const curtainRadius = Math.max(layout.radius * 1.02, Math.hypot(dx, dz) * 1.05 + layout.radius * 0.05);
+  let top = Math.max(floorY + layout.height, camera.position.y);
+  for (const x of [-1, 0, 1]) for (const y of [-1, 0, 1]) {
+    const direction = new THREE.Vector3(x, y, 0.5).unproject(camera).sub(camera.position).normalize();
+    const a = direction.x ** 2 + direction.z ** 2;
+    if (a < 1e-10) continue;
+    const b = dx * direction.x + dz * direction.z;
+    const c = dx * dx + dz * dz - curtainRadius * curtainRadius;
+    const distance = (-b + Math.sqrt(Math.max(0, b * b - a * c))) / a;
+    top = Math.max(top, camera.position.y + distance * direction.y);
+  }
+  const height = Math.max(layout.height, top - floorY) * 1.05;
+  // Radial overlap is 5% of the curtain diameter on every side.
+  return { ...layout, radius: curtainRadius * 1.1, curtainRadius, height };
+}
+
 export function createStageGeometry(layout, family, contactBoxes = []) {
   const relief = family === "silk" || family === "fur" || family === "velvet";
   if (!relief) return new THREE.CircleGeometry(layout.radius, 128);

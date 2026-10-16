@@ -23,7 +23,7 @@ const MODEL_ASSET_VERSION = "20260929-optimized-3dm-v10";
 import { watermarkPngBlob } from "./assets/js/png-watermark.js";
 import { createBottleReference } from "./assets/js/bottle-reference.js";
 import { createCoinReference } from "./assets/js/coin-reference.js?v=20261016";
-import { stageLayout, createStageGeometry } from "./assets/js/studio-stage.js?v=20261016";
+import { stageLayout, fitStageToCamera, createStageGeometry } from "./assets/js/studio-stage.js?v=20261016b";
 import { createRulerReference, getRulerSideOffset } from "./assets/js/ruler-reference.js?v=20261003-catalog-sheet-ruler-v11";
 import { pointInPlacementFrame, placementInWorld, sampleAxialProfileRadius } from "./assets/js/decal-placement.js?v=20260930-login-page-v11";
 import { buildViewerProductSummary, resolveRosebudsProductLink } from "./assets/js/rosebuds-product-link.js?v=20261016";
@@ -3946,7 +3946,7 @@ leatherBackdropTexture.colorSpace = THREE.SRGBColorSpace;
 leatherBackdropTexture.wrapS = THREE.RepeatWrapping;
 leatherBackdropTexture.repeat.set(12, 1);
 const leatherBackdrop = new THREE.Mesh(
-  new THREE.CylinderGeometry(30, 30, 40, 128, 1, true),
+  new THREE.CylinderGeometry(30, 30, 40, 128, 1, false),
   new THREE.MeshBasicMaterial({ map: leatherBackdropTexture, side: THREE.BackSide, fog: false }),
 );
 leatherBackdrop.position.y = floor.position.y + 19;
@@ -10197,15 +10197,21 @@ function updateStudioStage() {
     if (!isBoxEmpty(bounds)) { box.union(bounds); contacts.push(bounds); }
   }
   if (isBoxEmpty(box)) return;
-  const layout = stageLayout(box);
+  const layout = fitStageToCamera(stageLayout(box), camera, floor.position.y);
+  const last = floor.userData.studioLayout;
+  if (last && Math.abs(last.radius - layout.radius) < layout.radius * 0.005
+    && Math.abs(last.height - layout.height) < layout.height * 0.005
+    && last.center.distanceTo(layout.center) < 0.001
+    && last.material === settings.supportMaterial) return;
   const geometry = createStageGeometry(layout, supportPresets[settings.supportMaterial]?.family, contacts);
   floor.geometry.dispose();
   floor.geometry = geometry;
   floor.scale.setScalar(1);
   floor.position.x = layout.center.x;
   floor.position.z = layout.center.z;
-  leatherBackdrop.scale.set(layout.radius * 1.02 / 30, layout.height / 40, layout.radius * 1.02 / 30);
-  leatherBackdrop.position.set(layout.center.x, floor.position.y + layout.height / 2 - 0.02, layout.center.z);
+  leatherBackdrop.scale.set(layout.curtainRadius / 30, (layout.height + layout.radius * 0.08) / 40, layout.curtainRadius / 30);
+  leatherBackdrop.position.set(layout.center.x, floor.position.y + (layout.height - layout.radius * 0.08) / 2, layout.center.z);
+  floor.userData.studioLayout = { ...layout, material: settings.supportMaterial };
   floor.userData.stageMargin = 0.1;
   silkFloorTexture.repeat.set(1.5, 1.5);
   furFloorTexture.repeat.set(3, 3);
@@ -14375,9 +14381,19 @@ function showNotice(message) {
   }, 5200);
 }
 
+let studioCameraSignature = "";
+let studioCameraCheckTime = 0;
 function animate() {
   const elapsed = clock.getElapsedTime();
   if (!stemDecalGesture?.busy) controls.update();
+  if (elapsed - studioCameraCheckTime > 0.1) {
+    studioCameraCheckTime = elapsed;
+    const signature = [...camera.position.toArray(), ...camera.quaternion.toArray(), camera.aspect].join(",");
+    if (signature !== studioCameraSignature) {
+      studioCameraSignature = signature;
+      updateStudioStage();
+    }
+  }
   if (selectedStemDecal) {
     if (selectedStemDecal.parent) stemDecalSelectionHelper?.update();
     else { stemDecalGesture?.cancel(); clearStemDecalSelection(); }

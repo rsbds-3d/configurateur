@@ -4,7 +4,7 @@ Version : **v0.11-260930**
 
 | Date | Travail | État | Durée |
 |---|---|---|---|
-| 2026-10-16 | Compatibilites, cabochons, contact bronze, sol en relief, reglages et classeur | 49 tests passes ; controles Chrome effectues ; livraison en cours | Non mesuree |
+| 2026-10-16 | Compatibilites, cabochons, contact bronze, sol en relief, reglages et classeur | 49 tests passes ; Chrome controle ; application installee et site publie | Non mesuree |
 | 2026-09-30 | v0.11 : page de connexion publique autonome, garde d'accès avant rendu et conservation des liens directs vers les modèles | Code et tests en cours de validation | Non mesurée |
 | 2026-09-29 | v0.10 : remplacement contrôlé des 37 modèles 3DM optimisés, audit de tessellation, cache-buster et extension du glissement du logo à toute la surface | 35 tests, paquet web, EXE, installateur, réinstallation et publication GitHub validés | Non mesurée |
 | 2026-09-29 | Règle GLB parallèle au plug ; bouteille par défaut ; comparaison verticale inversée, arc réglable, centrage et halo du plug courant | Code, tests et contrôle visuel effectués ; livraison en cours | Non mesurée |
