@@ -10,6 +10,8 @@ Le site public est heberge sur GitHub Pages, et l'application Windows utilise un
 
 ## Parcours et donnees
 
+Correction du 20 octobre 2026 : le lien « Configuration sur mesure » du panneau produit ouvre egalement la modale integree, sans navigation externe. Les liens des produits standard continuent a ouvrir leur page Rosebuds. Les deux entrees utilisent le meme gestionnaire et la configuration courante. Cette correction n'active pas l'envoi d'e-mails.
+
 Bouton du viewer « Demander un devis pour cette configuration » : ouverture d'une modale, capture PNG filigranee, recapitulatif et message modifiable. Les coordonnees et le message restent en memoire apres fermeture ou erreur. Aucune inscription newsletter n'est effectuee. Le viewer et ses parametres ne sont pas modifies.
 
 La reference de configuration est un UUID prefixe RB-. Les champs disponibles proviennent de currentViewerConfiguration. Les dimensions manquantes ne sont pas inventees. Les choix du navigateur constituent une demande declaree par le client, pas une validation de faisabilite ni de prix.

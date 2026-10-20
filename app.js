@@ -8219,12 +8219,18 @@ function wireInterface() {
   document.querySelector("#scale-comparison-radius")?.addEventListener("change", refreshScaleReference);
   document.querySelector("#download-view-png")?.addEventListener("click", downloadCurrentView);
   document.querySelector("#download-product-sheet")?.addEventListener("click", downloadViewerProductSheet);
-  document.querySelector("#request-product-quote")?.addEventListener("click", async () => {
+  const requestViewerQuote = async () => {
     if (!currentViewerConfiguration) { showNotice("Attendez le chargement de la configuration."); return; }
     try {
       const { openQuoteForm } = await import("./assets/js/contact-form.js?v=20261016-contact");
       await openQuoteForm({ configuration: currentViewerConfiguration, capture: () => renderCanvasToPngBlob() });
     } catch { showNotice("Le formulaire de devis n’a pas pu s’ouvrir."); }
+  };
+  document.querySelector("#request-product-quote")?.addEventListener("click", requestViewerQuote);
+  document.querySelector("#viewer-product-link")?.addEventListener("click", (event) => {
+    if (event.currentTarget.dataset.custom !== "true") return;
+    event.preventDefault();
+    requestViewerQuote();
   });
   document.querySelector("#png-export-close")?.addEventListener("click", () => document.querySelector("#png-export-dialog")?.close());
   document.querySelector("#png-export-dialog")?.addEventListener("close", clearPngExport);
