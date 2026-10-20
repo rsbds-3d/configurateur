@@ -2673,6 +2673,8 @@ body:has(.controls.is-collapsed) .viewer-actions {
 .quote-preview [data-reference] { font-size: 12px; overflow-wrap: anywhere; }
 .quote-form { display: grid; align-content: start; gap: 16px; min-width: 0; }
 .quote-form label { display: grid; gap: 7px; color: #5d5d5d; font-size: 14px; }
+.quote-dialog [hidden] { display: none !important; }
+.quote-preview a { overflow-wrap: anywhere; }
 .quote-form input:not([type=file]), .quote-form textarea { box-sizing: border-box; width: 100%; min-height: 42px; border: 1px solid #c7c7c7; border-radius: 0; padding: 9px 12px; color: #38383b; background: #fff; font: inherit; }
 .quote-form input[type=file] { max-width: 100%; font-size: 13px; }
 .quote-form textarea { resize: vertical; line-height: 1.5; }

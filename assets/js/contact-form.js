@@ -1,6 +1,7 @@
-import {configurationRows,buildQuoteMessage,QUOTE_SUBJECT} from "./contact-model.js?v=20261016-contact";
+import {configurationRows,buildQuoteMessage,QUOTE_SUBJECT} from "./contact-model.js?v=20261020-formsubmit";
+import {buildPublicViewerUrl,sendFormSubmitQuote} from "./contact-formsubmit.js?v=20261020-formsubmit";
 
-let dialog, state, captureUrl, extraUrl, widgetId, apiBase, publicConfig;
+let dialog, state, captureUrl, extraUrl, widgetId, apiBase, publicConfig, provider, busy = false;
 const $ = selector => dialog.querySelector(selector);
 const readData = blob => new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result).split(",")[1]);r.onerror=reject;r.readAsDataURL(blob);});
 async function screenshotAttachment(blob) {
@@ -18,15 +19,16 @@ function status(message,error=false) { $("[data-status]").textContent=message;$(
 function createDialog() {
   dialog=document.createElement("dialog");dialog.className="quote-dialog";dialog.setAttribute("aria-labelledby","quote-title");
   dialog.innerHTML=`<header class="quote-header"><div><img class="quote-logo" src="./assets/brand/rosebuds-logo.png" alt="Rosebuds"><h2 id="quote-title">Contactez-nous</h2></div><div><small data-version></small><button type="button" data-close aria-label="Fermer">×</button></div></header>
-    <div class="quote-columns"><section class="quote-preview"><img data-capture alt="Aperçu de votre configuration 3D"><p data-reference></p><dl data-details></dl></section>
+    <div class="quote-columns"><section class="quote-preview"><img data-capture alt="Aperçu de votre configuration 3D"><p data-reference></p><p><a data-viewer-link target="_blank" rel="noopener">Ouvrir cette configuration 3D</a></p><dl data-details></dl></section>
     <form class="quote-form"><label>Nom et prénom<input name="name" autocomplete="name" required minlength="2" maxlength="120"></label>
     <label>Adresse e-mail<input name="email" type="email" autocomplete="email" required maxlength="254"></label>
     <label>Sujet<input name="subject" required maxlength="160"></label>
     <label>Message<textarea name="message" required minlength="10" maxlength="10000" rows="10"></textarea></label>
-    <label>Document joint <span>(facultatif, PNG, JPEG ou PDF, 2 Mo maximum)</span><input name="attachment" type="file" accept="image/png,image/jpeg,application/pdf"></label>
+    <label data-attachment-field>Document joint <span>(facultatif, PNG, JPEG ou PDF, 2 Mo maximum)</span><input name="attachment" type="file" accept="image/png,image/jpeg,application/pdf"></label>
     <p data-file-name></p><img data-extra-preview hidden alt="Document image joint"><button type="button" data-remove-file hidden>Retirer le document</button>
     <label class="quote-trap" aria-hidden="true">Site web<input name="website" tabindex="-1" autocomplete="off"></label>
     <p class="quote-privacy">Vos coordonnées et votre configuration seront utilisées par Rosebuds pour traiter cette demande, sans inscription à une newsletter. <a data-privacy target="_blank" rel="noopener">Confidentialité</a></p>
+    <p data-provider-notice hidden>Envoi via FormSubmit à info@rosebuds.net, sans pièce jointe : le lien vers le viewer est inclus. L’aperçu reste dans ce formulaire. FormSubmit annonce conserver les soumissions 30 jours. <a href="https://formsubmit.co/privacy.pdf" target="_blank" rel="noopener">Confidentialité FormSubmit</a></p>
     <div data-captcha></div><p data-status role="status" aria-live="polite"></p>
     <button class="quote-submit" type="submit">Envoyer ma demande</button>
     <div class="quote-fallback" hidden><button type="button" data-copy>Copier le message</button><a href="https://rosebuds.net/fr/nous-contacter" target="_blank" rel="noopener">Formulaire officiel Rosebuds</a><a data-mail>Ouvrir ma messagerie (dernier recours)</a></div></form></div>`;
@@ -53,7 +55,15 @@ function updateExtra() {
 }
 async function setupService() {
   const settings=await fetch("./assets/data/contact-config.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error();return r.json();});
+  provider=settings.provider === "formsubmit" ? "formsubmit" : "backend";
+  const hosted=provider === "formsubmit";
+  $("[data-attachment-field]").hidden=hosted;
+  $("[name=attachment]").disabled=hosted;
+  if(hosted){$("[name=attachment]").value="";updateExtra();}
+  $("[data-provider-notice]").hidden=!hosted;
+  $("[data-captcha]").hidden=hosted;
   $("[data-privacy]").href=settings.privacyUrl;
+  if(hosted)return;
   apiBase=String(settings.apiBase||"").replace(/\/$/,"");
   if(!apiBase)throw new Error("Le service d’envoi sécurisé n’est pas encore configuré. Vous pouvez conserver ou copier votre demande.");
   const url=new URL(apiBase,location.href);
@@ -65,12 +75,14 @@ async function setupService() {
   else window.turnstile.reset(widgetId);
 }
 export async function openQuoteForm({configuration,capture}) {
+  if(busy){if(!dialog.open)dialog.showModal();return;}
   if(!dialog)createDialog();
   const signature=JSON.stringify(configuration);
   if(state?.signature!==signature){
     $("[data-capture]").removeAttribute("src");
     state={signature,configuration:structuredClone(configuration),reference:`RB-${crypto.randomUUID()}`,requestId:crypto.randomUUID(),startedAt:Date.now()};
-    $("[name=subject]").value=QUOTE_SUBJECT;$("[name=message]").value=buildQuoteMessage(configuration,state.reference);
+    $("[name=subject]").value=QUOTE_SUBJECT;$("[name=message]").value=buildQuoteMessage(configuration,state.reference,buildPublicViewerUrl(configuration));
+    $("[data-viewer-link]").href=buildPublicViewerUrl(configuration);
     $("[data-reference]").textContent=state.reference;
     $("[data-details]").replaceChildren();
     for(const [key,value] of configurationRows(configuration)){const dt=document.createElement("dt"),dd=document.createElement("dd");dt.textContent=key;dd.textContent=value;$("[data-details]").append(dt,dd);}
@@ -80,15 +92,23 @@ export async function openQuoteForm({configuration,capture}) {
   try{
     const blob=await capture();state.screenshot=await screenshotAttachment(blob);
     if(captureUrl)URL.revokeObjectURL(captureUrl);captureUrl=URL.createObjectURL(blob);$("[data-capture]").src=captureUrl;
-    await setupService();status(state.sent?"Cette demande a déjà été prise en charge par le service d’envoi.":"");$(".quote-submit").disabled=Boolean(state.sent);
+    await setupService();status(state.sent?"Cette demande a déjà été prise en charge par le service d’envoi.":provider === "formsubmit"?"Au premier envoi, Rosebuds doit valider l’e-mail d’activation FormSubmit. La réception finale reste à confirmer.":"");$(".quote-submit").disabled=Boolean(state.sent);
   }catch(error){status(error.message||"Le service de contact est indisponible.",true);$(".quote-fallback").hidden=false;}
   $("[data-mail]").href=`mailto:info@rosebuds.net?subject=${encodeURIComponent($("[name=subject]").value)}&body=${encodeURIComponent($("[name=message]").value)}`;
 }
 async function submit(event) {
-  event.preventDefault();const form=$("form"),button=$(".quote-submit");if(button.disabled||!form.reportValidity())return;
-  const token=window.turnstile?.getResponse(widgetId);if(!token){status("Veuillez terminer la vérification anti-spam.",true);return;}
+  event.preventDefault();const form=$("form"),button=$(".quote-submit");if(busy||state.sent||button.disabled||!form.reportValidity())return;
+  if(form.elements.website.value || Date.now()-state.startedAt<2000){status("Veuillez patienter quelques instants puis réessayer.",true);return;}
+  const token=provider === "formsubmit" ? "" : window.turnstile?.getResponse(widgetId);if(provider !== "formsubmit" && !token){status("Veuillez terminer la vérification anti-spam.",true);return;}
+  busy=true;
   button.disabled=true;status("Envoi de votre demande à Rosebuds en cours…");
   try{
+    if(provider === "formsubmit"){
+      await sendFormSubmitQuote({reference:state.reference,configuration:state.configuration,name:form.elements.name.value,email:form.elements.email.value,subject:form.elements.subject.value,message:form.elements.message.value,website:form.elements.website.value});
+      state.sent=true;
+      status("FormSubmit a pris en charge votre demande destinée à info@rosebuds.net. Au premier envoi, Rosebuds doit cliquer sur le lien d’activation reçu par e-mail. La réception finale n’est pas confirmée. Référence : "+state.reference);
+      return;
+    }
     const file=$("[name=attachment]").files[0];
     const attachments=[state.screenshot];if(file)attachments.push({name:file.name,type:file.type,content:await readData(file)});
     const payload={reference:state.reference,configuration:state.configuration,name:form.elements.name.value,email:form.elements.email.value,subject:form.elements.subject.value,message:form.elements.message.value,attachments};
@@ -99,4 +119,5 @@ async function submit(event) {
     const result=await response.json().catch(()=>({}));if(!response.ok||result.status!=="accepted")throw Error(result.error||"Votre demande n’a pas pu être transmise. Veuillez réessayer ou utiliser une autre méthode de contact.");
     state.sent=true;status("Votre demande de devis a été envoyée à info@rosebuds.net. Merci pour votre intérêt. L’équipe Rosebuds pourra vous répondre à l’adresse e-mail indiquée. Prise en charge confirmée ; réception finale non confirmée.");
   }catch(error){status(error.message||"Votre demande n’a pas pu être transmise. Veuillez réessayer ou utiliser une autre méthode de contact.",true);$(".quote-fallback").hidden=false;button.disabled=false;window.turnstile?.reset(widgetId);}
+  finally{busy=false;}
 }

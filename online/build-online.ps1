@@ -4,7 +4,7 @@ $projectRoot = Split-Path -Parent $PSScriptRoot
 $outputRoot = Join-Path $PSScriptRoot 'dist'
 $expectedPrefix = [IO.Path]::GetFullPath($PSScriptRoot).TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
 $resolvedOutput = [IO.Path]::GetFullPath($outputRoot)
-$cacheToken = '20261020-custom-quote-v11'
+$cacheToken = '20261020-formsubmit-v11'
 
 if (-not $resolvedOutput.StartsWith($expectedPrefix, [StringComparison]::OrdinalIgnoreCase)) {
   throw "Le dossier de sortie doit rester dans le dossier online."

@@ -1,0 +1,25 @@
+const assert = require('node:assert/strict');
+(async () => {
+ const {buildPublicViewerUrl,buildFormSubmitPayload,sendFormSubmitQuote,FORMSUBMIT_ENDPOINT} = await import('../assets/js/contact-formsubmit.js');
+ const configuration={catalogModel:'plug-classique-medium-keyring',modelFamily:'Classique',classicHead:'bronze',bronzeType:'keyring',plugSize:'MEDIUM-30',metalFamily:'inox',metalFinish:'stainless-mirror-silver',ornament:'bronze',ornamentFinish:'Gold',email:'private@example.test'};
+ const quote={name:'Élodie Client',email:'client@example.test',subject:'Devis',message:'Bonjour',reference:'RB-test',configuration,to:'evil@example.test',attachments:[{content:'private-image'}]};
+ const url=new URL(buildPublicViewerUrl(configuration));
+ assert.equal(url.origin,'https://rsbds-3d.github.io');assert.equal(url.pathname,'/configurateur/configurateur.html');
+ assert.equal(url.searchParams.get('viewer'),'1');
+ for(const key of ['catalogModel','classicHead','bronzeType','metalFinish','ornamentFinish','plugSize'])assert.equal(url.searchParams.get(key),configuration[key]);
+ assert.equal(url.searchParams.has('email'),false);
+ const payload=buildFormSubmitPayload(quote);
+ assert.equal(payload.email,quote.email);assert.equal(payload._replyto,quote.email);
+ assert.equal(payload.to,undefined);assert.equal(payload._cc,undefined);assert.equal(payload.attachments,undefined);
+ assert.ok(!JSON.stringify(payload).includes('private-image'));assert.equal(payload.viewer_3D,url.href);
+ assert.ok(payload.caracteristiques.includes('Gold'));assert.ok(payload._subject.includes(quote.reference));
+ const {buildQuoteMessage}=await import('../assets/js/contact-model.js');
+ assert.ok(!buildQuoteMessage(configuration,quote.reference,url.href).includes('pièce jointe'));
+ let calls=0;
+ await sendFormSubmitQuote(quote,async(endpoint,options)=>{calls++;assert.equal(endpoint,'https://formsubmit.co/ajax/info@rosebuds.net');assert.equal(endpoint,FORMSUBMIT_ENDPOINT);assert.equal(options.method,'POST');assert.equal(options.credentials,'omit');assert.equal(JSON.parse(options.body)._replyto,quote.email);return {ok:true,json:async()=>({success:'true'})};});
+ assert.equal(calls,1);
+ for(const result of [{ok:false,success:true},{ok:true,success:'false'},{ok:true,success:undefined}])await assert.rejects(()=>sendFormSubmitQuote(quote,async()=>({ok:result.ok,json:async()=>({success:result.success})})));
+ await assert.rejects(()=>sendFormSubmitQuote(quote,async()=>{throw Error('network');}));
+ assert.ok(buildFormSubmitPayload({...quote,configuration:{...configuration,mixedMaterials:true}}).limite_apercu);
+ console.log('FormSubmit: fixed endpoint, Reply-To, exact public URL, no files/PII in URL, explicit API success, error handling. All sends mocked.');
+})().catch(error=>{console.error(error);process.exitCode=1;});

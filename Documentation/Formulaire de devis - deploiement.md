@@ -4,6 +4,8 @@ Version : v0.11-260930. Implementation du 16 octobre 2026.
 
 ## Etat et limites
 
+MISE A JOUR DU 20 OCTOBRE : l'utilisateur a choisi FormSubmit sans pieces jointes, avec lien viewer public. Voir [Activation FormSubmit](Activation%20FormSubmit.md), qui decrit le mode actif et ses limites. Les sections ci-dessous restent la documentation du backend alternatif Resend non active. L'activation FormSubmit par e-mail et la reception finale ne sont pas verifiees ; aucun test reel envoye par Codex.
+
 Le formulaire et son raccordement au viewer sont implementes. Le backend est fourni, mais aucun compte de messagerie, domaine d'expedition, scanner ni hebergement API n'a ete configure : l'envoi reel est desactive. Aucun e-mail de test n'a ete envoye. La fonctionnalite ne doit pas etre declaree pleinement operationnelle avant le test autorise de reception dans info@rosebuds.net.
 
 Le site public est heberge sur GitHub Pages, et l'application Windows utilise un serveur de fichiers local. Ces deux serveurs ne peuvent pas envoyer des e-mails de facon securisee sans backend supplementaire. Le meme backend HTTPS peut desservir les deux versions.

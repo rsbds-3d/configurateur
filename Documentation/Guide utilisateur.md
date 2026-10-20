@@ -4,6 +4,8 @@ Version : **v0.11-260930**
 
 ## Demande de devis integree
 
+Depuis le 20 octobre 2026, le mode actif est FormSubmit sans pieces jointes. « Configuration sur mesure » ouvre aussi le formulaire integre. L'apercu reste visible localement ; la demande contient un lien GitHub vers la configuration, depuis lequel PNG et PDF sont telechargeables (identification eventuellement requise). Le premier envoi necessite une activation dans info@rosebuds.net. Une acceptation du service ne confirme pas la reception finale. Voir Activation FormSubmit.md. Les indications de pieces jointes/backend ci-dessous concernent uniquement l'architecture alternative non active.
+
 Dans le viewer, le bouton « Demander un devis pour cette configuration » ouvre le recapitulatif, un apercu PNG et le formulaire de coordonnees. Le message est pre-rempli et modifiable. Un PNG, JPEG ou PDF facultatif de 2 Mo peut etre ajoute. Fermer le formulaire ne change pas le produit et conserve les champs dans la session.
 
 L'envoi reel exige le backend configure par l'administrateur. Tant qu'il ne l'est pas, le formulaire l'indique et propose de copier le message ou d'ouvrir le contact officiel, sans afficher de reussite. Voir « Formulaire de devis - deploiement.md ». Aucun test de reception reel n'a ete effectue.

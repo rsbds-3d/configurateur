@@ -4,6 +4,8 @@ Version : **v0.11-260930**
 
 ## Devis integre
 
+Decision utilisateur du 20 octobre 2026 : FormSubmit AJAX, destinataire fixe info@rosebuds.net, sans pieces jointes. Lien public GitHub construit a partir des parametres produit, sans donnees client. PNG/PDF accessibles depuis le viewer ; authentification preservee. Activation e-mail et recette reception restent obligatoires. Le backend Resend est conserve comme alternative, avec ses exigences propres. Voir Activation FormSubmit.md.
+
 Modale responsive, configuration et capture PNG du viewer, message editable, coordonnees obligatoires et document facultatif. Envoi via API Node24/Resend, destinataire serveur fixe info@rosebuds.net, expediteur de domaine verifie et Reply-To client. Turnstile serveur, rate-limit persistant, idempotence, validation et analyse antivirus des fichiers, webhook signe pour suivi des rebonds/rejets. Aucun secret cote navigateur. Newsletter absente faute de mecanisme reel. L'activation et le test de reception autorise restent requis avant de declarer le service operationnel.
 
 ## Precisions du 16 octobre 2026

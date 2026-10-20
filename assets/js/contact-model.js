@@ -17,6 +17,6 @@ export function configurationRows(c = {}) {
     ["Type de bronze",c.bronzeType], ["Finition / couleur de l’ornement",c.ornamentFinish],
   ].filter(([,value])=>value !== undefined && value !== null && String(value).trim() !== "");
 }
-export function buildQuoteMessage(configuration, reference) {
-  return `Bonjour,\n\nJe souhaiterais obtenir un devis pour un produit personnalisé réalisé avec le configurateur Rosebuds.\n\nRéférence de configuration : ${reference}\n${configurationRows(configuration).map(([key,value])=>`${key} : ${value}`).join("\n")}\n\nPourriez-vous m’indiquer la faisabilité technique, le prix TTC, le délai de fabrication, les possibilités de livraison et les éventuelles adaptations nécessaires ?\n\nVous trouverez en pièce jointe un aperçu de la configuration 3D.\n\nJe vous remercie par avance pour votre réponse.\n\nCordialement,`;
+export function buildQuoteMessage(configuration, reference, viewerUrl) {
+  return `Bonjour,\n\nJe souhaiterais obtenir un devis pour un produit personnalisé réalisé avec le configurateur Rosebuds.\n\nRéférence de configuration : ${reference}\n${configurationRows(configuration).map(([key,value])=>`${key} : ${value}`).join("\n")}\n\nPourriez-vous m’indiquer la faisabilité technique, le prix TTC, le délai de fabrication, les possibilités de livraison et les éventuelles adaptations nécessaires ?\n\n${viewerUrl ? `Configuration 3D : ${viewerUrl}\nLe PNG et la fiche PDF sont téléchargeables depuis ce viewer (identification éventuellement requise).` : "Vous trouverez en pièce jointe un aperçu de la configuration 3D."}\n\nJe vous remercie par avance pour votre réponse.\n\nCordialement,`;
 }
