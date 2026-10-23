@@ -1,0 +1,15 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const html = fs.readFileSync(require('node:path').join(__dirname, '../assets/email/rosebuds-devis-emailjs.html'), 'utf8');
+const expected = ['name','model','reference','date','reply_url','email','family','model_id','size','diameter','crystal_size','metal','metal_finish','ornament','ornament_finish','mixed_note','viewer_url','message'];
+assert.deepEqual([...new Set([...html.matchAll(/\{\{(\w+)\}\}/g)].map(m => m[1]))].sort(), expected.sort());
+assert.ok(html.includes('https://rsbds-3d.github.io/configurateur/assets/brand/rosebuds-logo-2017-email.png'));
+assert.ok(html.includes('alt="ROSEBUDS - logo couronne"'));
+assert.ok(html.includes('@media only screen and (max-width:620px)'));
+assert.ok(html.includes('#fe3a9e'));
+assert.ok(!html.includes('{{{'));
+assert.ok(!/<script|<form|data:image|tracking|pixel\.gif/i.test(html));
+assert.ok(!html.includes('RB-TEST-'));
+assert.equal((html.match(/scope="row"/g) || []).length, 8);
+assert.ok(html.includes('white-space:pre-wrap'));
+console.log('Modele EmailJS : variables preservees, logo HTTPS, responsive, sans script ni donnees de test.');

@@ -4,6 +4,12 @@ Version : **v0.11-260930**
 
 ## Devis integre
 
+Decision du 23 octobre 2026 : passage du formulaire au modele HTML EmailJS rosebuds_devis_html, service rosebuds_devis. Destinataire fixe info@rosebuds.net dans le modele distant, From compte Gmail dedie, Reply-To client. Cle publique uniquement dans la configuration, aucun secret prive. Transmission des dix-huit variables du modele, lien viewer par whitelist sans donnees client, aucune piece jointe. Confirmation exclusivement sur HTTP200 + texte OK, erreurs sans details fournisseur ni perte des champs, pas de nouvel envoi automatique ni fallback FormSubmit. Bloc de presentation FormSubmit retire ; confidentialite generale conservee. Test reel precedent recu ; envois de recette du raccordement simules.
+
+Limite de securite : honeypot, delai minimal et verrou d'envoi sont des protections ergonomiques cote navigateur, pas un rate-limit serveur inviolable. Configurer l'allowlist de domaines dans EmailJS si l'offre le permet et surveiller les quotas ; CAPTCHA EmailJS necessite des cles et activation specifiques, non inventees. Le backend alternatif conserve les protections serveur plus strictes.
+
+Historique du 20 octobre (mode remplace) :
+
 Decision utilisateur du 20 octobre 2026 : FormSubmit AJAX, destinataire fixe info@rosebuds.net, sans pieces jointes. Lien public GitHub construit a partir des parametres produit, sans donnees client. PNG/PDF accessibles depuis le viewer ; authentification preservee. Activation e-mail et recette reception restent obligatoires. Le backend Resend est conserve comme alternative, avec ses exigences propres. Voir Activation FormSubmit.md.
 
 Modale responsive, configuration et capture PNG du viewer, message editable, coordonnees obligatoires et document facultatif. Envoi via API Node24/Resend, destinataire serveur fixe info@rosebuds.net, expediteur de domaine verifie et Reply-To client. Turnstile serveur, rate-limit persistant, idempotence, validation et analyse antivirus des fichiers, webhook signe pour suivi des rebonds/rejets. Aucun secret cote navigateur. Newsletter absente faute de mecanisme reel. L'activation et le test de reception autorise restent requis avant de declarer le service operationnel.

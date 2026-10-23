@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Demande de devis Rosebuds</title>
+  <style>
+    body { margin:0; padding:0; background:#f4f4f4; }
+    table { border-collapse:collapse; }
+    img { border:0; display:block; }
+    a { color:#b5226b; }
+    @media only screen and (max-width:620px) {
+      .shell { width:100%!important; }
+      .pad { padding-left:22px!important; padding-right:22px!important; }
+      .title { font-size:27px!important; line-height:34px!important; }
+      .spec-label { width:42%!important; }
+      .cta { display:block!important; text-align:center!important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background:#f4f4f4;color:#38383b;font-family:Arial,Helvetica,sans-serif;">
+  <div style="display:none;font-size:1px;color:#f4f4f4;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;mso-hide:all;">Demande de devis de {{name}} : {{model}}. R&eacute;f&eacute;rence {{reference}}.</div>
+  <table role="presentation" width="100%" bgcolor="#f4f4f4" style="font-family:Arial,Helvetica,sans-serif;color:#38383b;font-size:14px;line-height:22px;"><tr><td align="center" style="padding:28px 10px;">
+    <table role="presentation" class="shell" width="640" bgcolor="#ffffff" style="width:640px;max-width:640px;background:#ffffff;">
+      <tr><td align="center" class="pad" style="padding:30px 40px 22px;border-top:4px solid #fe3a9e;">
+        <a href="https://rosebuds.net/fr/" style="display:inline-block;"><img src="https://rsbds-3d.github.io/configurateur/assets/brand/rosebuds-logo-2017-email.png" width="235" alt="ROSEBUDS - logo couronne" style="width:235px;max-width:100%;height:auto;"></a>
+        <p style="margin:15px 0 0;font-size:11px;line-height:18px;color:#5d5d5d;">MADE IN FRANCE</p>
+      </td></tr>
+      <tr><td class="pad" bgcolor="#fcf1f6" style="padding:30px 40px;background:#fcf1f6;border-top:1px solid #f2dce6;border-bottom:1px solid #f2dce6;">
+        <p style="margin:0 0 10px;font-size:11px;line-height:18px;font-weight:bold;color:#a91f62;">CONFIGURATEUR ROSEBUDS &middot; SUR MESURE</p>
+        <h1 class="title" style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:32px;line-height:39px;font-weight:normal;color:#38383b;">Une nouvelle demande<br>de devis.</h1>
+        <p style="margin:14px 0 0;font-size:14px;line-height:22px;color:#5d5d5d;">{{date}}</p>
+        <p style="margin:6px 0 0;font-size:12px;line-height:20px;overflow-wrap:anywhere;word-break:break-word;">R&eacute;f&eacute;rence : <strong>{{reference}}</strong></p>
+      </td></tr>
+      <tr><td class="pad" style="padding:28px 40px 0;">
+        <h2 style="margin:0 0 14px;font-family:Georgia,'Times New Roman',serif;font-size:23px;line-height:30px;font-weight:normal;">Votre interlocuteur</h2>
+        <p style="margin:0;font-size:16px;line-height:25px;font-weight:bold;overflow-wrap:anywhere;">{{name}}</p>
+        <p style="margin:4px 0 0;font-size:14px;line-height:23px;overflow-wrap:anywhere;"><a href="{{reply_url}}" style="color:#a91f62;text-decoration:underline;">{{email}}</a></p>
+      </td></tr>
+      <tr><td class="pad" style="padding:28px 40px 0;">
+        <div style="border-top:1px solid #e6e6e6;padding-top:25px;">
+          <p style="margin:0 0 7px;font-size:11px;line-height:18px;font-weight:bold;color:#a91f62;">{{family}}</p>
+          <h2 style="margin:0 0 18px;font-family:Georgia,'Times New Roman',serif;font-size:25px;line-height:33px;font-weight:normal;">{{model}}</h2>
+        </div>
+        <table width="100%" aria-label="Caracteristiques du produit" style="width:100%;font-size:13px;line-height:20px;table-layout:fixed;">
+          <tr bgcolor="#f7f7f7"><th class="spec-label" scope="row" align="left" width="40%" style="padding:11px 12px;color:#5d5d5d;font-weight:normal;">R&eacute;f&eacute;rence mod&egrave;le</th><td style="padding:11px 12px;overflow-wrap:anywhere;word-break:break-word;">{{model_id}}</td></tr>
+          <tr><th scope="row" align="left" style="padding:11px 12px;color:#5d5d5d;font-weight:normal;">Taille du plug</th><td style="padding:11px 12px;">{{size}}</td></tr>
+          <tr bgcolor="#f7f7f7"><th scope="row" align="left" style="padding:11px 12px;color:#5d5d5d;font-weight:normal;">Diam&egrave;tre</th><td style="padding:11px 12px;">{{diameter}}</td></tr>
+          <tr><th scope="row" align="left" style="padding:11px 12px;color:#5d5d5d;font-weight:normal;">Taille de la pierre</th><td style="padding:11px 12px;">{{crystal_size}}</td></tr>
+          <tr bgcolor="#f7f7f7"><th scope="row" align="left" style="padding:11px 12px;color:#5d5d5d;font-weight:normal;">M&eacute;tal</th><td style="padding:11px 12px;">{{metal}}</td></tr>
+          <tr><th scope="row" align="left" style="padding:11px 12px;color:#5d5d5d;font-weight:normal;">Finition du m&eacute;tal</th><td style="padding:11px 12px;">{{metal_finish}}</td></tr>
+          <tr bgcolor="#f7f7f7"><th scope="row" align="left" style="padding:11px 12px;color:#5d5d5d;font-weight:normal;">Ornement</th><td style="padding:11px 12px;">{{ornament}}</td></tr>
+          <tr><th scope="row" align="left" style="padding:11px 12px;color:#5d5d5d;font-weight:normal;">Finition / couleur</th><td style="padding:11px 12px;">{{ornament_finish}}</td></tr>
+        </table>
+        <p style="margin:12px 0 20px;font-size:12px;line-height:19px;color:#5d5d5d;">{{mixed_note}}</p>
+        <table role="presentation" width="100%"><tr><td align="center" bgcolor="#fe3a9e" style="background:#fe3a9e;padding:15px 18px;"><a class="cta" href="{{viewer_url}}" style="display:block;color:#181818;font-size:14px;line-height:22px;font-weight:bold;text-decoration:none;">Voir la configuration 3D</a></td></tr></table>
+        <p style="margin:10px 0 0;font-size:12px;line-height:19px;color:#5d5d5d;">L'aper&ccedil;u PNG et la fiche PDF sont disponibles dans le viewer. Une identification peut &ecirc;tre demand&eacute;e.</p>
+      </td></tr>
+      <tr><td class="pad" style="padding:28px 40px;">
+        <h2 style="margin:0 0 15px;font-family:Georgia,'Times New Roman',serif;font-size:23px;line-height:30px;font-weight:normal;">Le message du client</h2>
+        <div style="padding:18px 20px;background:#f7f7f7;border-left:3px solid #fe3a9e;font-size:14px;line-height:24px;color:#38383b;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;">{{message}}</div>
+        <table role="presentation" style="margin-top:22px;"><tr><td bgcolor="#38383b" style="background:#38383b;padding:13px 22px;"><a href="{{reply_url}}" style="color:#ffffff;font-size:14px;line-height:22px;font-weight:bold;text-decoration:none;">R&eacute;pondre au client</a></td></tr></table>
+        <p style="margin:10px 0 0;font-size:12px;line-height:19px;color:#5d5d5d;overflow-wrap:anywhere;">La r&eacute;ponse sera adress&eacute;e &agrave; {{email}}.</p>
+      </td></tr>
+      <tr><td class="pad" bgcolor="#333333" style="padding:23px 40px;background:#333333;color:#ffffff;">
+        <p style="margin:0 0 6px;font-family:Georgia,'Times New Roman',serif;font-size:19px;line-height:27px;">ROSEBUDS&trade;</p>
+        <p style="margin:0;font-size:12px;line-height:20px;color:#eeeeee;">Demande issue du configurateur 3D &middot; {{reference}}</p>
+        <p style="margin:10px 0 0;font-size:12px;line-height:20px;"><a href="https://rosebuds.net/fr/" style="color:#ffffff;text-decoration:underline;">rosebuds.net</a> &nbsp;&middot;&nbsp; <a href="mailto:info@rosebuds.net" style="color:#ffffff;text-decoration:underline;">info@rosebuds.net</a></p>
+      </td></tr>
+    </table>
+  </td></tr></table>
+</body>
+</html>

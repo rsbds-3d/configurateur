@@ -1,4 +1,4 @@
-import {configurationRows} from "./contact-model.js?v=20261020-formsubmit";
+import {configurationRows} from "./contact-model.js?v=20261023-emailjs";
 
 export const FORMSUBMIT_ENDPOINT = "https://formsubmit.co/ajax/info@rosebuds.net";
 export function buildPublicViewerUrl(configuration = {}) {

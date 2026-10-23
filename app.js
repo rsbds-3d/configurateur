@@ -8222,7 +8222,7 @@ function wireInterface() {
   const requestViewerQuote = async () => {
     if (!currentViewerConfiguration) { showNotice("Attendez le chargement de la configuration."); return; }
     try {
-      const { openQuoteForm } = await import("./assets/js/contact-form.js?v=20261020-formsubmit");
+    const { openQuoteForm } = await import("./assets/js/contact-form.js?v=20261023-emailjs");
       await openQuoteForm({ configuration: currentViewerConfiguration, capture: () => renderCanvasToPngBlob() });
     } catch { showNotice("Le formulaire de devis n’a pas pu s’ouvrir."); }
   };

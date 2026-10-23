@@ -4,11 +4,11 @@ Version : **v0.11-260930**
 
 ## Demande de devis integree
 
-Depuis le 20 octobre 2026, le mode actif est FormSubmit sans pieces jointes. « Configuration sur mesure » ouvre aussi le formulaire integre. L'apercu reste visible localement ; la demande contient un lien GitHub vers la configuration, depuis lequel PNG et PDF sont telechargeables (identification eventuellement requise). Le premier envoi necessite une activation dans info@rosebuds.net. Une acceptation du service ne confirme pas la reception finale. Voir Activation FormSubmit.md. Les indications de pieces jointes/backend ci-dessous concernent uniquement l'architecture alternative non active.
+Depuis le 23 octobre 2026, le mode configure est EmailJS : les demandes sont envoyees a info@rosebuds.net depuis Configurateur Rosebuds, avec le nouveau modele HTML et le logo Illustrator 2017. « Configuration sur mesure » ouvre le formulaire integre. L'apercu reste visible localement ; la demande contient un lien GitHub vers la configuration, depuis lequel PNG et PDF sont telechargeables (identification eventuellement requise). Aucun fichier n'est joint. Le bloc d'information FormSubmit a ete retire a la demande de l'utilisateur ; la mention generale de confidentialite reste presente. Voir EmailJS - modele HTML.md pour l'etat de livraison.
 
-Dans le viewer, le bouton « Demander un devis pour cette configuration » ouvre le recapitulatif, un apercu PNG et le formulaire de coordonnees. Le message est pre-rempli et modifiable. Un PNG, JPEG ou PDF facultatif de 2 Mo peut etre ajoute. Fermer le formulaire ne change pas le produit et conserve les champs dans la session.
+Dans le viewer, le bouton « Demander un devis pour cette configuration » ouvre le recapitulatif, un apercu PNG et le formulaire de coordonnees. Le message est pre-rempli et modifiable. Fermer le formulaire ne change pas le produit et conserve les champs dans la session. En cas d'erreur les champs restent disponibles ; le bouton se bloque pendant l'envoi puis apres acceptation pour eviter les doublons.
 
-L'envoi reel exige le backend configure par l'administrateur. Tant qu'il ne l'est pas, le formulaire l'indique et propose de copier le message ou d'ouvrir le contact officiel, sans afficher de reussite. Voir « Formulaire de devis - deploiement.md ». Aucun test de reception reel n'a ete effectue.
+EmailJS ne necessite pas de backend personnel. Le bouton Repondre du mail utilise l'adresse du client. Un test EmailJS autorise a ete recu et confirme par Rosebuds le 23 octobre ; chaque nouvel envoi est confirme seulement comme pris en charge, pas comme arrive en boite. Le backend securise avec pieces jointes et FormSubmit restent des alternatives de configuration non actives. Aucun repli automatique ne renvoie un deuxieme mail.
 
 ## Corrections du 16 octobre 2026
 

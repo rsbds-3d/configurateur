@@ -1,5 +1,10 @@
 {
-  "provider": "formsubmit",
+  "provider": "emailjs",
+  "emailjs": {
+    "serviceId": "rosebuds_devis",
+    "templateId": "rosebuds_devis_html",
+    "publicKey": "IprGbYk5qIghTdiHu"
+  },
   "apiBase": "",
   "privacyUrl": "https://rosebuds.net/fr/content/28-confidentialite"
 }
