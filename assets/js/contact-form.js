@@ -1,6 +1,7 @@
 import {configurationRows,buildQuoteMessage,QUOTE_SUBJECT} from "./contact-model.js?v=20261023-emailjs";
 import {buildPublicViewerUrl,sendFormSubmitQuote} from "./contact-formsubmit.js?v=20261023-emailjs";
-import {sendEmailJsQuote,validateEmailJsConfig} from "./contact-emailjs.js?v=20261023-emailjs";
+import {sendEmailJsQuote,validateEmailJsConfig} from "./contact-emailjs.js?v=20261030-rich";
+import {formatQuoteSelection,quoteMessageHtml} from "./quote-message-html.js?v=20261030-rich";
 
 let dialog, state, captureUrl, extraUrl, widgetId, apiBase, publicConfig, provider, busy = false;
 const $ = selector => dialog.querySelector(selector);
@@ -20,11 +21,11 @@ function status(message,error=false) { $("[data-status]").textContent=message;$(
 function createDialog() {
   dialog=document.createElement("dialog");dialog.className="quote-dialog";dialog.setAttribute("aria-labelledby","quote-title");
   dialog.innerHTML=`<header class="quote-header"><div><img class="quote-logo" src="./assets/brand/rosebuds-logo-2017-email.png" alt="Rosebuds"><h2 id="quote-title">Contactez-nous</h2></div><div><small data-version></small><button type="button" data-close aria-label="Fermer">×</button></div></header>
-    <div class="quote-columns"><section class="quote-preview"><img data-capture alt="Aperçu de votre configuration 3D"><p data-reference></p><p><a data-viewer-link target="_blank" rel="noopener">Ouvrir cette configuration 3D</a></p><dl data-details></dl></section>
+    <div class="quote-columns"><section class="quote-preview"><img data-capture alt="Aperçu en perspective de votre configuration 3D"><p data-reference></p><p><a data-viewer-link target="_blank" rel="noopener">Ouvrir cette configuration 3D</a></p><table class="quote-details"><caption>Votre configuration</caption><tbody data-details></tbody></table></section>
     <form class="quote-form"><label>Nom et prénom<input name="name" autocomplete="name" required minlength="2" maxlength="120"></label>
     <label>Adresse e-mail<input name="email" type="email" autocomplete="email" required maxlength="254"></label>
     <label>Sujet<input name="subject" required maxlength="160"></label>
-    <label>Message<textarea name="message" required minlength="10" maxlength="10000" rows="10"></textarea></label>
+    <div class="quote-message-field"><label for="quote-message">Message</label><div class="quote-format-tools" role="group" aria-label="Mise en forme du message"><button type="button" data-format="bold" title="Gras" aria-label="Gras"><strong>B</strong></button><button type="button" data-format="italic" title="Italique" aria-label="Italique"><em>I</em></button><button type="button" data-format="list" title="Liste à puces" aria-label="Liste à puces">☷</button></div><textarea id="quote-message" name="message" required minlength="10" maxlength="10000" rows="10" aria-label="Message"></textarea><details class="quote-message-preview"><summary>Aperçu du message</summary><div data-message-preview></div></details></div>
     <label data-attachment-field>Document joint <span>(facultatif, PNG, JPEG ou PDF, 2 Mo maximum)</span><input name="attachment" type="file" accept="image/png,image/jpeg,application/pdf"></label>
     <p data-file-name></p><img data-extra-preview hidden alt="Document image joint"><button type="button" data-remove-file hidden>Retirer le document</button>
     <label class="quote-trap" aria-hidden="true">Site web<input name="website" tabindex="-1" autocomplete="off"></label>
@@ -41,6 +42,12 @@ function createDialog() {
   $("[data-remove-file]").onclick=()=>{$("[name=attachment]").value="";updateExtra();};
   $("[name=attachment]").onchange=updateExtra;
   $("form").onsubmit=submit;
+  dialog.querySelectorAll('[data-format]').forEach(button=>{button.onclick=()=>formatQuoteSelection($("[name=message]"),button.dataset.format);});
+  $("[name=message]").addEventListener('input',updateMessagePreview);
+}
+function updateMessagePreview() {
+  if(!state)return;
+  $("[data-message-preview]").innerHTML=quoteMessageHtml($("[name=message]").value,configurationRows(state.configuration),buildPublicViewerUrl(state.configuration));
 }
 function updateExtra() {
   if(extraUrl)URL.revokeObjectURL(extraUrl);extraUrl=null;
@@ -87,13 +94,16 @@ export async function openQuoteForm({configuration,capture}) {
     $("[data-viewer-link]").href=buildPublicViewerUrl(configuration);
     $("[data-reference]").textContent=state.reference;
     $("[data-details]").replaceChildren();
-    for(const [key,value] of configurationRows(configuration)){const dt=document.createElement("dt"),dd=document.createElement("dd");dt.textContent=key;dd.textContent=value;$("[data-details]").append(dt,dd);}
+    for(const [key,value] of configurationRows(configuration)){const row=document.createElement("tr"),label=document.createElement("th"),cell=document.createElement("td");label.scope="row";label.textContent=key;cell.textContent=value;row.append(label,cell);$("[data-details]").append(row);}
   }
   $(".quote-submit").disabled=true;$(".quote-fallback").hidden=true;
+  updateMessagePreview();
   if(!dialog.open)dialog.showModal();status("Préparation de l’aperçu 3D…");
   try{
-    const blob=await capture();state.screenshot=await screenshotAttachment(blob);
-    if(captureUrl)URL.revokeObjectURL(captureUrl);captureUrl=URL.createObjectURL(blob);$("[data-capture]").src=captureUrl;
+    if(!state.screenshot){
+      const blob=await capture();state.screenshot=await screenshotAttachment(blob);
+      if(captureUrl)URL.revokeObjectURL(captureUrl);captureUrl=URL.createObjectURL(blob);$("[data-capture]").src=captureUrl;
+    }
     await setupService();status(state.sent?"Cette demande a déjà été prise en charge par le service d’envoi.":provider === "formsubmit"?"Au premier envoi, Rosebuds doit valider l’e-mail d’activation FormSubmit. La réception finale reste à confirmer.":"");$(".quote-submit").disabled=Boolean(state.sent);
   }catch(error){status(error.message||"Le service de contact est indisponible.",true);$(".quote-fallback").hidden=false;}
   $("[data-mail]").href=`mailto:info@rosebuds.net?subject=${encodeURIComponent($("[name=subject]").value)}&body=${encodeURIComponent($("[name=message]").value)}`;

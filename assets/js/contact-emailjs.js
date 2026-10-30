@@ -1,5 +1,6 @@
 import {configurationRows} from "./contact-model.js?v=20261023-emailjs";
 import {buildPublicViewerUrl} from "./contact-formsubmit.js?v=20261023-emailjs";
+import {quoteMessageHtml} from "./quote-message-html.js?v=20261030-rich";
 
 export const EMAILJS_ENDPOINT = "https://api.emailjs.com/api/v1.0/email/send";
 const failure = "Votre demande n’a pas pu être transmise. Veuillez réessayer ou utiliser une autre méthode de contact. Vos informations sont conservées.";
@@ -32,6 +33,7 @@ export function buildEmailJsParams(quote) {
     diameter:value('Diamètre'),crystal_size:value('Taille de la pierre'),metal:value('Métal'),
     metal_finish:value('Finition du métal'),ornament:value('Ornement'),ornament_finish:value('Finition / couleur de l’ornement'),
     mixed_note:notes.join('\n'),viewer_url:buildPublicViewerUrl(quote.configuration),message:quote.message,
+    message_html:quoteMessageHtml(quote.message, configurationRows(quote.configuration), buildPublicViewerUrl(quote.configuration)),
   };
 }
 

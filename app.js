@@ -7904,6 +7904,18 @@ async function renderCanvasToPngBlob(withWatermark = true) {
   return withWatermark ? watermarkPngBlob(blob) : blob;
 }
 
+async function captureQuoteProduct() {
+  const { captureQuotePreview } = await import("./assets/js/quote-preview.js?v=20261030");
+  const bounds = getVisibleMeshBox(root);
+  const metalBox = getModelMeshBox(root, child => !["gem", "bronze"].includes(child.userData?.classicPlugRole));
+  const ornamentBox = getModelMeshBox(root, child => ["gem", "bronze"].includes(child.userData?.classicPlugRole));
+  const front = !ornamentBox.isEmpty() && !metalBox.isEmpty()
+    ? ornamentBox.getCenter(new THREE.Vector3()).sub(metalBox.getCenter(new THREE.Vector3()))
+    : new THREE.Vector3(1, 0, 1);
+  if (front.lengthSq() < 0.000001) front.set(1, 0, 1);
+  return watermarkPngBlob(await captureQuotePreview({ renderer, scene, model: root, bounds, front, excluded: [scaleReferenceGroup] }));
+}
+
 function downloadBlob(blob, filename) {
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
@@ -8222,8 +8234,8 @@ function wireInterface() {
   const requestViewerQuote = async () => {
     if (!currentViewerConfiguration) { showNotice("Attendez le chargement de la configuration."); return; }
     try {
-    const { openQuoteForm } = await import("./assets/js/contact-form.js?v=20261023-emailjs");
-      await openQuoteForm({ configuration: currentViewerConfiguration, capture: () => renderCanvasToPngBlob() });
+      const { openQuoteForm } = await import("./assets/js/contact-form.js?v=20261030-rich");
+      await openQuoteForm({ configuration: currentViewerConfiguration, capture: captureQuoteProduct });
     } catch { showNotice("Le formulaire de devis n’a pas pu s’ouvrir."); }
   };
   document.querySelector("#request-product-quote")?.addEventListener("click", requestViewerQuote);

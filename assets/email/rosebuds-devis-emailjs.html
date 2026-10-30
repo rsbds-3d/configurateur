@@ -43,6 +43,7 @@
           <p style="margin:0 0 7px;font-size:11px;line-height:18px;font-weight:bold;color:#a91f62;">{{family}}</p>
           <h2 style="margin:0 0 18px;font-family:Georgia,'Times New Roman',serif;font-size:25px;line-height:33px;font-weight:normal;">{{model}}</h2>
         </div>
+        {{^message_html}}
         <table width="100%" aria-label="Caracteristiques du produit" style="width:100%;font-size:13px;line-height:20px;table-layout:fixed;">
           <tr bgcolor="#f7f7f7"><th class="spec-label" scope="row" align="left" width="40%" style="padding:11px 12px;color:#5d5d5d;font-weight:normal;">R&eacute;f&eacute;rence mod&egrave;le</th><td style="padding:11px 12px;overflow-wrap:anywhere;word-break:break-word;">{{model_id}}</td></tr>
           <tr><th scope="row" align="left" style="padding:11px 12px;color:#5d5d5d;font-weight:normal;">Taille du plug</th><td style="padding:11px 12px;">{{size}}</td></tr>
@@ -53,13 +54,14 @@
           <tr bgcolor="#f7f7f7"><th scope="row" align="left" style="padding:11px 12px;color:#5d5d5d;font-weight:normal;">Ornement</th><td style="padding:11px 12px;">{{ornament}}</td></tr>
           <tr><th scope="row" align="left" style="padding:11px 12px;color:#5d5d5d;font-weight:normal;">Finition / couleur</th><td style="padding:11px 12px;">{{ornament_finish}}</td></tr>
         </table>
+        {{/message_html}}
         <p style="margin:12px 0 20px;font-size:12px;line-height:19px;color:#5d5d5d;">{{mixed_note}}</p>
         <table role="presentation" width="100%"><tr><td align="center" bgcolor="#fe3a9e" style="background:#fe3a9e;padding:15px 18px;"><a class="cta" href="{{viewer_url}}" style="display:block;color:#181818;font-size:14px;line-height:22px;font-weight:bold;text-decoration:none;">Voir la configuration 3D</a></td></tr></table>
         <p style="margin:10px 0 0;font-size:12px;line-height:19px;color:#5d5d5d;">L'aper&ccedil;u PNG et la fiche PDF sont disponibles dans le viewer. Une identification peut &ecirc;tre demand&eacute;e.</p>
       </td></tr>
       <tr><td class="pad" style="padding:28px 40px;">
         <h2 style="margin:0 0 15px;font-family:Georgia,'Times New Roman',serif;font-size:23px;line-height:30px;font-weight:normal;">Le message du client</h2>
-        <div style="padding:18px 20px;background:#f7f7f7;border-left:3px solid #fe3a9e;font-size:14px;line-height:24px;color:#38383b;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;">{{message}}</div>
+        <div style="padding:18px 20px;background:#f7f7f7;border-left:3px solid #fe3a9e;font-size:14px;line-height:24px;color:#38383b;overflow-wrap:anywhere;word-break:break-word;">{{#message_html}}{{{message_html}}}{{/message_html}}{{^message_html}}<div style="white-space:pre-wrap;">{{message}}</div>{{/message_html}}</div>
         <table role="presentation" style="margin-top:22px;"><tr><td bgcolor="#38383b" style="background:#38383b;padding:13px 22px;"><a href="{{reply_url}}" style="color:#ffffff;font-size:14px;line-height:22px;font-weight:bold;text-decoration:none;">R&eacute;pondre au client</a></td></tr></table>
         <p style="margin:10px 0 0;font-size:12px;line-height:19px;color:#5d5d5d;overflow-wrap:anywhere;">La r&eacute;ponse sera adress&eacute;e &agrave; {{email}}.</p>
       </td></tr>

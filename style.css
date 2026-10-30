@@ -2667,9 +2667,12 @@ body:has(.controls.is-collapsed) .viewer-actions {
 .quote-header button { width: 40px; height: 40px; flex-shrink: 0; padding: 0; font-size: 28px; background: #fff; color: #38383b; border: 1px solid #c7c7c7; }
 .quote-columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 32px; }
 .quote-preview img { width: 100%; aspect-ratio: 4 / 3; object-fit: contain; background: #f5f5f5; }
-.quote-preview dl { display: grid; grid-template-columns: minmax(100px, .8fr) minmax(0, 1.2fr); gap: 10px 16px; font-size: 14px; }
-.quote-preview dt { color: #5d5d5d; }
-.quote-preview dd { margin: 0; overflow-wrap: anywhere; }
+.quote-details { width: 100%; table-layout: fixed; border-collapse: collapse; border: 1px solid #dedede; font-size: 14px; line-height: 1.5; }
+.quote-details caption { padding: 12px 14px; background: #38383b; color: #fff; text-align: left; font-weight: 600; border-top: 3px solid #fe3a9e; }
+.quote-details th, .quote-details td { padding: 10px 12px; border-bottom: 1px solid #e6e6e6; text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+.quote-details th { width: 43%; font-weight: 400; color: #5d5d5d; border-right: 1px solid #e6e6e6; }
+.quote-details td { font-weight: 500; color: #38383b; }
+.quote-details tr:nth-child(even) { background: #faf3f7; }
 .quote-preview [data-reference] { font-size: 12px; overflow-wrap: anywhere; }
 .quote-form { display: grid; align-content: start; gap: 16px; min-width: 0; }
 .quote-form label { display: grid; gap: 7px; color: #5d5d5d; font-size: 14px; }
@@ -2678,6 +2681,13 @@ body:has(.controls.is-collapsed) .viewer-actions {
 .quote-form input:not([type=file]), .quote-form textarea { box-sizing: border-box; width: 100%; min-height: 42px; border: 1px solid #c7c7c7; border-radius: 0; padding: 9px 12px; color: #38383b; background: #fff; font: inherit; }
 .quote-form input[type=file] { max-width: 100%; font-size: 13px; }
 .quote-form textarea { resize: vertical; line-height: 1.5; }
+.quote-message-field { display: grid; gap: 7px; }
+.quote-format-tools { display: flex; gap: 4px; padding: 5px; border: 1px solid #c7c7c7; background: #fafafa; }
+.quote-format-tools button { width: 34px; height: 32px; min-height: 32px; padding: 0; border: 1px solid #dedede; background: #fff; color: #38383b; font: 16px Arial,sans-serif; }
+.quote-format-tools button:hover { border-color: #fe3a9e; background: #fcf1f6; }
+.quote-message-preview { border: 1px solid #dedede; font-size: 14px; line-height: 1.6; }
+.quote-message-preview summary { padding: 10px 12px; cursor: pointer; color: #38383b; background: #fafafa; }
+.quote-message-preview [data-message-preview] { padding: 14px; overflow-wrap: anywhere; }
 .quote-form input:focus-visible, .quote-form textarea:focus-visible, .quote-form button:focus-visible { outline: 2px solid #fe3a9e; outline-offset: 2px; }
 .quote-form button, .quote-fallback a { white-space: normal; overflow-wrap: anywhere; min-height: 40px; }
 .quote-form .quote-submit { padding: 12px 20px; background: #38383b; color: #fff; border: 0; font-size: 15px; }
