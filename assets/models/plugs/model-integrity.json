@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedFor": "v0.10-260929",
+  "generatedFor": "v0.11-260930",
   "models": [
     {
       "modelId": "plug-classique-large-35",
@@ -215,14 +215,17 @@
     {
       "modelId": "plug-new-small-cabochon-lisse",
       "target": "new-small/new-small-cabochon-lisse.3dm",
-      "bytes": 1640188,
-      "sha256": "BCE994579CB7FE53A61C4EB7002AD3396ED863BDFFB0676518D23E08DBBAA3A6"
+      "bytes": 1875627,
+      "sha256": "604BAA043F4CD6C46433C7C8F0183F079D13F1DA9AD83E2C05115E67D41BA707"
     },
     {
       "modelId": "plug-new-small-cristal",
       "target": "new-small/new-small-cristal.3dm",
-      "bytes": 1830639,
-      "sha256": "306DC8B40BEB9D4F17C59322B369E8A50B486C2C527B6C15764914CF48E592E6"
+      "bytes": 2047160,
+      "sha256": "D824679554E5604045737E3F8BFE038FA6CA90D167E29B405E205199E24553B6"
     }
-  ]
+  ],
+  "assetRevisions": {
+    "new-small": "20261104-new-small-v11"
+  }
 }

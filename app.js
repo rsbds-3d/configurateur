@@ -20,6 +20,7 @@ import { buildBVHInWorker, compileBeforeSwap, abortError } from "./assets/js/dia
 import { attachDecalGesture } from "./assets/js/decal-gesture.js?v=20260929-optimized-3dm-v10";
 
 const MODEL_ASSET_VERSION = "20260929-optimized-3dm-v10";
+const NEW_SMALL_ASSET_VERSION = "20261104-new-small-v11";
 import { watermarkPngBlob } from "./assets/js/png-watermark.js";
 import { createBottleReference } from "./assets/js/bottle-reference.js";
 import { createCoinReference } from "./assets/js/coin-reference.js?v=20261016";
@@ -710,7 +711,7 @@ const modelDefaults = {
     gemColor: "#ffb5c6",
     camera: [3.8, 1.9, 4.2],
     target: [0, -0.35, 0],
-    url: "./assets/models/plugs/new-small/new-small-cabochon-lisse.3dm?v=20260729-new-small-models",
+    url: "./assets/models/plugs/new-small/new-small-cabochon-lisse.3dm?v=20261104-new-small-v11",
     meshOptions: { ...defaultRhinoMeshOptions, preserveRhinoFrame: false, rhinoZUp: false, classicPlugVolumeMaterials: true, classicPlugGem: true },
   },
   "plug-new-small-cristal": {
@@ -720,7 +721,7 @@ const modelDefaults = {
     gemColor: "#f5fbff",
     camera: [3.8, 1.9, 4.2],
     target: [0, -0.35, 0],
-    url: "./assets/models/plugs/new-small/new-small-cristal.3dm?v=20260729-new-small-models",
+    url: "./assets/models/plugs/new-small/new-small-cristal.3dm?v=20261104-new-small-v11",
     meshOptions: { ...defaultRhinoMeshOptions, preserveRhinoFrame: false, rhinoZUp: false, classicPlugVolumeMaterials: true, classicPlugGem: true },
   },
   "plug-new-medium-30-sans-tete-cabochon-lisse": {
@@ -4042,7 +4043,8 @@ function loadWithTimeout(promise, timeoutMs, label) {
 function withCurrentModelVersion(url) {
   if (typeof url !== "string" || /^(blob:|data:)/i.test(url)) return url;
   const separator = url.includes("?") ? "&" : "?";
-  return `${url}${separator}meshVersion=${MODEL_ASSET_VERSION}`;
+  const revision = /\/new-small\//i.test(url) ? NEW_SMALL_ASSET_VERSION : MODEL_ASSET_VERSION;
+  return `${url}${separator}meshVersion=${revision}`;
 }
 
 function createPlugFallbackPart(geometry, name, position, rotation = [0, 0, Math.PI / 2]) {
