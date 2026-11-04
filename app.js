@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { seatBronzeMeshes } from "./assets/js/bronze-seat.js?v=20261104";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
@@ -11899,36 +11900,11 @@ function scaleClassicPlugBronzeOrnament(model, meshOptions = {}) {
 }
 
 function seatBronzeAgainstPlate(model) {
-  const bodyBox = getModelMeshBox(model, mesh => mesh.userData?.classicPlugRole === "metal");
-  if (isBoxEmpty(bodyBox)) return;
-  const size = bodyBox.getSize(new THREE.Vector3());
-  const axis = size.x >= size.y && size.x >= size.z ? "x" : size.y >= size.z ? "y" : "z";
-  const radialAxes = ["x", "y", "z"].filter(value => value !== axis);
-  const bodyCenter = bodyBox.getCenter(new THREE.Vector3());
-  getRootBronzeMeshes(model).forEach(mesh => {
-    const box = new THREE.Box3().setFromObject(mesh);
-    const center = box.getCenter(new THREE.Vector3());
-    const direction = center[axis] < bodyCenter[axis] ? 1 : -1;
-    const plate = direction > 0 ? bodyBox.min[axis] : bodyBox.max[axis];
-    const radialRadius = Math.max(...radialAxes.map(value => box.max[value] - box.min[value])) / 2;
-    const position = mesh.geometry.getAttribute("position");
-    const vertex = new THREE.Vector3();
-    let seat = direction > 0 ? -Infinity : Infinity;
-    // Ignore the central fixing stem: seat the ornament's back against the plate.
-    const step = Math.max(1, Math.floor(position.count / 10000));
-    for (let i = 0; i < position.count; i += step) {
-      vertex.fromBufferAttribute(position, i).applyMatrix4(mesh.matrixWorld);
-      const radius = Math.hypot(...radialAxes.map(value => vertex[value] - center[value]));
-      if (radius < radialRadius * 0.4) continue;
-      seat = direction > 0 ? Math.max(seat, vertex[axis]) : Math.min(seat, vertex[axis]);
-    }
-    if (!Number.isFinite(seat)) return;
-    const world = mesh.getWorldPosition(new THREE.Vector3());
-    world[axis] += plate - seat;
-    mesh.position.copy(mesh.parent.worldToLocal(world));
-    mesh.userData.bronzePlateContact = { axis, plate, seatBefore: seat, gapAfter: 0 };
+  const metals = [];
+  model.traverse(mesh => {
+    if (mesh.isMesh && mesh.userData?.classicPlugRole === "metal" && !mesh.userData.stemDecal) metals.push(mesh);
   });
-  model.updateWorldMatrix(true, true);
+  return seatBronzeMeshes(model, metals, getRootBronzeMeshes(model));
 }
 
 function assignClassicPlugMaterialsByVolume(model, meshOptions = {}) {
