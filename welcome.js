@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const VIEWER_VERSION = "20261106-engraving-v11";
+  const VIEWER_VERSION = "20261106-bronze-hibou-v11";
   function acceptPromptSuggestion(event, field) {
     if (event.key !== "Tab" || event.shiftKey || event.ctrlKey || event.altKey || event.metaKey || field.value.trim()) return;
     const suggestion = field.placeholder.replace(/^Exemple\s*:\s*/i, "").trim();
@@ -136,7 +136,7 @@
     "plug-classique-xxxl-80-keyring",
     "plug-classique-xxxl-90-keyring",
     "plug-classique-xxxl-100-keyring",
-  ]);
+  ].flatMap(id => [id, id.replace(/keyring$/, "hibou")]));
   const params = new URLSearchParams(window.location.search);
 
   if (window.location.protocol === "file:") {
@@ -319,6 +319,12 @@
         id: "keyring",
         label: "Keyring",
         description: "Bronze Keyring de référence Ø 26,8 mm, mis à l’échelle comme la pierre principale pour chaque taille de plug.",
+        visual: "ornament-bronze",
+      },
+      {
+        id: "hibou",
+        label: "Hibou",
+        description: "Bronze Hibou de référence Ø 26,8 mm, adapté au diamètre de chaque taille de plug.",
         visual: "ornament-bronze",
       },
     ];
@@ -907,7 +913,7 @@
         return "Quel matériau souhaitez-vous pour le bronze ?";
       }
       if (state.head === "bronze" && value === "La teinte sera transmise au rendu optique du cristal, de la gemme ou du décor.") {
-        return "Choisissez Gold, Silver, Shiny ou Patine pour le bronze Keyring.";
+        return "Choisissez Gold, Silver, Shiny ou Patine pour le bronze.";
       }
       return value;
     }
@@ -982,7 +988,7 @@
   }
 
   function getCrystalSize(id) {
-    if (CLASSIC_MODELS_WITHOUT_HEAD.has(id) || String(id || "").includes("-keyring")) return "";
+    if (CLASSIC_MODELS_WITHOUT_HEAD.has(id) || CLASSIC_BRONZE_MODELS.has(id)) return "";
     const text = String(id || "").toLowerCase();
     if (text.includes("new-small") || text.includes("new-medium")) return "12 mm";
     if (text.includes("classique-small-18")) return "18 mm";
@@ -1007,7 +1013,7 @@
   }
 
   function getBronzeType(id) {
-    return String(id || "").includes("keyring") ? "keyring" : "";
+    return CLASSIC_BRONZE_MODELS.has(id) ? id.split("-").at(-1) : "";
   }
 
   function matchesClassicHead(model, family, head) {

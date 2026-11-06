@@ -36,7 +36,12 @@ for (const [id, baseId, targetDiameter] of variants) {
 const asset = path.join(root, "assets", "models", "plugs", "bronzes", "keyring-reference-26-8.3dm");
 assert(fs.existsSync(asset) && fs.statSync(asset).size > 1_000_000, "Le bronze Keyring de référence doit être un 3DM exploitable et partagé.");
 assert(app.includes("composeRhinoBronzeOrnament"), "Le corps avec tête et le bronze partagé doivent être composés au chargement.");
-assert(app.includes('child.name = "Bronze Keyring reference 26.8 mm"'), "Le maillage bronze doit être identifié sans ambiguïté.");
+assert(app.includes('child.name = `Bronze ${meshOptions.bronzeLabel} reference'), "Le maillage bronze doit être identifié sans ambiguïté.");
+assert(fs.existsSync(path.join(root, "assets/models/plugs/bronzes/hibou-reference-26-8.3dm")));
+assert(welcome.includes('id: "hibou"'));
+for (const [id] of variants) {
+  assert(html.includes(`value="${id.replace(/keyring$/, "hibou")}"`), `Variante Hibou manquante : ${id}`);
+}
 
 assert(app.includes('classicPlugRole = "bronze"'), "Le bronze doit avoir un rôle distinct du métal et des pierres.");
 assert(app.includes('const scale = target / reference;'), "Le bronze doit suivre la même loi d'échelle dimensionnelle que l'ornement principal.");

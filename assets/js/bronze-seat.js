@@ -88,8 +88,10 @@ export function seatBronzeMeshes(model, metals, bronzes, {apply=true,resolution=
     // A small inset hides the tangent slit of the rounded edge without burying
     // the ornament in the plate (as a maximum-gap fit would do).
     const rimGap=quantile(gaps,.05)+Math.max(...span)*.01;
-    const shift=rimGap>tolerance?rimGap+tolerance:0;
-    if(apply&&shift>0) {
+    const offsetToSeat=rimGap+tolerance;
+    const shift=rimGap>tolerance || (mesh.userData.seatBronzeBothDirections && offsetToSeat < -tolerance)
+      ? offsetToSeat : 0;
+    if(apply&&shift!==0) {
       const offset=new Vector3();offset.setComponent(axis,shift*direction);
       const world=mesh.getWorldPosition(new Vector3());
       const worldOffset=offset.applyMatrix4(model.matrixWorld).sub(new Vector3().setFromMatrixPosition(model.matrixWorld));

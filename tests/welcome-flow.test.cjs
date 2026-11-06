@@ -109,7 +109,7 @@ const expectedClassicBronzeModels = [
   "plug-classique-xxxl-90-keyring",
   "plug-classique-xxxl-100-keyring",
 ];
-const bronzeBlock = welcome.match(/const CLASSIC_BRONZE_MODELS = new Set\(\[([\s\S]*?)\]\);/)?.[1] || "";
+const bronzeBlock = welcome.match(/const CLASSIC_BRONZE_MODELS = new Set\(\[([\s\S]*?)\]\.flatMap/)?.[1] || "";
 const classifiedBronzes = Array.from(bronzeBlock.matchAll(/"([^"]+)"/g), (match) => match[1]);
 assert.deepStrictEqual(classifiedBronzes, expectedClassicBronzeModels, "La catégorie Bronzes doit proposer le Keyring sur tous les corps Originale avec tête.");
 assert(welcome.includes('bronzeType: model.bronzeType'), "Le type de bronze doit rester présent dans chaque configuration de résultat.");

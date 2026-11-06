@@ -6,7 +6,8 @@ const {chromium} = require('C:/Users/charl/.cache/codex-runtimes/codex-primary-r
 
 (async () => {
   const root = path.resolve(process.argv[2] || '.');
-  const output = path.resolve('outputs/bronze-contact-20261104');
+  const bronzeType = process.argv[4] || 'keyring';
+  const output = path.resolve(bronzeType === 'keyring' ? 'outputs/bronze-contact-20261104' : `outputs/bronze-contact-${bronzeType}`);
   fs.mkdirSync(output, {recursive:true});
   const types = {'.html':'text/html','.js':'text/javascript','.json':'application/json','.css':'text/css','.wasm':'application/wasm','.png':'image/png'};
   const server = http.createServer((req,res) => {
@@ -27,7 +28,7 @@ const {chromium} = require('C:/Users/charl/.cache/codex-runtimes/codex-primary-r
     for(const variant of variants) {
       const page=await browser.newPage({viewport:{width:1100,height:720}});page.setDefaultTimeout(120000);
       const errors=[];page.on('pageerror',e=>errors.push(e.message));
-      const params=new URLSearchParams({viewer:'1',thumbnail:'1',catalogModel:`plug-classique-${variant}-keyring`,modelFamily:'Classique',metalFamily:'inox',metalFinish:'stainless-mirror-silver',ornament:'bronze',ornamentFinish:'Gold'});
+      const params=new URLSearchParams({viewer:'1',thumbnail:'1',catalogModel:`plug-classique-${variant}-${bronzeType}`,modelFamily:'Classique',metalFamily:'inox',metalFinish:'stainless-mirror-silver',ornament:'bronze',ornamentFinish:'Gold'});
       await page.goto(`http://127.0.0.1:${server.address().port}/?${params}`);
       await page.waitForFunction(()=>document.body.dataset.viewerReady==='true' && window.__contactTest);
       const report=await page.evaluate(()=>{
@@ -40,6 +41,7 @@ const {chromium} = require('C:/Users/charl/.cache/codex-runtimes/codex-primary-r
       });
       assert(report.initial.length>0,variant+': missing bronze');
       assert(report.initial.every(r=>r.samples>=16 && r.rimGapAfter<=r.tolerance),variant+': rim gap');
+      if(bronzeType==='hibou') assert(report.initial.every(r=>Math.abs(r.rimGapAfter)<=2*r.tolerance),variant+': bronze embedded in plate');
       assert(report.repeated.every(r=>Math.abs(r.shift)<1e-5),variant+': not idempotent');
       assert.deepEqual(report.before,report.after,variant+': repeated seating changes geometry');
       const pixels=await page.locator('#jewel-canvas').evaluate(canvas=>{

@@ -10,6 +10,7 @@ const end = welcome.indexOf("function getModelFamily", start);
 assert(start >= 0 && end > start, "Les fonctions de dimensions du catalogue doivent rester isolables.");
 
 const sandbox = {
+  CLASSIC_BRONZE_MODELS: new Set(["plug-classique-medium-keyring", "plug-classique-medium-hibou"]),
   CLASSIC_MODELS_WITHOUT_HEAD: new Set([
     "plug-classique-xl-45-sans-tete",
   ]),
@@ -44,6 +45,7 @@ assert.strictEqual(dimensions.getPlugSize("plug-classique-xxxl-60"), "XXXL-60");
 assert.strictEqual(dimensions.getPlugSize("plug-classique-xxxl-100"), "XXXL-100");
 assert.strictEqual(dimensions.getPlugSizeLabel("plug-classique-large-35"), "LARGE");
 assert.strictEqual(dimensions.getPlugSizeLabel("plug-classique-medium"), "MEDIUM");
+assert.strictEqual(dimensions.getCrystalSize("plug-classique-medium-hibou"), "");
 assert.strictEqual(dimensions.getCrystalSize("plug-classique-xxxl-100"), "50 mm");
 
 assert.strictEqual(dimensions.getPlugSize("plug-new-small-cristal"), "SMALL-25");

@@ -10,6 +10,7 @@ const FIELD_ALIASES = Object.freeze({
   ],
   bronzeType: [
     ["keyring", ["keyring", "porte cles", "porte-clés"]],
+    ["hibou", ["hibou", "owl"]],
   ],
   metal: [
     ["inox", ["inox", "acier inoxydable", "stainless steel", "stainless"]],

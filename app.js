@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { seatBronzeMeshes } from "./assets/js/bronze-seat.js?v=20261104";
+import { seatBronzeMeshes } from "./assets/js/bronze-seat.js?v=20261106-hibou";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
@@ -1001,6 +1001,10 @@ const modelDefaults = {
 };
 
 const CLASSIC_BRONZE_KEYRING_SOURCE = "./assets/models/plugs/bronzes/keyring-reference-26-8.3dm?v=20260930-bronze-keyring-v11";
+const classicBronzeTypes = [
+  { id: "keyring", label: "Keyring", url: CLASSIC_BRONZE_KEYRING_SOURCE },
+  { id: "hibou", label: "Hibou", url: "./assets/models/plugs/bronzes/hibou-reference-26-8.3dm?v=20261106" },
+];
 const classicBronzeKeyringVariants = [
   ["plug-classique-large-35-keyring", "plug-classique-large-35", "LARGE 35", 27],
   ["plug-classique-medium-keyring", "plug-classique-medium", "MEDIUM 30", 27],
@@ -1018,25 +1022,28 @@ const classicBronzeKeyringVariants = [
   ["plug-classique-xxxl-100-keyring", "plug-classique-xxxl-100", "XXXL 100", 50],
 ];
 
-classicBronzeKeyringVariants.forEach(([id, baseId, sizeLabel, targetDiameterMm]) => {
+classicBronzeTypes.forEach(bronze => classicBronzeKeyringVariants.forEach(([keyringId, baseId, sizeLabel, targetDiameterMm]) => {
+  const id = keyringId.replace(/keyring$/, bronze.id);
   const base = modelDefaults[baseId];
   modelDefaults[id] = {
     ...base,
-    title: `Plug Originale ${sizeLabel} bronze Keyring`,
+    title: `Plug Originale ${sizeLabel} bronze ${bronze.label}`,
     eyebrow: "Collection Bronzes Originale",
-    copy: `Plug Originale ${sizeLabel} avec tête et bronze Keyring à la place de la pierre principale.`,
+    copy: `Plug Originale ${sizeLabel} avec tête et bronze ${bronze.label} à la place de la pierre principale.`,
     gemColor: "#bd7d3f",
     meshOptions: {
       ...(base.meshOptions || defaultRhinoMeshOptions),
       classicPlugVolumeMaterials: true,
       classicPlugGem: false,
       classicPlugBronze: true,
-      bronzeUrl: CLASSIC_BRONZE_KEYRING_SOURCE,
+      bronzeUrl: bronze.url,
+      bronzeLabel: bronze.label,
+      bronzeType: bronze.id,
       bronzeReferenceDiameterMm: 26.8,
       bronzeTargetDiameterMm: targetDiameterMm,
     },
   };
-});
+}));
 
 const gemPresets = {
   padparadscha: {
@@ -4335,7 +4342,7 @@ function getCatalogModelMeta(id, label = "") {
     isNewMedium,
     isBronze,
     classicHead: isBronze ? "bronze" : (isSansTete ? "sans-tete" : "avec-tete"),
-    bronzeType: normalized.includes("keyring") ? "keyring" : "",
+    bronzeType: modelDefaults[id]?.meshOptions?.bronzeType || "",
     isPlug: String(id || "").startsWith("plug-"),
     source,
   };
@@ -4794,7 +4801,7 @@ async function composeRhinoBronzeOrnament(object, meshOptions = {}, onProgress) 
   ornament.updateWorldMatrix(true, true);
   const ornamentCenter = getVisibleMeshBox(ornament).getCenter(new THREE.Vector3());
   const bronzeGroup = new THREE.Group();
-  bronzeGroup.name = "Bronze Keyring replacement group";
+  bronzeGroup.name = `Bronze ${meshOptions.bronzeLabel} replacement group`;
   bronzeGroup.position.copy(replacementCenter);
   [...ornament.children].forEach((child) => {
     if (child.isMesh) {
@@ -4806,8 +4813,9 @@ async function composeRhinoBronzeOrnament(object, meshOptions = {}, onProgress) 
       child.rotation.set(0, 0, 0);
       child.scale.set(1, 1, 1);
       child.updateMatrix();
-      child.name = "Bronze Keyring reference 26.8 mm";
+      child.name = `Bronze ${meshOptions.bronzeLabel} reference ${meshOptions.bronzeReferenceDiameterMm} mm`;
       child.userData.classicPlugRole = "bronze";
+      child.userData.seatBronzeBothDirections = meshOptions.bronzeType === "hibou";
     }
     bronzeGroup.add(child);
   });
@@ -7461,11 +7469,8 @@ function getComparisonPlugDiameterMm(id) {
 function getComparisonCrystalSize(id) {
   const text = String(id || "").toLowerCase();
   if (text.includes("sans-tete")) return "";
-  if (text.includes("keyring")) {
-    if (text.includes("xxxl")) return "50 mm";
-    if (text.includes("xl-45") || text.includes("xxl-50")) return "35 mm";
-    return "27 mm";
-  }
+  const bronzeDiameter = modelDefaults[id]?.meshOptions?.bronzeTargetDiameterMm;
+  if (bronzeDiameter) return `${bronzeDiameter} mm`;
   if (text.includes("new-small") || text.includes("new-medium")) return "12 mm";
   if (text.includes("classique-small-18")) return "18 mm";
   if (text.includes("classique-small")) return "16 mm";
@@ -7486,6 +7491,7 @@ function getAutomaticScaleComparisonModelIds() {
     const meta = getCatalogModelMeta(id, modelDefaults[id]?.title || id);
     if (meta.modelFamily !== currentMeta.modelFamily) return false;
     if (meta.modelFamily === "Classique" && meta.classicHead !== currentMeta.classicHead) return false;
+    if (currentMeta.bronzeType && meta.bronzeType !== currentMeta.bronzeType) return false;
     // Size comparison is visual, not a list of commercially available finishes.
     if (ornament === "none") return !meta.hasStone;
     if (!catalogModelSupportsOrnament(meta, ornament, metalFamily)) return false;
@@ -11064,9 +11070,9 @@ async function loadRhinoModel(url, meshOptions = {}) {
   const object = await loadRawRhinoObject(url, updateRhinoLoadingProgress);
   setLoadingProgress(58, "Décodage du document Rhino 3DM");
   if (effectiveMeshOptions.bronzeUrl) {
-    setLoadingProgress(61, "Chargement du bronze Keyring");
+    setLoadingProgress(61, `Chargement du bronze ${effectiveMeshOptions.bronzeLabel}`);
     await composeRhinoBronzeOrnament(object, effectiveMeshOptions, (event) => {
-      updateLoadingFromProgressEvent(event, "Téléchargement du bronze Keyring", 61, 68);
+      updateLoadingFromProgressEvent(event, `Téléchargement du bronze ${effectiveMeshOptions.bronzeLabel}`, 61, 68);
     });
   }
   setLoadingProgress(69, "Assemblage du corps et de l'ornement");
