@@ -1,4 +1,5 @@
-import {configurationRows} from "./contact-model.js?v=20261023-emailjs";
+import {configurationRows} from "./contact-model.js?v=20261103";
+import {engravingToParams} from './engraving.js?v=20261103';
 
 export const FORMSUBMIT_ENDPOINT = "https://formsubmit.co/ajax/info@rosebuds.net";
 export function buildPublicViewerUrl(configuration = {}) {
@@ -7,6 +8,7 @@ export function buildPublicViewerUrl(configuration = {}) {
   for (const key of ["catalogModel", "modelFamily", "classicHead", "bronzeType", "plugSize", "crystalSize", "metalFamily", "metalFinish", "ornament", "ornamentFinish"]) {
     if (configuration[key] != null && String(configuration[key]).trim()) url.searchParams.set(key, String(configuration[key]));
   }
+  engravingToParams(url.searchParams,configuration.personalization);
   return url.href;
 }
 export function buildFormSubmitPayload(quote) {

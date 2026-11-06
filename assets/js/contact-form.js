@@ -1,6 +1,6 @@
-import {configurationRows,buildQuoteMessage,QUOTE_SUBJECT} from "./contact-model.js?v=20261023-emailjs";
-import {buildPublicViewerUrl,sendFormSubmitQuote} from "./contact-formsubmit.js?v=20261023-emailjs";
-import {sendEmailJsQuote,validateEmailJsConfig} from "./contact-emailjs.js?v=20261030-rich";
+import {configurationRows,buildQuoteMessage,QUOTE_SUBJECT} from "./contact-model.js?v=20261103";
+import {buildPublicViewerUrl,sendFormSubmitQuote} from "./contact-formsubmit.js?v=20261103";
+import {sendEmailJsQuote,validateEmailJsConfig} from "./contact-emailjs.js?v=20261103";
 import {formatQuoteSelection,quoteMessageHtml} from "./quote-message-html.js?v=20261030-rich";
 
 let dialog, state, captureUrl, extraUrl, widgetId, apiBase, publicConfig, provider, busy = false;

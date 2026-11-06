@@ -14,7 +14,7 @@
     </style>
     <link rel="icon" href="./assets/icons/rosebuds-launcher.ico?v=20261004-crown" sizes="any" />
     <link rel="apple-touch-icon" href="./assets/icons/rosebuds-launcher.png?v=20261004-crown" />
-    <link rel="stylesheet" href="./welcome.css?v=20261004-source-normals-faceted-v11" />
+    <link rel="stylesheet" href="./welcome.css?v=20261106-engraving-v11" />
     <script type="importmap">
       {
         "imports": {
@@ -96,6 +96,11 @@
             </div>
             <p id="welcome-results-count" class="welcome-results-count"></p>
           </div>
+          <section class="welcome-personalization" aria-labelledby="personalization-title">
+            <h3 id="personalization-title">Personnalisation</h3>
+            <label class="personalization-toggle"><input id="personalization-enabled" type="checkbox"> Graver un prénom ou un mot</label>
+            <div id="personalization-fields" hidden><label for="personalization-text">Prénom ou mot à graver</label><input id="personalization-text" type="text" maxlength="24" autocomplete="off"><p id="personalization-error" role="status"></p></div>
+          </section>
           <div id="welcome-gallery" class="welcome-gallery"></div>
         </section>
       </main>
@@ -1036,7 +1041,7 @@
       </section>
     </main>
 
-    <script src="./welcome.js?v=20261104-bronze-seat-v11" defer></script>
+    <script src="./welcome.js?v=20261106-engraving-v11" defer></script>
   </body>
 </html>
 

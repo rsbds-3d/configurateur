@@ -1,5 +1,5 @@
-import {configurationRows} from "./contact-model.js?v=20261023-emailjs";
-import {buildPublicViewerUrl} from "./contact-formsubmit.js?v=20261023-emailjs";
+import {configurationRows} from "./contact-model.js?v=20261103";
+import {buildPublicViewerUrl} from "./contact-formsubmit.js?v=20261103";
 import {quoteMessageHtml} from "./quote-message-html.js?v=20261030-rich";
 
 export const EMAILJS_ENDPOINT = "https://api.emailjs.com/api/v1.0/email/send";
@@ -22,7 +22,7 @@ export function buildEmailJsParams(quote) {
   const reference = String(quote.reference || '').replace(/[\r\n]/g, ' ').slice(0,100);
   if (!reference) throw new Error("La référence de configuration est manquante.");
   const date = new Date(quote.startedAt || Date.now());
-  const notes = ['Longueur','Type de bronze'].filter(key => rows.has(key)).map(key => `${key} : ${rows.get(key)}`);
+  const notes = ['Longueur','Type de bronze','Texte à graver','Police de gravure'].filter(key => rows.has(key)).map(key => `${key} : ${rows.get(key)}`);
   if (quote.subject) notes.push(`Sujet : ${String(quote.subject).slice(0,160)}`);
   if (quote.configuration?.mixedMaterials) notes.push("Matériaux multiples : le lien reproduit la finition principale, pas les affectations par pièce. Se référer au descriptif pour le devis.");
   return {

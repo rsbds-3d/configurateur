@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const VIEWER_VERSION = "20261104-bronze-seat-v11";
+  const VIEWER_VERSION = "20261106-engraving-v11";
   function acceptPromptSuggestion(event, field) {
     if (event.key !== "Tab" || event.shiftKey || event.ctrlKey || event.altKey || event.metaKey || field.value.trim()) return;
     const suggestion = field.placeholder.replace(/^Exemple\s*:\s*/i, "").trim();
@@ -584,6 +584,15 @@
 
     render();
 
+    const personalizationToggle=document.querySelector('#personalization-enabled');
+    const personalizationText=document.querySelector('#personalization-text');
+    personalizationToggle?.addEventListener('change',()=>{
+      document.querySelector('#personalization-fields').hidden=!personalizationToggle.checked;
+      personalizationText.required=personalizationToggle.checked;
+      if(personalizationToggle.checked)personalizationText.focus();
+      else document.querySelector('#personalization-error').textContent='';
+    });
+
     function render() {
       stepsRoot.hidden = catalogMode !== "guided";
       if (progress) progress.hidden = catalogMode !== "guided";
@@ -691,7 +700,7 @@
       return all.find(([value]) => value === id)?.[2] || "#d8d5cb";
     }
 
-    function openViewer(modelId, configuration) {
+    async function openViewer(modelId, configuration) {
       const model = models.find((entry) => entry.id === modelId);
       const resolved = configuration || resolveConfigurationForModel(model, state);
       const url = new URL(window.location.href);
@@ -707,6 +716,11 @@
       url.searchParams.set("metalFinish", resolved.metalFinish);
       url.searchParams.set("ornament", resolved.ornament);
       url.searchParams.set("ornamentFinish", resolved.ornamentFinish);
+      const {normalizeEngraving,engravingToParams}=await import('./assets/js/engraving.js?v=20261103');
+      try {
+        const personalization=normalizeEngraving({enabled:personalizationToggle?.checked,text:personalizationText?.value});
+        engravingToParams(url.searchParams,personalization);
+      } catch(error) {document.querySelector('#personalization-error').textContent=error.message;personalizationText.focus();return;}
       window.location.assign(url.toString());
     }
 

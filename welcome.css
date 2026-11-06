@@ -874,3 +874,13 @@ button {
   font: inherit;
   cursor: pointer;
 }
+@font-face { font-family: 'Rosebuds Engraving'; src: url('./assets/fonts/barlow-condensed/BarlowCondensed-Regular.ttf') format('truetype'); font-display: swap; }
+.welcome-personalization { padding: 24px 0; margin: 16px 0 28px; border-top: 1px solid #dedede; border-bottom: 1px solid #dedede; }
+.welcome-personalization h3 { margin: 0 0 16px; font-size: 20px; }
+.personalization-toggle { display: flex; align-items: center; gap: 10px; }
+.personalization-toggle input { width: 18px; height: 18px; accent-color: #fe3a9e; }
+#personalization-fields { max-width: 420px; margin-top: 16px; }
+#personalization-fields[hidden] { display: none; }
+#personalization-fields label { display: block; margin-bottom: 8px; }
+#personalization-text { box-sizing: border-box; width: 100%; border: 1px solid #aaa; padding: 10px 12px; font: 24px 'Rosebuds Engraving',Arial,sans-serif; }
+#personalization-error { color: #a31828; font-size: 14px; }

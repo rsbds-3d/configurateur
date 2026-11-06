@@ -30,6 +30,8 @@ import { createStudioFur, createFurAlphaTexture, disposeStudioFur } from "./asse
 import { createRulerReference, getRulerSideOffset } from "./assets/js/ruler-reference.js?v=20261003-catalog-sheet-ruler-v11";
 import { pointInPlacementFrame, placementInWorld, sampleAxialProfileRadius } from "./assets/js/decal-placement.js?v=20260930-login-page-v11";
 import { buildViewerProductSummary, resolveRosebudsProductLink } from "./assets/js/rosebuds-product-link.js?v=20261016";
+import { engravingFromParams, engravingToParams, normalizeEngraving, engravingCanvas } from "./assets/js/engraving.js?v=20261103";
+let engravingSettings = engravingFromParams(new URLSearchParams(location.search));
 
 const canvas = document.querySelector("#jewel-canvas");
 const loaderEl = document.querySelector("#loader");
@@ -7912,10 +7914,13 @@ async function captureQuoteProduct() {
   const bounds = getVisibleMeshBox(root);
   const metalBox = getModelMeshBox(root, child => !["gem", "bronze"].includes(child.userData?.classicPlugRole));
   const ornamentBox = getModelMeshBox(root, child => ["gem", "bronze"].includes(child.userData?.classicPlugRole));
-  const front = !ornamentBox.isEmpty() && !metalBox.isEmpty()
+  let front = !ornamentBox.isEmpty() && !metalBox.isEmpty()
     ? ornamentBox.getCenter(new THREE.Vector3()).sub(metalBox.getCenter(new THREE.Vector3()))
     : new THREE.Vector3(1, 0, 1);
   if (front.lengthSq() < 0.000001) front.set(1, 0, 1);
+  if(engravingSettings.enabled) root.traverse(child=>{
+    if(child.userData.personalizedEngraving) front=placementInWorld(child.stemDecalPlacement,child.stemDecalFrameWorld,child.stemDecalModel.matrixWorld).normal;
+  });
   return watermarkPngBlob(await captureQuotePreview({ renderer, scene, model: root, bounds, front, excluded: [scaleReferenceGroup] }));
 }
 
@@ -8194,6 +8199,7 @@ function wireInterface() {
     begin: startStemDecalDrag,
     move: handleStemDecalPointerMove,
     finish: finishStemDecalDrag,
+    onContext: (event, hit) => { if(hit.object.userData.personalizedEngraving) showEngravingContextMenu(event); },
     immediate: () => document.querySelector("#decal-edit-mode")?.checked === true,
     lock: () => {
       canvasPointerStart = null;
@@ -8237,7 +8243,7 @@ function wireInterface() {
   const requestViewerQuote = async () => {
     if (!currentViewerConfiguration) { showNotice("Attendez le chargement de la configuration."); return; }
     try {
-      const { openQuoteForm } = await import("./assets/js/contact-form.js?v=20261030-rich");
+      const { openQuoteForm } = await import("./assets/js/contact-form.js?v=20261103");
       await openQuoteForm({ configuration: currentViewerConfiguration, capture: captureQuoteProduct });
     } catch { showNotice("Le formulaire de devis n’a pas pu s’ouvrir."); }
   };
@@ -11226,6 +11232,7 @@ function removeStemDecals(model) {
     if (stemDecalDragState?.decal === child || selectedStemDecal === child) stemDecalGesture?.cancel();
     if (selectedStemDecal === child) clearStemDecalSelection();
     child.geometry?.dispose?.();
+    if (child.userData.personalizedEngraving) child.material?.map?.dispose();
     child.material?.dispose?.();
     child.parent?.remove(child);
   });
@@ -11659,7 +11666,8 @@ function selectStemDecal(hit) {
   scene.add(stemDecalSelectionHelper);
   renderer.domElement.classList.add("is-decal-selected");
   const modelId = selectedStemDecal.userData.decalModelId;
-  document.querySelector("#selected-object-name").textContent = `Logo ROSEBUDS - ${modelDefaults[modelId]?.title || modelId}`;
+  document.querySelector("#selected-object-name").textContent = selectedStemDecal.userData.personalizedEngraving
+    ? `Gravure : ${engravingSettings.text}` : `Logo ROSEBUDS - ${modelDefaults[modelId]?.title || modelId}`;
 }
 
 function syncStemDecalEditMode() {
@@ -11719,14 +11727,18 @@ function handleStemDecalPointerMove(event) {
 function finishStemDecalDrag(persist = true) {
   if (!stemDecalDragState) return;
   const { decal, initial } = stemDecalDragState;
-  const saved = persist && writeStoredStemDecalPosition(decal.userData?.decalModelId, decal.stemDecalPlacement);
+  let saved = false;
+  if(persist && decal.userData.personalizedEngraving) {
+    engravingSettings = normalizeEngraving({...engravingSettings, axialRatio:decal.stemDecalPlacement.axialRatio,angle:decal.stemDecalPlacement.angle});
+    syncEngravingConfiguration();saved=true;
+  } else if(persist) saved = writeStoredStemDecalPosition(decal.userData?.decalModelId, decal.stemDecalPlacement);
   if (!persist) {
     setStemDecalPlacementCoordinates(decal.stemDecalPlacement, initial.axialRatio, initial.angle);
     rebuildStemDecalGeometry(decal);
   }
   renderer.domElement.classList.remove("is-decal-dragging");
   stemDecalDragState = null;
-  if (persist) showNotice(saved ? "Position du logo mémorisée pour ce plug." : "Position modifiée ; stockage du navigateur indisponible.");
+  if (persist) showNotice(decal.userData.personalizedEngraving ? "Position de la gravure mise à jour." : saved ? "Position du logo mémorisée pour ce plug." : "Position modifiée ; stockage du navigateur indisponible.");
 }
 
 function resetCurrentStemDecalPosition() {
@@ -11808,6 +11820,7 @@ function addStemDecalToClassicPlug(model, meshOptions = {}) {
   decal.userData.ignoreRaycastSelection = true;
   decal.renderOrder = 82;
   model.add(decal);
+  addPersonalizedEngraving(model, decal).catch(error=>showNotice(error.message));
   logDebug("decal", "Decalcomanie ROSEBUDS projetee sur la tige metal", {
     target: targetEntry.mesh.name || targetEntry.mesh.material?.name || "metal",
     vertices: geometry.attributes.position.count,
@@ -11820,6 +11833,80 @@ function addStemDecalToClassicPlug(model, meshOptions = {}) {
     bins: placement.binRange,
   });
 }
+const engravingJobs = new WeakMap();
+async function addPersonalizedEngraving(model, logo) {
+  const token = {};
+  engravingJobs.set(model, token);
+  if(!engravingSettings.enabled) return;
+  const canvas = await engravingCanvas(engravingSettings.text);
+  if(engravingJobs.get(model)!==token || !logo.parent) return;
+  const placement = Object.fromEntries(Object.entries(logo.stemDecalPlacement).map(([key,value])=>[key,value?.clone ? value.clone() : value]));
+  // Use the opposite radial side of the logo, in the same cylindrical frame.
+  setStemDecalPlacementCoordinates(placement, engravingSettings.axialRatio ?? placement.axialRatio,
+    engravingSettings.angle ?? placement.angle + Math.PI);
+  const texture = new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
+  const material = createStemDecalMaterial();material.name='Gravure personnalisee';material.map=texture;
+  const decal = new THREE.Mesh(new THREE.BufferGeometry(),material);
+  decal.name=`Gravure : ${engravingSettings.text}`;
+  decal.userData={...logo.userData,personalizedEngraving:true,engravingText:engravingSettings.text};
+  decal.stemDecalModel=model;decal.stemDecalTarget=logo.stemDecalTarget;
+  decal.stemDecalPlacement=placement;decal.stemDecalFrameWorld=logo.stemDecalFrameWorld.clone();decal.renderOrder=83;
+  if(!rebuildStemDecalGeometry(decal)) {decal.geometry.dispose();texture.dispose();material.dispose();throw Error('La gravure ne peut pas etre projetee sur cette tige.');}
+  for(const old of [...model.children].filter(child=>child.userData.personalizedEngraving)) {
+    if(selectedStemDecal===old) clearStemDecalSelection();
+    old.geometry.dispose();old.material.map?.dispose();old.material.dispose();model.remove(old);
+  }
+  model.add(decal);
+}
+
+function syncEngravingConfiguration() {
+  const params=engravingToParams(new URLSearchParams(location.search),engravingSettings);
+  history.replaceState(null,'',`${location.pathname}?${params}`);
+  if(currentViewerConfiguration) currentViewerConfiguration.personalization={...engravingSettings};
+}
+
+async function refreshPersonalizedEngraving() {
+  const logos=[];
+  root.traverse(child=>{if(child.isMesh && child.userData.stemDecal && !child.userData.personalizedEngraving) logos.push(child);});
+  await Promise.all(logos.map(logo=>addPersonalizedEngraving(logo.stemDecalModel,logo)));
+}
+
+let engravingMenu, engravingDialog;
+function showEngravingContextMenu(event) {
+  if(!engravingMenu) {
+    engravingMenu=document.createElement('div');engravingMenu.className='engraving-context';engravingMenu.setAttribute('role','menu');
+    engravingMenu.innerHTML='<button type="button" role="menuitem">Modifier la gravure…</button>';
+    engravingMenu.querySelector('button').onclick=()=>{engravingMenu.hidden=true;openEngravingEditor();};
+    document.body.append(engravingMenu);
+    window.addEventListener('pointerdown',e=>{if(!engravingMenu.contains(e.target))engravingMenu.hidden=true;});
+    window.addEventListener('keydown',e=>{if(e.key==='Escape')engravingMenu.hidden=true;});
+  }
+  engravingMenu.hidden=false;engravingMenu.style.left=`${Math.max(8,Math.min(event.clientX,innerWidth-240))}px`;
+  engravingMenu.style.top=`${Math.max(8,Math.min(event.clientY,innerHeight-55))}px`;
+  engravingMenu.querySelector('button').focus();
+}
+function openEngravingEditor() {
+  if(!engravingDialog) {
+    engravingDialog=document.createElement('dialog');engravingDialog.className='engraving-dialog';
+    engravingDialog.setAttribute('aria-labelledby','engraving-editor-title');
+    engravingDialog.innerHTML='<form><h2 id="engraving-editor-title">Modifier la gravure</h2><label>Prénom ou mot<input name="engraving" required maxlength="24" autocomplete="off"></label><p role="status"></p><div><button type="button" data-cancel>Annuler</button><button type="submit">Valider</button></div></form>';
+    engravingDialog.querySelector('[data-cancel]').onclick=()=>engravingDialog.close();
+    engravingDialog.querySelector('form').onsubmit=async event=>{
+      event.preventDefault();const button=engravingDialog.querySelector('[type=submit]');button.disabled=true;
+      try {
+        const next=normalizeEngraving({...engravingSettings,enabled:true,text:engravingDialog.querySelector('input').value});
+        const before=engravingSettings;engravingSettings=next;
+        try {await refreshPersonalizedEngraving();} catch(error){engravingSettings=before;await refreshPersonalizedEngraving();throw error;}
+        syncEngravingConfiguration();engravingDialog.close();showNotice('Gravure mise à jour.');
+      } catch(error){engravingDialog.querySelector('[role=status]').textContent=error.message;}
+      finally {button.disabled=false;}
+    };
+    document.body.append(engravingDialog);
+  }
+  engravingDialog.querySelector('input').value=engravingSettings.text;
+  engravingDialog.querySelector('[role=status]').textContent='';engravingDialog.showModal();engravingDialog.querySelector('input').focus();
+}
+
 function getClassicPlugEntryMaterials(entry) {
   return Array.isArray(entry?.mesh?.material) ? entry.mesh.material.filter(Boolean) : [entry?.mesh?.material].filter(Boolean);
 }
@@ -14492,6 +14579,7 @@ function startJewelryConfigurator() {
     .then(() => loadInitialModelFromUrl())
     .then(() => applyWelcomeLaunchConfiguration(launchParams))
     .then(() => groundCurrentPlug())
+    .then(() => framePersonalizedEngraving())
     .then(() => applyThumbnailCaptureComposition(launchParams))
     .then(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))))
     .then(() => {
@@ -14587,9 +14675,11 @@ async function updateViewerProductInformation(params, meta, overrides = {}) {
     metalFinish,
     ornament: params.get("ornament") || (meta.ornamentFamilies.includes("crystal") ? "crystal" : meta.ornamentFamilies[0] || "none"),
     ornamentFinish: params.get("ornamentFinish") || "",
+    personalization: {...engravingSettings},
   };
   const summary = document.querySelector("#viewer-product-summary");
   Object.assign(configuration, overrides);
+  if(engravingSettings.enabled) configuration.forceCustom=true;
   configuration.metalFinish = settings.metalPreset;
   configuration.metalFamily = settings.metalPreset.startsWith("aluminum-") ? "alu" : "inox";
   currentViewerConfiguration = configuration;
@@ -14655,6 +14745,32 @@ async function applyWelcomeLaunchConfiguration(params) {
     applyCatalogGemPreset(ornamentFamily, ornamentFinish, { reason: "configuration accueil" });
   }
   await updateViewerProductInformation(params, meta);
+  if(engravingSettings.enabled) {
+    await refreshPersonalizedEngraving().catch(error=>showNotice(error.message));
+  }
+}
+
+function framePersonalizedEngraving() {
+  if (!engravingSettings.enabled) return;
+  let engraving;
+  root.traverse(child => { if (!engraving && child.userData.personalizedEngraving) engraving = child; });
+  if (!engraving) return;
+  const getPlacement = () => placementInWorld(engraving.stemDecalPlacement, engraving.stemDecalFrameWorld, engraving.stemDecalModel.matrixWorld);
+  let placement = getPlacement();
+  // Present the engraved side above the studio floor without moving it relative to the logo.
+  if (placement.normal.y < 0) {
+    root.rotateOnWorldAxis(placement.axis, Math.PI);
+    groundCurrentPlug();
+    placement = getPlacement();
+  }
+  const center = getVisibleMeshBox(root).getCenter(new THREE.Vector3());
+  const distance = camera.position.distanceTo(controls.target);
+  const direction = placement.normal.clone().addScaledVector(placement.axis, .25);
+  direction.y = Math.max(direction.y, .22);
+  camera.position.copy(center).addScaledVector(direction.normalize(), distance);
+  controls.target.copy(center);
+  controls.update();
+  updateStudioStage();
 }
 
 window.addEventListener("pagehide", () => {

@@ -1,6 +1,8 @@
+import {normalizeEngraving} from './engraving.js?v=20261103';
 export const QUOTE_RECIPIENT = "info@rosebuds.net";
 export const QUOTE_SUBJECT = "Demande de devis — Produit Rosebuds personnalisé";
 export function configurationRows(c = {}) {
+  const personalization=normalizeEngraving(c.personalization);
   const metal = c.metalDisplay || ({alu:"Aluminium",inox:"Stainless steel"})[c.metalFamily] || c.metalFamily;
   const finishes = {"stainless-mirror-silver":"Poli miroir","stainless-flash-gold-1-micron":"Flash or 1 micron",
     "aluminum-black":"Black","aluminum-red":"Red","aluminum-pink":"Pink","aluminum-violet":"Violet",
@@ -15,6 +17,7 @@ export function configurationRows(c = {}) {
     ["Finition du métal",c.metalFinishLabel || finishes[c.metalFinish] || c.metalFinish],
     ["Ornement",({crystal:"Cristal",gem:"Gemme",bronze:"Bronze","pressed-glass":"Verre pressé",none:"Sans ornement"})[c.ornament] || c.ornament],
     ["Type de bronze",c.bronzeType], ["Finition / couleur de l’ornement",c.ornamentFinish],
+    ...(personalization.enabled ? [["Personnalisation",personalization.angle == null ? 'Gravure côté opposé au logo' : 'Gravure positionnée dans la vue 3D'],["Texte à graver",personalization.text],["Police de gravure",personalization.font]] : []),
   ].filter(([,value])=>value !== undefined && value !== null && String(value).trim() !== "");
 }
 export function buildQuoteMessage(configuration, reference, viewerUrl) {

@@ -1,6 +1,6 @@
 export function attachDecalGesture(element, {
   hitTest, select, begin, move, finish, lock, unlock,
-  immediate = () => false, holdMs = 450, tolerance = 8,
+  immediate = () => false, onContext = () => {}, holdMs = 450, tolerance = 8,
   schedule = (callback, delay) => setTimeout(callback, delay),
   unschedule = (timer) => clearTimeout(timer),
   frame = (callback) => requestAnimationFrame(callback),
@@ -71,7 +71,8 @@ export function attachDecalGesture(element, {
     if (event.pointerId === state.id) end(event.type === "pointerup");
   };
   const context = (event) => {
-    if (state || hitTest(event)) consume(event);
+    const hit = hitTest(event);
+    if (state || hit) { consume(event); if (event.type === 'contextmenu' && hit) onContext(event, hit); }
   };
   const key = (event) => { if (event.key === "Escape" && state) { consume(event); end(false); } };
   const listeners = { pointerdown: down, pointermove: drag, pointerup: up, pointercancel: up, lostpointercapture: up, contextmenu: context, dblclick: context, keydown: key };
