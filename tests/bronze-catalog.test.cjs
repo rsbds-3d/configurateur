@@ -41,7 +41,10 @@ assert(fs.existsSync(path.join(root, "assets/models/plugs/bronzes/hibou-referenc
 assert(welcome.includes('id: "hibou"'));
 for (const [id] of variants) {
   assert(html.includes(`value="${id.replace(/keyring$/, "hibou")}"`), `Variante Hibou manquante : ${id}`);
+  assert(html.includes(`value="${id.replace(/keyring$/, "griffin-door-knocker")}"`), `Variante Griffin manquante : ${id}`);
 }
+assert(fs.existsSync(path.join(root, "assets/models/plugs/bronzes/griffin-door-knocker-reference-26-8.3dm")));
+assert(welcome.includes('id: "griffin-door-knocker"'));
 
 assert(app.includes('classicPlugRole = "bronze"'), "Le bronze doit avoir un rôle distinct du métal et des pierres.");
 assert(app.includes('const scale = target / reference;'), "Le bronze doit suivre la même loi d'échelle dimensionnelle que l'ornement principal.");

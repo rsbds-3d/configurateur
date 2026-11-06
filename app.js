@@ -1003,7 +1003,8 @@ const modelDefaults = {
 const CLASSIC_BRONZE_KEYRING_SOURCE = "./assets/models/plugs/bronzes/keyring-reference-26-8.3dm?v=20260930-bronze-keyring-v11";
 const classicBronzeTypes = [
   { id: "keyring", label: "Keyring", url: CLASSIC_BRONZE_KEYRING_SOURCE },
-  { id: "hibou", label: "Hibou", url: "./assets/models/plugs/bronzes/hibou-reference-26-8.3dm?v=20261106" },
+  { id: "hibou", label: "Hibou", url: "./assets/models/plugs/bronzes/hibou-reference-26-8.3dm?v=20261106", seatBothDirections: true, rotationX: -Math.PI / 2 },
+  { id: "griffin-door-knocker", label: "Griffin Door Knocker", url: "./assets/models/plugs/bronzes/griffin-door-knocker-reference-26-8.3dm?v=20261106", seatBothDirections: true, preserveRadialOrigin: true, rotationX: -Math.PI / 2 },
 ];
 const classicBronzeKeyringVariants = [
   ["plug-classique-large-35-keyring", "plug-classique-large-35", "LARGE 35", 27],
@@ -1039,6 +1040,9 @@ classicBronzeTypes.forEach(bronze => classicBronzeKeyringVariants.forEach(([keyr
       bronzeUrl: bronze.url,
       bronzeLabel: bronze.label,
       bronzeType: bronze.id,
+      bronzeSeatBothDirections: bronze.seatBothDirections,
+      bronzePreserveRadialOrigin: bronze.preserveRadialOrigin,
+      bronzeRotationX: bronze.rotationX,
       bronzeReferenceDiameterMm: 26.8,
       bronzeTargetDiameterMm: targetDiameterMm,
     },
@@ -4800,6 +4804,11 @@ async function composeRhinoBronzeOrnament(object, meshOptions = {}, onProgress) 
   const ornament = await loadRawRhinoObject(meshOptions.bronzeUrl, onProgress);
   ornament.updateWorldMatrix(true, true);
   const ornamentCenter = getVisibleMeshBox(ornament).getCenter(new THREE.Vector3());
+  if (meshOptions.bronzePreserveRadialOrigin) {
+    // The hanging ring is asymmetric; the Rhino origin centers the mounting plate.
+    ornamentCenter.y = 0;
+    ornamentCenter.z = 0;
+  }
   const bronzeGroup = new THREE.Group();
   bronzeGroup.name = `Bronze ${meshOptions.bronzeLabel} replacement group`;
   bronzeGroup.position.copy(replacementCenter);
@@ -4809,13 +4818,14 @@ async function composeRhinoBronzeOrnament(object, meshOptions = {}, onProgress) 
       child.updateMatrix();
       child.geometry.applyMatrix4(child.matrix);
       child.geometry.translate(-ornamentCenter.x, -ornamentCenter.y, -ornamentCenter.z);
+      if (meshOptions.bronzeRotationX) child.geometry.rotateX(meshOptions.bronzeRotationX);
       child.position.set(0, 0, 0);
       child.rotation.set(0, 0, 0);
       child.scale.set(1, 1, 1);
       child.updateMatrix();
       child.name = `Bronze ${meshOptions.bronzeLabel} reference ${meshOptions.bronzeReferenceDiameterMm} mm`;
       child.userData.classicPlugRole = "bronze";
-      child.userData.seatBronzeBothDirections = meshOptions.bronzeType === "hibou";
+      child.userData.seatBronzeBothDirections = Boolean(meshOptions.bronzeSeatBothDirections);
     }
     bronzeGroup.add(child);
   });

@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const VIEWER_VERSION = "20261106-engraving-fonts-v11";
+  const VIEWER_VERSION = "20261106-bronze-griffin-v11";
   function acceptPromptSuggestion(event, field) {
     if (event.key !== "Tab" || event.shiftKey || event.ctrlKey || event.altKey || event.metaKey || field.value.trim()) return;
     const suggestion = field.placeholder.replace(/^Exemple\s*:\s*/i, "").trim();
@@ -136,7 +136,7 @@
     "plug-classique-xxxl-80-keyring",
     "plug-classique-xxxl-90-keyring",
     "plug-classique-xxxl-100-keyring",
-  ].flatMap(id => [id, id.replace(/keyring$/, "hibou")]));
+  ].flatMap(id => ["keyring", "hibou", "griffin-door-knocker"].map(type => id.replace(/keyring$/, type))));
   const params = new URLSearchParams(window.location.search);
 
   if (window.location.protocol === "file:") {
@@ -325,6 +325,12 @@
         id: "hibou",
         label: "Hibou",
         description: "Bronze Hibou de référence Ø 26,8 mm, adapté au diamètre de chaque taille de plug.",
+        visual: "ornament-bronze",
+      },
+      {
+        id: "griffin-door-knocker",
+        label: "Griffin Door Knocker",
+        description: "Bronze au griffon avec anneau, adapté au diamètre de chaque taille de plug.",
         visual: "ornament-bronze",
       },
     ];
@@ -1016,7 +1022,7 @@
   }
 
   function getBronzeType(id) {
-    return CLASSIC_BRONZE_MODELS.has(id) ? id.split("-").at(-1) : "";
+    return CLASSIC_BRONZE_MODELS.has(id) ? id.match(/-(keyring|hibou|griffin-door-knocker)$/)?.[1] || "" : "";
   }
 
   function matchesClassicHead(model, family, head) {
