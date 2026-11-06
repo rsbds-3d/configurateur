@@ -1,5 +1,5 @@
-import {configurationRows} from "./contact-model.js?v=20261103";
-import {buildPublicViewerUrl} from "./contact-formsubmit.js?v=20261103";
+import {configurationRows} from "./contact-model.js?v=20261106-fonts";
+import {buildPublicViewerUrl} from "./contact-formsubmit.js?v=20261106-fonts";
 import {quoteMessageHtml} from "./quote-message-html.js?v=20261030-rich";
 
 export const EMAILJS_ENDPOINT = "https://api.emailjs.com/api/v1.0/email/send";

@@ -2696,7 +2696,8 @@ body:has(.controls.is-collapsed) .viewer-actions {
 .engraving-dialog::backdrop { background: #0008; }
 .engraving-dialog h2 { font-size: 22px; margin: 0 0 20px; }
 .engraving-dialog label { display: grid; gap: 8px; }
-.engraving-dialog input { width: 100%; box-sizing: border-box; padding: 10px; border: 1px solid #aaa; font-size: 18px; }
+.engraving-dialog input, .engraving-dialog select { width: 100%; min-width: 0; box-sizing: border-box; padding: 10px; border: 1px solid #aaa; font-size: 16px; }
+.engraving-dialog label + label { margin-top: 12px; }
 .engraving-dialog form > div { display: flex; justify-content: flex-end; gap: 12px; }
 .engraving-dialog button { padding: 10px 16px; border: 1px solid #ccc; background: #fff; color: #38383b; }
 .engraving-dialog button[type=submit] { background: #38383b; color: #fff; }

@@ -30,7 +30,7 @@ import { createStudioFur, createFurAlphaTexture, disposeStudioFur } from "./asse
 import { createRulerReference, getRulerSideOffset } from "./assets/js/ruler-reference.js?v=20261003-catalog-sheet-ruler-v11";
 import { pointInPlacementFrame, placementInWorld, sampleAxialProfileRadius } from "./assets/js/decal-placement.js?v=20260930-login-page-v11";
 import { buildViewerProductSummary, resolveRosebudsProductLink } from "./assets/js/rosebuds-product-link.js?v=20261016";
-import { engravingFromParams, engravingToParams, normalizeEngraving, engravingCanvas } from "./assets/js/engraving.js?v=20261103";
+import { engravingFromParams, engravingToParams, normalizeEngraving, engravingCanvas, populateEngravingFonts } from "./assets/js/engraving.js?v=20261106-fonts";
 let engravingSettings = engravingFromParams(new URLSearchParams(location.search));
 
 const canvas = document.querySelector("#jewel-canvas");
@@ -8249,7 +8249,7 @@ function wireInterface() {
   const requestViewerQuote = async () => {
     if (!currentViewerConfiguration) { showNotice("Attendez le chargement de la configuration."); return; }
     try {
-      const { openQuoteForm } = await import("./assets/js/contact-form.js?v=20261103");
+      const { openQuoteForm } = await import("./assets/js/contact-form.js?v=20261106-fonts");
       await openQuoteForm({ configuration: currentViewerConfiguration, capture: captureQuoteProduct });
     } catch { showNotice("Le formulaire de devis n’a pas pu s’ouvrir."); }
   };
@@ -11844,7 +11844,7 @@ async function addPersonalizedEngraving(model, logo) {
   const token = {};
   engravingJobs.set(model, token);
   if(!engravingSettings.enabled) return;
-  const canvas = await engravingCanvas(engravingSettings.text);
+  const canvas = await engravingCanvas(engravingSettings.text, engravingSettings.font);
   if(engravingJobs.get(model)!==token || !logo.parent) return;
   const placement = Object.fromEntries(Object.entries(logo.stemDecalPlacement).map(([key,value])=>[key,value?.clone ? value.clone() : value]));
   // Use the opposite radial side of the logo, in the same cylindrical frame.
@@ -11895,12 +11895,12 @@ function openEngravingEditor() {
   if(!engravingDialog) {
     engravingDialog=document.createElement('dialog');engravingDialog.className='engraving-dialog';
     engravingDialog.setAttribute('aria-labelledby','engraving-editor-title');
-    engravingDialog.innerHTML='<form><h2 id="engraving-editor-title">Modifier la gravure</h2><label>Prénom ou mot<input name="engraving" required maxlength="24" autocomplete="off"></label><p role="status"></p><div><button type="button" data-cancel>Annuler</button><button type="submit">Valider</button></div></form>';
+    engravingDialog.innerHTML='<form><h2 id="engraving-editor-title">Modifier la gravure</h2><label>Prénom ou mot<input name="engraving" required maxlength="24" autocomplete="off"></label><label>Police de gravure<select name="font" required></select></label><p role="status"></p><div><button type="button" data-cancel>Annuler</button><button type="submit">Valider</button></div></form>';
     engravingDialog.querySelector('[data-cancel]').onclick=()=>engravingDialog.close();
     engravingDialog.querySelector('form').onsubmit=async event=>{
       event.preventDefault();const button=engravingDialog.querySelector('[type=submit]');button.disabled=true;
       try {
-        const next=normalizeEngraving({...engravingSettings,enabled:true,text:engravingDialog.querySelector('input').value});
+        const next=normalizeEngraving({...engravingSettings,enabled:true,text:engravingDialog.querySelector('input').value,font:engravingDialog.querySelector('select').value});
         const before=engravingSettings;engravingSettings=next;
         try {await refreshPersonalizedEngraving();} catch(error){engravingSettings=before;await refreshPersonalizedEngraving();throw error;}
         syncEngravingConfiguration();engravingDialog.close();showNotice('Gravure mise à jour.');
@@ -11910,6 +11910,7 @@ function openEngravingEditor() {
     document.body.append(engravingDialog);
   }
   engravingDialog.querySelector('input').value=engravingSettings.text;
+  populateEngravingFonts(engravingDialog.querySelector('select'),engravingSettings.font,engravingDialog.querySelector('input'));
   engravingDialog.querySelector('[role=status]').textContent='';engravingDialog.showModal();engravingDialog.querySelector('input').focus();
 }
 

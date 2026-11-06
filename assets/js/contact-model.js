@@ -1,4 +1,4 @@
-import {normalizeEngraving} from './engraving.js?v=20261103';
+import {normalizeEngraving} from './engraving.js?v=20261106-fonts';
 export const QUOTE_RECIPIENT = "info@rosebuds.net";
 export const QUOTE_SUBJECT = "Demande de devis — Produit Rosebuds personnalisé";
 export function configurationRows(c = {}) {

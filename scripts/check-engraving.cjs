@@ -26,8 +26,18 @@ const {chromium} = require('C:/Users/charl/.cache/codex-runtimes/codex-primary-r
     const page = await browser.newPage({viewport:{width:1150,height:760}});
     const errors=[];page.on('pageerror',error=>{errors.push(error.message);console.error(error);});
     page.on('console',message=>{if(message.type()==='error')console.error(message.text());});
-    const query=new URLSearchParams({viewer:'1',catalogModel:'plug-new-small-cristal',modelFamily:'NEW SMALL',plugSize:'SMALL-25',metalFamily:'inox',metalFinish:'stainless-mirror-silver',ornament:'crystal',ornamentFinish:'Aurore Boreale',personalization:'1',engravingText:'Élodie'});
-    await page.goto('http://127.0.0.1:'+server.address().port+'/?'+query);
+    await page.goto('http://127.0.0.1:'+server.address().port+'/');
+    await page.locator('[data-key="family"][data-value="NEW SMALL"]').click();
+    for(const key of ['plugSize','crystalSize','metal','metalFinish','ornament','ornamentFinish']) {
+      await page.locator(`[data-welcome-choice][data-key="${key}"]`).first().click();
+    }
+    await page.locator('#personalization-enabled').check();
+    await page.locator('#personalization-text').fill('Élodie');
+    await page.locator('#personalization-font').selectOption('sansita-swashed');
+    await page.waitForFunction(()=>document.querySelector('#personalization-text').style.fontFamily.includes('Rosebuds-sansita-swashed'));
+    await page.screenshot({path:path.join(output,'catalogue-font.png')});
+    await page.locator('[data-open-model="plug-new-small-cristal"]').first().click();
+    await page.waitForURL(url=>url.searchParams.get('engravingFont')==='sansita-swashed');
     await page.waitForFunction(()=>document.body.dataset.viewerReady==='true' && window.__engravingTest,{},{timeout:90000});
     const inspect=()=>page.evaluate(()=>{
       const {root,camera,placementInWorld,configuration}=window.__engravingTest;
@@ -42,17 +52,21 @@ const {chromium} = require('C:/Users/charl/.cache/codex-runtimes/codex-primary-r
     const initial=await inspect();console.log(JSON.stringify(initial));
     assert.equal(initial.items.length,1);
     assert.equal(initial.items[0].text,'Élodie');
+    assert.equal(initial.configuration.font,'Sansita Swashed');
     assert(initial.items[0].vertices>0);
     assert(initial.items[0].facing>.5 && initial.items[0].camera[1]>0);
     await page.screenshot({path:path.join(output,'desktop.png')});
     await page.mouse.click(initial.items[0].x,initial.items[0].y,{button:'right'});
     await page.getByRole('menuitem',{name:'Modifier la gravure…'}).click({timeout:5000});
     await page.getByRole('textbox',{name:'Prénom ou mot'}).fill('Maël');
+    await page.getByRole('combobox',{name:'Police de gravure'}).selectOption('nickainley');
     await page.getByRole('button',{name:'Valider',exact:true}).click();
     await page.waitForFunction(()=>new URL(location.href).searchParams.get('engravingText')==='Maël');
     const edited=await inspect();
     assert.equal(edited.items[0].text,'Maël');
     assert.equal(edited.configuration.text,'Maël');
+    assert.equal(edited.configuration.font,'Nickainley Normal');
+    assert.equal(new URL(page.url()).searchParams.get('engravingFont'),'nickainley');
     await page.mouse.move(edited.items[0].x,edited.items[0].y);
     await page.mouse.down();
     await page.mouse.move(edited.items[0].x+18,edited.items[0].y+3,{steps:6});
@@ -63,6 +77,7 @@ const {chromium} = require('C:/Users/charl/.cache/codex-runtimes/codex-primary-r
     await page.setViewportSize({width:1150,height:760});
     await page.locator('#viewer-product-link').click();
     await page.locator('td:visible').filter({hasText:/^Maël$/}).waitFor({timeout:10000});
+    await page.locator('td:visible').filter({hasText:/^Nickainley Normal$/}).waitFor({timeout:10000});
     assert.deepEqual(errors,[]);
     console.log('Engraving projected, edited and persisted.');
   } finally {

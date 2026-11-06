@@ -882,5 +882,7 @@ button {
 #personalization-fields { max-width: 420px; margin-top: 16px; }
 #personalization-fields[hidden] { display: none; }
 #personalization-fields label { display: block; margin-bottom: 8px; }
+#personalization-fields label[for="personalization-font"] { margin-top: 12px; }
+#personalization-font { width: 100%; min-width: 0; padding: 10px; font: inherit; border: 1px solid #aaa; background: #fff; color: #222; }
 #personalization-text { box-sizing: border-box; width: 100%; border: 1px solid #aaa; padding: 10px 12px; font: 24px 'Rosebuds Engraving',Arial,sans-serif; }
 #personalization-error { color: #a31828; font-size: 14px; }

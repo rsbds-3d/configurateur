@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const VIEWER_VERSION = "20261106-bronze-hibou-v11";
+  const VIEWER_VERSION = "20261106-engraving-fonts-v11";
   function acceptPromptSuggestion(event, field) {
     if (event.key !== "Tab" || event.shiftKey || event.ctrlKey || event.altKey || event.metaKey || field.value.trim()) return;
     const suggestion = field.placeholder.replace(/^Exemple\s*:\s*/i, "").trim();
@@ -592,6 +592,9 @@
 
     const personalizationToggle=document.querySelector('#personalization-enabled');
     const personalizationText=document.querySelector('#personalization-text');
+    const personalizationFont=document.querySelector('#personalization-font');
+    const engravingModule=()=>import('./assets/js/engraving.js?v=20261106-fonts');
+    engravingModule().then(({populateEngravingFonts})=>populateEngravingFonts(personalizationFont,undefined,personalizationText)).catch(console.error);
     personalizationToggle?.addEventListener('change',()=>{
       document.querySelector('#personalization-fields').hidden=!personalizationToggle.checked;
       personalizationText.required=personalizationToggle.checked;
@@ -722,9 +725,9 @@
       url.searchParams.set("metalFinish", resolved.metalFinish);
       url.searchParams.set("ornament", resolved.ornament);
       url.searchParams.set("ornamentFinish", resolved.ornamentFinish);
-      const {normalizeEngraving,engravingToParams}=await import('./assets/js/engraving.js?v=20261103');
       try {
-        const personalization=normalizeEngraving({enabled:personalizationToggle?.checked,text:personalizationText?.value});
+        const {normalizeEngraving,engravingToParams}=await engravingModule();
+        const personalization=normalizeEngraving({enabled:personalizationToggle?.checked,text:personalizationText?.value,font:personalizationFont?.value});
         engravingToParams(url.searchParams,personalization);
       } catch(error) {document.querySelector('#personalization-error').textContent=error.message;personalizationText.focus();return;}
       window.location.assign(url.toString());

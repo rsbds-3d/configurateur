@@ -1,5 +1,5 @@
-import {configurationRows} from "./contact-model.js?v=20261103";
-import {engravingToParams} from './engraving.js?v=20261103';
+import {configurationRows} from "./contact-model.js?v=20261106-fonts";
+import {engravingToParams} from './engraving.js?v=20261106-fonts';
 
 export const FORMSUBMIT_ENDPOINT = "https://formsubmit.co/ajax/info@rosebuds.net";
 export function buildPublicViewerUrl(configuration = {}) {
